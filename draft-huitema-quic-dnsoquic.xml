@@ -6,7 +6,7 @@
    'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1035.xml'>
 
 
-<!ENTITY rfc7042 PUBLIC ''  
+<!ENTITY rfc7626 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7626.xml"> 
  
 <!ENTITY rfc7858 PUBLIC ''  
@@ -111,11 +111,11 @@ Thanks to our wide cast of supporters.
 
 <back>
 
-<references title="Informative References">
+<references title="Normative References">
        &rfc1033;
        &rfc1035;
        &rfc7858;
-</reference>
+</references>
 <references title="Informative References">
       &rfc7626;
 </references>  
