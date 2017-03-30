@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [<!ENTITY rfc1033 PUBLIC ''
-   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1033.xml'>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+
+<!ENTITY rfc1034 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1034.xml'>
+
 <!ENTITY rfc1035 PUBLIC ''
    'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1035.xml'>
-
 
 <!ENTITY rfc7626 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7626.xml"> 
  
 <!ENTITY rfc7858 PUBLIC ''  
-   "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7824.xml"> 
+   "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7858.xml"> 
+
+<!ENTITY I-D.hamilton-quic-transport-protocol PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.hamilton-quic-transport-protocol.xml"> 
+
+<!ENTITY I-D.thomson-quic-tls PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.thomson-quic-tls.xml"> 
+
+<!ENTITY I-D.shade-quic-http2-mapping PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.shade-quic-http2-mapping.xml"> 
+
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -75,14 +87,107 @@
 <middle>
 <section title="Introduction">
 <t>
-TBD
+Domain Name System (DNS) concepts are specified in <xref target="RFC1034" /> and implementation 
+in <xref target="RFC1035" />.
+QUIC transport is specified in <xref target="I-D.hamilton-quic-transport-protocol" />.
+QUIC connection setup includes the negotiation of security parameters using TLS, as specified in
+<xref target="I-D.thomson-quic-tls" />.
+</t>
+<t>
+The DNS privacy issues are defined in <xref target="RFC7626"/>.  
+<xref target="RFC7858" /> defines how to mitigate these issues by transmitting DNS messages over TLS and TCP.
+We believe that transmitting DNS messages over QUIC will provide the same privacy protections as 
+<xref target="RFC7858" />, because QUIC provides faster connection set up than TLS over TCP, and also
+because traffic sent over QUIC will not experience the "head of queue blocking" issues inherent to TCP.
+</t>
+<t>
+Specifying the transmission of an application over QUIC requires to specify how the application messages are
+mapped to QUIC streams, and generally how the application will use QUIC. This is done for HTTP in 
+<xref target="I-D.shade-quic-http2-mapping" />. The 
+purpose of this document is to define the way DNS can be transmitted over QUIC.
 </t>
 </section>
 
 <section title="Design Considerations" >
 <t>
-TBD
+Domain Name Service 
 </t>
+<section title="Queries and streams" >
+<t>
+   A QUIC stream provides reliable in-order delivery of bytes, but makes
+   no guarantees about order of delivery with regard to bytes on other
+   streams.  On the wire, data is framed into QUIC STREAM frames, but
+   this framing is invisible to the HTTP framing layer.  A QUIC receiver
+   buffers and orders received STREAM frames, exposing the data
+   contained within as a reliable byte stream to the application.
+</t>
+<t>
+   Streams are identified by a stream ID. Clients can initiate streams with
+   odd numbers, servers can initiate streams with even numbers. Both 
+   parties can send data on streams initiated by the other party, such
+   as for example the client initiating a stream and sending a query
+   on that stream, and the server sending a response through the same
+   stream.
+</t>
+<t>
+   The simplest way to map DNS over QUIC would be to use exactly one stream,
+   probably stream 3. This stream would carry a series of messages, delimited
+   by a length field, much like DNS over TLS or DNS over TCP. The obvious
+   drawback is that QUIC's mitigation of "head of queue blocking" only
+   applies to data sent on multiple stream. Transmission
+   on the stream affected by the transmission error is blocked, but
+   transmission on the other streams can continue. If all data is sent on
+   a single stream, then processing on that stream's data will be suspended
+   until the error will be connected.
+</t>
+<t>
+   Another plausible mapping would be to have the client send each query on 
+   its own stream, and expect the answer to arrive on the same stream. This
+   design will take full advantage of QUIC's features. If a packet is loss,
+   the corresponding request or answer would have to be retransmitted, but
+   other queries would proceed in parallel. This will be very similar to
+   what happens with DNS over UDP, but without having the restriction on
+   message length inherent to UDP.
+</t>
+<t>
+   The mappings of HTTP over QUIC (<xref target="I-D.shade-quic-http2-mapping" />
+   use a different design, intermediate between
+   the "single stream for all messages" and "one stream per transaction" designs
+   described above. In the HTTP over QUIC mappings, the client sends all the
+   request headers over stream 3, together with a pointer to the stream that
+   will carry the request bodies from the client, and the responses from
+   the server. This allows the server to just wait on that
+   stream, and learn here about arrivals of queries from the client. The
+   advantage is that the server can then schedule processing of the request
+   and response according to various policies and priorities, and can also
+   control more tightly the usage of streams. There are two downsides. Using
+   a stream for request headers requires mechanisms to manage the relation between
+   header and body streams, which increases the complexity of the protocol.
+   Also, the header stream is exposed to head of queue blocking, which
+   somewhat reduces the performance of the protocol. 
+</t>
+<t>
+   DNS is a much simpler application than HTTP, and the additional compexity
+   of a separate stream for requests or headers does not appear justified. This
+   specification will adopt the "one stream per transaction" design. This
+   design assumes that the QUIC API provides a way for clients and servers to
+   be notified when a new stream is initiated by the peer.
+</t>
+<t>
+TODO: what about end of streams, versus messages?
+</t>
+<t>
+TODO: discussion of message lengths, explicit length versus implicit, e.g. by 
+end of stream.
+</t> 
+
+</section>
+<section title="Connections duration and tradeoffs" >
+</section>
+<section title="Authentication" >
+</section>
+<section title="Robustness and Denial of Service" >
+</section>
 </section>
 <section title="Specifications" >
 <t>
@@ -112,12 +217,15 @@ Thanks to our wide cast of supporters.
 <back>
 
 <references title="Normative References">
-       &rfc1033;
+       &rfc1034;
        &rfc1035;
-       &rfc7858;
+       &I-D.hamilton-quic-transport-protocol;
+       &I-D.thomson-quic-tls;
 </references>
 <references title="Informative References">
       &rfc7626;
+      &rfc7858;
+      &I-D.shade-quic-http2-mapping;
 </references>  
 
 </back>
