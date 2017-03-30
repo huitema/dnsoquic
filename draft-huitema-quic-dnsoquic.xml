@@ -14,14 +14,14 @@
 <!ENTITY rfc7858 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7858.xml"> 
 
-<!ENTITY I-D.hamilton-quic-transport-protocol PUBLIC ''  
-   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.hamilton-quic-transport-protocol.xml"> 
+<!ENTITY I-D.ietf-quic-transport PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-quic-transport.xml"> 
 
-<!ENTITY I-D.thomson-quic-tls PUBLIC ''  
-   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.thomson-quic-tls.xml"> 
+<!ENTITY I-D.ietf-quic-tls PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-quic-tls.xml"> 
 
-<!ENTITY I-D.shade-quic-http2-mapping PUBLIC ''  
-   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.shade-quic-http2-mapping.xml"> 
+<!ENTITY I-D.ietf-quic-http PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-quic-http.xml"> 
 
 ]>
 
@@ -89,9 +89,9 @@
 <t>
 Domain Name System (DNS) concepts are specified in <xref target="RFC1034" /> and implementation 
 in <xref target="RFC1035" />.
-QUIC transport is specified in <xref target="I-D.hamilton-quic-transport-protocol" />.
+QUIC transport is specified in <xref target="I-D.ietf-quic-transport" />.
 QUIC connection setup includes the negotiation of security parameters using TLS, as specified in
-<xref target="I-D.thomson-quic-tls" />.
+<xref target="I-D.ietf-quic-tls" />.
 </t>
 <t>
 The DNS privacy issues are defined in <xref target="RFC7626"/>.  
@@ -103,7 +103,7 @@ because traffic sent over QUIC will not experience the "head of queue blocking" 
 <t>
 Specifying the transmission of an application over QUIC requires to specify how the application messages are
 mapped to QUIC streams, and generally how the application will use QUIC. This is done for HTTP in 
-<xref target="I-D.shade-quic-http2-mapping" />. The 
+<xref target="I-D.ietf-quic-http" />. The 
 purpose of this document is to define the way DNS can be transmitted over QUIC.
 </t>
 </section>
@@ -150,7 +150,7 @@ Domain Name Service
    message length inherent to UDP.
 </t>
 <t>
-   The mappings of HTTP over QUIC (<xref target="I-D.shade-quic-http2-mapping" />
+   The mappings of HTTP over QUIC (<xref target="I-D.ietf-quic-http" />
    use a different design, intermediate between
    the "single stream for all messages" and "one stream per transaction" designs
    described above. In the HTTP over QUIC mappings, the client sends all the
@@ -231,13 +231,13 @@ Thanks to our wide cast of supporters.
 <references title="Normative References">
        &rfc1034;
        &rfc1035;
-       &I-D.hamilton-quic-transport-protocol;
-       &I-D.thomson-quic-tls;
+       &I-D.ietf-quic-transport;
+       &I-D.ietf-quic-tls;
 </references>
 <references title="Informative References">
       &rfc7626;
       &rfc7858;
-      &I-D.shade-quic-http2-mapping;
+      &I-D.ietf-quic-http;
 </references>  
 
 </back>
