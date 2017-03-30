@@ -188,6 +188,18 @@ end of stream.
 </section>
 <section title="Robustness and Denial of Service" >
 </section>
+<section title="When to use QUIC" >
+<t>
+Stub to recursive resolver scenario: configured resolver, much like DNS over TLS.
+</t>
+<t>
+Stub to local resolver (DHCP, etc): do we care.
+</t>
+<t>
+Resolver to authoritative: how does the resolver know that the authoritative can use QUIC? 
+Try and cache? Define an EDNS option? Some kind of service record? Does it belong in this draft?
+</t>
+</section>
 </section>
 <section title="Specifications" >
 <t>
