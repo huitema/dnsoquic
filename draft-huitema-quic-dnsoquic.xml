@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [<!ENTITY rfc1033 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1033.xml'>
+<!ENTITY rfc1035 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1035.xml'>
+
+
+<!ENTITY rfc7042 PUBLIC ''  
+   "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7626.xml"> 
+ 
+<!ENTITY rfc7858 PUBLIC ''  
+   "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7824.xml"> 
+]>
+
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<?rfc compact="yes"?>
+<?rfc toc="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+
+<!-- Expand crefs and put them inline -->
+<?rfc comments='yes' ?>
+<?rfc inline='yes' ?>
+
+<rfc category="info" 
+     docName="draft-huitema-quic-dnsoquic-00.txt" 
+     ipr="trust200902">
+
+<front>
+    <title abbrev="DNS over QUIC">
+      Specification of DNS over QUIC
+    </title>
+
+   <author fullname="Christian Huitema" initials="C." surname="Huitema">
+      <organization>Private Octopus Inc.</organization>
+      <address>
+        <postal>
+          <street> </street>
+          <city>Friday Harbor</city>
+          <code>98250</code>
+          <region>WA</region>
+          <country>U.S.A.</country>
+        </postal>
+        <email>huitema@huitema.net</email>
+      </address>
+    </author>
+   <author fullname="Melinda Shore" initials="M." surname="Shore">
+      <organization>No Mountain Software</organization>
+      <address>
+        <postal>
+          <street> </street>
+          <city></city>
+          <country></country>
+        </postal>
+        <email>melinda.shore@nomountain.net</email>
+      </address>
+    </author>
+    <date year="2017" />
+
+    <abstract>
+        <t> 
+   This document describes the use of QUIC to
+   provide transport privacy for DNS.  The encryption provided by QUIC
+   has similar properties as that provded by TLS, while QUIC transport
+   functions eliminate the end-of-queue blocking issues inherent
+   with TCP, while providing more efficent error corrections than
+   UDP. DNS over QUIC has privacy properties similar to DNS over TLS
+   specified in RFC 7858, and performance similar to classic
+   DNS over UDP.
+        </t>
+    </abstract>
+</front>
+
+<middle>
+<section title="Introduction">
+<t>
+TBD
+</t>
+</section>
+
+<section title="Design Considerations" >
+<t>
+TBD
+</t>
+</section>
+<section title="Specifications" >
+<t>
+TBD
+</t>
+</section>
+
+<section title="Security Considerations">
+<t>
+TBD 
+</t>
+</section>
+
+<section title="IANA Considerations" anchor="iana">
+<t> 
+TBD
+</t> 
+</section>
+
+<section title="Acknowledgments">
+    <t>
+Thanks to our wide cast of supporters.
+    </t>
+</section>
+</middle>
+
+<back>
+
+<references title="Informative References">
+       &rfc1033;
+       &rfc1035;
+       &rfc7858;
+</reference>
+<references title="Informative References">
+      &rfc7626;
+</references>  
+
+</back>
+</rfc>
