@@ -8,8 +8,26 @@
 <!ENTITY rfc1035 PUBLIC ''
    'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1035.xml'>
 
+<!ENTITY rfc1996 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1996.xml'>
+
+<!ENTITY rfc2119 PUBLIC ''
+   'http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+
+<!ENTITY rfc4033 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4033.xml'>
+
+<!ENTITY rfc5936 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5936.xml'>
+
+<!ENTITY rfc6698 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6698.xml'>
+
 <!ENTITY rfc7626 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7626.xml"> 
+
+<!ENTITY rfc7766 PUBLIC ''  
+   "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7766.xml"> 
  
 <!ENTITY rfc7858 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7858.xml"> 
@@ -35,7 +53,7 @@
 <?rfc comments='yes' ?>
 <?rfc inline='yes' ?>
 
-<rfc category="info" 
+<rfc category="std" 
      docName="draft-huitema-quic-dnsoquic-00.txt" 
      ipr="trust200902">
 
@@ -74,9 +92,9 @@
         <t> 
    This document describes the use of QUIC to
    provide transport privacy for DNS.  The encryption provided by QUIC
-   has similar properties as that provded by TLS, while QUIC transport
-   functions eliminate the end-of-queue blocking issues inherent
-   with TCP, while providing more efficent error corrections than
+   has similar properties as that provided by TLS, while QUIC transport
+   eliminates the end-of-queue blocking issues inherent
+   with TCP and provides more efficent error corrections than
    UDP. DNS over QUIC has privacy properties similar to DNS over TLS
    specified in RFC 7858, and performance similar to classic
    DNS over UDP.
@@ -106,12 +124,33 @@ mapped to QUIC streams, and generally how the application will use QUIC. This is
 <xref target="I-D.ietf-quic-http" />. The 
 purpose of this document is to define the way DNS can be transmitted over QUIC.
 </t>
+
+<section title="Requirements">
+<t>
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in <xref target="RFC2119" />.
+</t>
 </section>
+
+</section> <!-- end of introduction -->
 
 <section title="Design Considerations" >
 <t>
-Domain Name Service 
+TODO: some nice paragraph to start the design section
 </t>
+<section title="When to use DNS over QUIC" >
+<t>
+Stub to recursive resolver scenario: configured resolver, much like DNS over TLS.
+</t>
+<t>
+Stub to local resolver (DHCP, etc): do we care.
+</t>
+<t>
+Resolver to authoritative: how does the resolver know that the authoritative can use QUIC? 
+Try and cache? Define an EDNS option? Some kind of service record? Does it belong in this draft?
+</t>
+</section>
 <section title="Queries and streams" >
 <t>
    A QUIC stream provides reliable in-order delivery of bytes, but makes
@@ -173,39 +212,114 @@ Domain Name Service
    design assumes that the QUIC API provides a way for clients and servers to
    be notified when a new stream is initiated by the peer.
 </t>
+</section>
+<section title="Queries with multiple responses" >
 <t>
-TODO: what about end of streams, versus messages?
+Many DNS transactions consist of simple exchanges, in which the DNS client sends 
+a Query, and the DNS server replies with a Response, but there are different
+usage models. We cannot enumerate all possible usages of the DNS protocol, but the
+following examples are sufficient to document their diverse nature. In the  
+zone transfer scenario (<xref target="RFC5936" />), the client emits a single 
+AXFR query, and the server responds with a series of AXFR responses. In
+the Push service currently
+elaborated in the DNSSD working group,
+the client emits a single SUBSCRIBE query, and the server responds with a series
+of PUSH messages. In the notification scenario (<xref target="RFC1996" /> the
+server sends a series of NOTIFY messages.
 </t>
 <t>
-TODO: discussion of message lengths, explicit length versus implicit, e.g. by 
-end of stream.
+All these scenarios have to be supported by the specification of DNS over QUIC. 
+This convinces us that a rigid mapping of DNS "query/response" structure to the
+QUIC stream would not be adequate. For example, there are scenarios that require
+an ordered delivery of responses, and the only way to guarantee that with QUIC
+is to send a succession of responses on the same stream. On the other hand, there
+are scenarios in which queries and responses can be processed in parallel, 
+without any particular ordering requirements. In such cases, using multiple
+streams will result in improved performance.
+</t>
+<t>
+The simplest way to achieve all these requirements is to consider QUIC streams 
+as light weight TCP connections. If a query is sent on a specific stream,
+responses should be sent through the same stream, much like they would be sent 
+through the same TCP connection. If a client is concerned with performance,
+it will open multiple streams to enable parallel processing and mitigate
+end of queue blocking.
 </t> 
-
 </section>
 <section title="Connections duration and tradeoffs" >
+<t>
+The establishment and maintenance of QUIC connections requires allocation of
+resource on the server. This is very similar to the allocation of resource
+for maintening TLS connections discussed in section 3.4 of <xref target="RFC7858" />,
+or to the handling of TCP connections discussed in section 6 of
+<xref target="RFC7766" />, which notes the downside of opening two many connections.
+</t>
+<t>
+The tradeoffs need to be informed with two specificities of QUIC, the 
+use of multiple streams, 
+and the possibility of sending zero RTT data during session resume.
+</t>
 </section>
+<section title="Use of Zero RTT data" >
+<t>
+QUIC enables transmission of "Zero RTT" data. TLS 1.3 also does, and in fact QUIC's security
+negotiation reuses TLS 1.3. The issue of using 0-RTT data with TLS 1.3 was analyzed by
+Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIV" working group <xref target="DNS0RTT" />.
+In this message, DKG lists two concerns:
+</t>
+<t>
+<list style="numbers">
+<t>
+The zero-RTT data can be replayed by adversaries. That data may triggers a request by a
+recursive resolver to an authoritative resolvers. Adversaries may be able to pick a time 
+at which the recursive resolver queries are observable, and thus find out what name was
+queried for in the 0-RTT data.
+</t>
+<t>
+The zero-RTT mechanism relies on TLS resume. Clients and servers can cooperate to avoid
+linkability by third parties, but the server will always be able to link the resumed session 
+to the initial session. This creates a virtual long duration session. The series of requests
+in that section can be used by the server to identify the client.
+</t>
+</list>
+</t>
+<t>
+Clients will have to balance the risks associated to these two attacks versus the performance
+gains resulting from 0-RTT.
+</t>
+</section>
+
 <section title="Authentication" >
+<t>
+We envisage using DNS over QUIC in two main scenarios, client to to recursive resolver
+and recursive resolver to auhoritative resolver. 
+In the client to recursive resolver scenario,
+the authentication requirements are the same as described in <xref target="RFC7858" />. 
+There is no need to authenticate the client's identity in either scenario.
+</t>
+<t>
+In the recursive resolver to authoritative server scenario, the server's identity can be 
+verifed using the usual TLS mechanisms, using either X.509 certifcate or the
+DANE mechanisms <xref target="RFC6698"/>. The server's authority to provide 
+answers for the client's queries can be verified using DNS Security Extensions (DNSSEC) 
+<xref target="RFC4033" />, and there is no much point to replicate that mechanism using QUIC
+security negotiation. 
+</t>
 </section>
+
 <section title="Robustness and Denial of Service" >
 </section>
-<section title="When to use QUIC" >
-<t>
-Stub to recursive resolver scenario: configured resolver, much like DNS over TLS.
-</t>
-<t>
-Stub to local resolver (DHCP, etc): do we care.
-</t>
-<t>
-Resolver to authoritative: how does the resolver know that the authoritative can use QUIC? 
-Try and cache? Define an EDNS option? Some kind of service record? Does it belong in this draft?
-</t>
-</section>
-</section>
+
+</section> <!-- end of design -->
+
 <section title="Specifications" >
 <t>
 TBD
 </t>
 </section>
+
+
+
 
 <section title="Security Considerations">
 <t>
@@ -231,13 +345,32 @@ Thanks to our wide cast of supporters.
 <references title="Normative References">
        &rfc1034;
        &rfc1035;
+       &rfc2119;
        &I-D.ietf-quic-transport;
        &I-D.ietf-quic-tls;
 </references>
+
 <references title="Informative References">
+      &rfc4033;
+      &rfc5936;
+      &rfc6698;
       &rfc7626;
+      &rfc7766;
       &rfc7858;
       &I-D.ietf-quic-http;
+      &rfc1996;
+
+<reference anchor="DNS0RTT" target="https://www.ietf.org/mail-archive/web/dns-privacy/current/msg01276.html">
+  <front>
+    <title>DNS + 0-RTT</title>
+    <author initials="D." surname="Kahn Gillmor" fullname="Daniel Kahn Gillmor">
+      <organization/>
+    </author>
+    <date year="2016" month="April" day="06" />
+  </front>
+  <seriesInfo name="Message" value="DNS-Privacy WG mailing list"/>
+</reference>
+
 </references>  
 
 </back>
