@@ -41,6 +41,9 @@
 <!ENTITY I-D.ietf-quic-http PUBLIC ''  
    "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-quic-http.xml"> 
 
+<!ENTITY I-D.ietf-dprive-dtls-and-tls-profiles PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dprive-dtls-and-tls-profiles.xml">
+
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -86,15 +89,37 @@
         <email>melinda.shore@nomountain.net</email>
       </address>
     </author>
+   <author fullname="Allison Mankin" initials="A." surname="Mankin">
+      <organization>Salesforce</organization>
+      <address>
+        <postal>
+          <street> </street>
+          <city></city>
+          <country></country>
+        </postal>
+        <email>amankin@salesforce.com</email>
+      </address>
+    </author>
+   <author fullname="Sara Dickinson" initials="S." surname="Dickinson">
+      <organization>Sinodun IT</organization>
+      <address>
+        <postal>
+          <street>Magdalen Centre, Oxford Science Park </street>
+          <city>Oxford</city>
+          <country>U.K.</country>
+        </postal>
+        <email>sara@sinodun.com</email>
+      </address>
+    </author>
     <date year="2017" />
 
     <abstract>
         <t> 
    This document describes the use of QUIC to
    provide transport privacy for DNS.  The encryption provided by QUIC
-   has similar properties as that provided by TLS, while QUIC transport
+   has similar properties to that provided by TLS, while QUIC transport
    eliminates the end-of-queue blocking issues inherent
-   with TCP and provides more efficent error corrections than
+   with TCP and provides more efficient error corrections than
    UDP. DNS over QUIC has privacy properties similar to DNS over TLS
    specified in RFC 7858, and performance similar to classic
    DNS over UDP.
@@ -112,11 +137,11 @@ QUIC connection setup includes the negotiation of security parameters using TLS,
 <xref target="I-D.ietf-quic-tls" />.
 </t>
 <t>
-The DNS privacy issues are defined in <xref target="RFC7626"/>.  
+DNS privacy considerations are described in <xref target="RFC7626"/>.  
 <xref target="RFC7858" /> defines how to mitigate these issues by transmitting DNS messages over TLS and TCP.
-We believe that transmitting DNS messages over QUIC will provide the same privacy protections as 
-<xref target="RFC7858" />, because QUIC provides faster connection set up than TLS over TCP, and also
-because traffic sent over QUIC will not experience the "head of queue blocking" issues inherent to TCP.
+Transmitting DNS messages over QUIC will provide the same privacy protections as 
+<xref target="RFC7858" />, with the added benefit that QUIC provides faster connection set up than TLS over TCP, and also
+ traffic sent over QUIC will not experience the "head of queue blocking" issues inherent to TCP.
 </t>
 <t>
 Specifying the transmission of an application over QUIC requires to specify how the application messages are
@@ -177,7 +202,7 @@ Try and cache? Define an EDNS option? Some kind of service record? Does it belon
    on the stream affected by the transmission error is blocked, but
    transmission on the other streams can continue. If all data is sent on
    a single stream, then processing on that stream's data will be suspended
-   until the error will be connected.
+   until the error is corrected.
 </t>
 <t>
    Another plausible mapping would be to have the client send each query on 
@@ -206,7 +231,7 @@ Try and cache? Define an EDNS option? Some kind of service record? Does it belon
    somewhat reduces the performance of the protocol. 
 </t>
 <t>
-   DNS is a much simpler application than HTTP, and the additional compexity
+   DNS is a much simpler application than HTTP, and the additional complexity
    of a separate stream for requests or headers does not appear justified. This
    specification will adopt the "one stream per transaction" design. This
    design assumes that the QUIC API provides a way for clients and servers to
@@ -246,13 +271,13 @@ it will open multiple streams to enable parallel processing and mitigate
 end of queue blocking.
 </t> 
 </section>
-<section title="Connections duration and tradeoffs" >
+<section title="Connection duration and tradeoffs" >
 <t>
 The establishment and maintenance of QUIC connections requires allocation of
 resource on the server. This is very similar to the allocation of resource
-for maintening TLS connections discussed in section 3.4 of <xref target="RFC7858" />,
+for maintaining TLS connections discussed in section 3.4 of <xref target="RFC7858" />,
 or to the handling of TCP connections discussed in section 6 of
-<xref target="RFC7766" />, which notes the downside of opening two many connections.
+<xref target="RFC7766" />, which notes the downside of opening too many connections.
 </t>
 <t>
 The tradeoffs need to be informed with two specificities of QUIC, the 
@@ -292,17 +317,17 @@ gains resulting from 0-RTT.
 <section title="Authentication" >
 <t>
 We envisage using DNS over QUIC in two main scenarios, client to to recursive resolver
-and recursive resolver to auhoritative resolver. 
+and recursive resolver to authoritative resolver. 
 In the client to recursive resolver scenario,
-the authentication requirements are the same as described in <xref target="RFC7858" />. 
+the authentication requirements are the same as described in <xref target="RFC7858" /> and <xref target="I-D.ietf-dprive-dtls-and-tls-profiles" />. 
 There is no need to authenticate the client's identity in either scenario.
 </t>
 <t>
 In the recursive resolver to authoritative server scenario, the server's identity can be 
-verifed using the usual TLS mechanisms, using either X.509 certifcate or the
+verified using the usual TLS mechanisms, using either X.509 certifcate or the
 DANE mechanisms <xref target="RFC6698"/>. The server's authority to provide 
 answers for the client's queries can be verified using DNS Security Extensions (DNSSEC) 
-<xref target="RFC4033" />, and there is no much point to replicate that mechanism using QUIC
+<xref target="RFC4033" />, and there is not much point to replicate that mechanism using QUIC
 security negotiation. 
 </t>
 </section>
@@ -319,9 +344,13 @@ TBD
 </section>
 
 
-
-
 <section title="Security Considerations">
+<t>
+TBD 
+</t>
+</section>
+
+<section title="Privacy Considerations">
 <t>
 TBD 
 </t>
@@ -348,6 +377,7 @@ Thanks to our wide cast of supporters.
        &rfc2119;
        &I-D.ietf-quic-transport;
        &I-D.ietf-quic-tls;
+       &I-D.ietf-dprive-dtls-and-tls-profiles;
 </references>
 
 <references title="Informative References">
