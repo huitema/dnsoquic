@@ -28,6 +28,9 @@
 
 <!ENTITY rfc7766 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7766.xml"> 
+
+<!ENTITY rfc7828 PUBLIC ''  
+   "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7828.xml"> 
  
 <!ENTITY rfc7858 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7858.xml"> 
@@ -341,7 +344,201 @@ security negotiation.
 <t>
 TBD
 </t>
+
+<section anchor="connection-establishment" title="Connection Establishment">
+
+<t>DNS/QUIC connections are established as described in 
+<xref target="I-D.ietf-quic-transport"/>. During
+connection establishment, DNS/QUIC support is indicated by selecting the ALPN
+token "dq" in the crypto handshake.</t>
+
+<section title="Draft Version Identification" >
+
+<t><list style='empty'>
+  <t><spanx style="strong">RFC Editor's Note:</spanx>  Please remove this section prior to publication of a
+final version of this document.</t>
+</list></t>
+
+<t>Only implementations of the final, published RFC can identify themselves as
+"dq". Until such an RFC exists, implementations MUST NOT identify themselves
+using this string.</t>
+
+<t>Implementations of draft versions of the protocol MUST add the string "-" and
+the corresponding draft number to the identifier. For example,
+draft-huitema-quic-dnsoquic-00 is identified using the string "hq-h00".</t>
 </section>
+
+<section anchor="port-selection" title="Port Selection">
+        <t>
+          By default, a DNS server that supports DNS/QUIC MUST listen for
+          and accept QUIC connections on UDP port 853, unless it has mutual agreement
+          with its clients to use a port other than
+          853 for DNS over QUIC.
+          In order to use a port other than 853, both clients and servers
+          would need a configuration option in their software.
+        </t>
+        <t>
+          By default, a DNS client desiring to use DNS over QUIC with a
+          particular server MUST establish a QUIC connection to UDP
+          port 853 on the server, unless it has mutual agreement with its server
+          to use a port other than port 853 for DNS over QUIC.
+          Such another port MUST NOT be port 53.
+          This recommendation against use of port 53 for DNS over QUIC
+	  is to avoid confusion between DNS over QUIC and DNS over UDP
+          as specified in <xref target="RFC1035" />.      
+        </t>
+      </section>
+
+<section anchor="fall-back" title="Fall Back procedures">
+<t>
+If the establishment of the DNS over QUIC session fails, clients
+SHOULD attempt to fall back to DNS over TLS, as specified in
+<xref target="RFC7858" />.
+</t>
+
+        <t>
+          DNS clients SHOULD remember server IP addresses that don't
+          support DNS over QUIC, including timeouts, connection
+          refusals, and QUIC handshake failures, and not request
+          DNS over QUIC from them for a reasonable period (such as
+          one hour per server).  DNS clients following an out-of-band key-pinned
+          privacy profile (<xref target="RFC7858"/>) MAY be more aggressive about retrying
+          DNS-over-QUIC connection failures.
+        </t>
+</section>
+     
+</section> <!-- end of Connections -->
+
+<section title="Stream Mapping and Usage" >
+<t>
+The mapping of
+DNS traffic over QUIC streams takes advantage of the QUIC stream features
+detailed in section 10 of <xref target="I-D.ietf-quic-transport" />.
+</t>
+<t>
+The majority of DNS traffic follows a simple pattern in which the
+client emits a query, and the server provides a response. 
+In this case the
+client MUST select the next available client stream, in conformance
+with section 10.2 of <xref target="I-D.ietf-quic-transport" />.
+</t>
+<t>
+The client MUST send the DNS query over the selected stream, 
+and MUST indicate through the STREAM FIN mechanism that no further data will
+be sent on that stream.
+</t>
+<t>
+The server MUST send the response on the same stream, and MUST indicate through the 
+STREAM FIN mechanism mechanism that no further data will
+be sent on that stream. 
+</t> 
+<t>
+DNS query and responses are formatted as specified in <xref target="RFC1035" />, with
+a two bytes length field prepended.
+</t>
+<section title="Multiple Responses" >
+<t>
+In some DNS transactions such as AXFR, a single query generates a series of responses. In that
+case, the server MUST send all responses on the stream selected by the client for 
+the query. The server MUST indicate the termination of the stream after
+all queries have been sent.
+</t>
+</section>
+
+<section title="Server initiated transactions" >
+<t>
+There are traffic patterns in which a server sends unsolicited queries to a client,
+such as for example NOTIFY messages. When a server wishes to send such queries
+it MUST select the next available server stream, in conformance
+with section 10.2 of <xref target="I-D.ietf-quic-transport" />. It will then send 
+the DNS query over the selected stream, 
+and MUST indicate through the STREAM FIN mechanism that no further data will
+be sent on that stream.
+</t>
+<t>
+The client MUST send the response on the same stream, and MUST indicate through the 
+STREAM FIN mechanism mechanism that no further data will
+be sent on that stream. 
+</t> 
+</section>
+
+<section title="Stream Reset" >
+<t>
+Stream transmission may be abandoned by either party, using the stream "reset" facility. 
+A stream reset indicates that one party is unwilling to continue processing
+the transaction associated with the stream. The corresponding query MUST be abandoned.
+</t>
+<t>
+TODO: should there be timers? What if a client sends a query and the server never sends
+a response?
+</t>
+</section>
+
+</section> <!-- end of Stream mapping -->
+
+<section anchor="Connection-Close" title="Connection Reuse, Close, and Reestablishment">
+<t>
+TODO: the text here is a mix of specifications and usage guidelines. Would benefit from
+some cleanup.
+</t>
+        <t>
+          For DNS clients that use library functions such as "getaddrinfo()" and "gethostbyname()",
+          current implementations are known to open and close TCP connections for each DNS
+          query.  To avoid excess QUIC connections, each with a single query,
+          clients SHOULD reuse a single QUIC connection to the
+          recursive resolver.  Alternatively, they may prefer to use UDP
+          to a DNS-over-QUIC-enabled caching resolver on the same machine
+          that then uses a system-wide QUIC connection to the recursive
+          resolver.
+        </t>
+        <t>
+          In order to amortize QUIC and TLS connection setup costs, clients
+          and servers SHOULD NOT immediately close a connection after
+          each response.  Instead, clients and servers SHOULD reuse
+          existing connections for subsequent queries as long as they
+          have sufficient resources.  In some cases, this means that
+          clients and servers may need to keep idle connections open for
+          some amount of time.
+        </t>
+        <t>
+          Proper management of established and idle connections is important
+          to the healthy operation of a DNS server.  An implementor of
+          DNS over QUIC SHOULD follow best practices for DNS over TCP, as
+          described in <xref target="RFC7766"/>.  Failure
+          to do so may lead to resource exhaustion and denial of service.
+        </t>
+        <t>
+          This document does not make specific recommendations for timeout
+          values on idle connections.  Clients and servers should reuse
+          and/or close connections depending on the level of available
+          resources.  Timeouts may be longer during periods of low activity
+          and shorter during periods of high activity.  Current work in
+          this area may also assist DNS-over-TLS clients and servers
+          in selecting useful timeout values <xref
+                target="RFC7828"/> <xref target="TDNS"/>.
+        </t>
+        <t>
+          Clients and servers that keep idle connections open MUST be
+          robust to termination of idle connection by either party.  As
+          with current DNS over TCP, DNS servers MAY close the connection
+          at any time (perhaps due to resource constraints).  As with current
+          DNS over TCP, clients MUST handle abrupt closes and be prepared
+          to reestablish connections and/or retry queries.
+        </t>
+        <t>
+          When reestablishing a DNS-over-QUIC connection that was terminated,
+          clients and servers SHOULD take advantage of the QUIC "resume"
+          mechanisms.
+          
+        </t>
+        <t>
+          When closing a connection, DNS servers SHOULD use the QUIC
+          GOAWAY mechanisms.
+        </t>
+      </section>
+
+
+</section> <!-- end of Specifications -->
 
 
 <section title="Security Considerations">
@@ -363,6 +560,11 @@ TBD
 </section>
 
 <section title="Acknowledgments">
+<t>
+This document liberally borrows text from <xref target="I-D.ietf-quic-http" /> authored by
+Mike Bishop, and from <xref target="RFC7858" /> authored by Zi Hu, Liang Zhu, John Heidemann,
+Allison Mankin, Duane Wessels, and Paul Hoffman.
+</t>
     <t>
 Thanks to our wide cast of supporters.
     </t>
@@ -385,6 +587,7 @@ Thanks to our wide cast of supporters.
       &rfc5936;
       &rfc6698;
       &rfc7626;
+      &rfc7828;
       &rfc7766;
       &rfc7858;
       &I-D.ietf-quic-http;
@@ -400,6 +603,22 @@ Thanks to our wide cast of supporters.
   </front>
   <seriesInfo name="Message" value="DNS-Privacy WG mailing list"/>
 </reference>
+
+<reference anchor="TDNS" target="http://dx.doi.org/10.1109/SP.2015.18">
+        <front>
+          <title>Connection-Oriented DNS to Improve Privacy and Security</title>
+          <author initials="L." surname="Zhu" fullname="Liang Zhu"/>
+          <author initials="Z." surname="Hu" fullname="Zi Hu"/>
+          <author initials="J." surname="Heidemann" fullname="John Heidemann"/>
+          <author initials="D." surname="Wessels" fullname="Duane Wessels"/>
+          <author initials="A." surname="Mankin" fullname="Allison Mankin"/>
+          <author initials="N." surname="Somaiya" fullname="Nikita Somaiya"/>
+          <date/>
+        </front>
+        <seriesInfo name="2015 IEEE Symposium" value="on Security and Privacy (SP)" />
+   <seriesInfo name="DOI" value="10.1109/SP.2015.18" />
+      </reference>
+
 
 </references>  
 
