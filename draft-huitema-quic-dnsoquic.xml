@@ -20,8 +20,17 @@
 <!ENTITY rfc5936 PUBLIC ''
    'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5936.xml'>
 
+<!ENTITY rfc6335 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6335.xml'>
+
 <!ENTITY rfc6698 PUBLIC ''
    'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6698.xml'>
+
+<!ENTITY rfc7120 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7120.xml'>
+
+<!ENTITY rfc7301 PUBLIC ''
+   'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7301.xml'>
 
 <!ENTITY rfc7626 PUBLIC ''  
    "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7626.xml"> 
@@ -49,6 +58,9 @@
 
 <!ENTITY I-D.ietf-dprive-dtls-and-tls-profiles PUBLIC ''  
    "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dprive-dtls-and-tls-profiles.xml">
+
+<!ENTITY I-D.ietf-dnssd-push PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dnssd-push.xml">
 
 ]>
 
@@ -181,6 +193,12 @@ This is done for HTTP in
 <xref target="I-D.ietf-quic-http" />. The 
 purpose of this document is to define the way DNS can be transmitted over QUIC.
 </t>
+<t>
+In this document, <xref target="consider-design" /> presents the reasoning that guided our
+design. <xref target="DNS-QUIC-spec" /> specifies the actual mapping of DNS over QUIC. 
+<xref target="usage-and-deployment" /> presents guidelines on the usage and deployment
+of DNS over QUIC.
+</t>
 
 <section title="Requirements">
 <t>
@@ -192,7 +210,7 @@ purpose of this document is to define the way DNS can be transmitted over QUIC.
 
 </section> <!-- end of introduction -->
 
-<section title="Design Considerations" >
+<section title="Design Considerations" anchor="consider-design" >
 <t>
 This section and its subsection present the design guidelines that were used for
 the proposed mapping of DNS over QUIC. This section is informative in nature.
@@ -339,10 +357,7 @@ in <xref target="quic-development" />.
 
 </section> <!-- end of design -->
 
-<section title="Specifications" >
-<t>
-TBD
-</t>
+<section title="Specifications" anchor="DNS-QUIC-spec" >
 
 <section anchor="connection-establishment" title="Connection Establishment">
 
@@ -380,11 +395,14 @@ draft-huitema-quic-dnsoquic-00 is identified using the string "hq-h00".</t>
         <t>
           By default, a DNS client desiring to use DNS over QUIC with a
           particular server MUST establish a QUIC connection to UDP
-          port 853 on the server, unless it has mutual agreement with its server
-          to use a port other than port 853 for DNS over QUIC.
-          Such another port MUST NOT be port 53.
+          port 953 on the server, unless it has mutual agreement with its server
+          to use a port other than port 953 for DNS over QUIC.
+          Such another port MUST NOT be port 53 or port 853.
           This recommendation against use of port 53 for DNS over QUIC
 	  is to avoid confusion between DNS over QUIC and DNS over UDP
+          as specified in <xref target="RFC1035" />.      
+          Similarly, using port 853 
+	  would cause confusion between DNS over QUIC and DNS over DTLS
           as specified in <xref target="RFC1035" />.      
         </t>
       </section>
@@ -400,7 +418,7 @@ DNS traffic over QUIC streams takes advantage of the QUIC stream features
 detailed in section 10 of <xref target="I-D.ietf-quic-transport" />.
 </t>
 <t>
-The majority of DNS traffic follows a simple pattern in which the
+The stub to resolver DNS traffic follows a simple pattern in which the
 client emits a query, and the server provides a response. 
 In this case the
 client MUST select the next available client stream, in conformance
@@ -417,22 +435,16 @@ STREAM FIN mechanism mechanism that no further data will
 be sent on that stream. 
 </t> 
 <t>
-DNS query and responses are formatted as specified in <xref target="RFC1035" />, with
-a two bytes length field prepended.
+DNS query and responses are formatted as specified in <xref target="RFC1035" />.
+In contrast with DNS over TCP <xref target="RFC7766" /> and DNS over TLS <xref target="RFC7858" />, 
+these messages are sent without a two bytes length field prepended.
 </t>
-<section title="Multiple Responses" >
-<t>
-In some DNS transactions such as AXFR, a single query generates a series of responses. In that
-case, the server MUST send all responses on the stream selected by the client for 
-the query. The server MUST indicate the termination of the stream after
-all queries have been sent.
-</t>
-</section>
 
 <section title="Server initiated transactions" >
 <t>
-There are traffic patterns in which a server sends unsolicited queries to a client,
-such as for example NOTIFY messages. When a server wishes to send such queries
+There are planned traffic patterns in which a server sends unsolicited queries to a client,
+such as for example PUSH messages defined in <xref target="I-D.ietf-dnssd-push"/>. 
+When a server wishes to send such queries
 it MUST select the next available server stream, in conformance
 with section 10.2 of <xref target="I-D.ietf-quic-transport" />. It will then send 
 the DNS query over the selected stream, 
@@ -446,11 +458,13 @@ be sent on that stream.
 </t> 
 </section>
 
-<section title="Stream Reset" >
+<section title="Stream Reset" anchor="quic-stream-reset" >
 <t>
 Stream transmission may be abandoned by either party, using the stream "reset" facility. 
 A stream reset indicates that one party is unwilling to continue processing
-the transaction associated with the stream. The corresponding query MUST be abandoned.
+the transaction associated with the stream. The corresponding transaction MUST be abandoned.
+A Server Failure (ServFail, <xref target="RFC1035" />) SHOULD be
+notified to the initiator of the transaction.
 </t>
 <t>
 TODO: should there be timers? What if a client sends a query and the server never sends
@@ -460,67 +474,42 @@ a response?
 
 </section> <!-- end of Stream mapping -->
 
-<section anchor="Connection-Close" title="Connection Reuse, Close, and Reestablishment">
+<section anchor="Connection-Close" title="Closing the DNS over QUIC connection">
 <t>
-TODO: the text here is a mix of specifications and usage guidelines. Would benefit from
-some cleanup.
+QUIC connections are closed using the CONNECTION_CLOSE
+mechanisms specified in <xref target="I-D.ietf-quic-transport" />.
+Connections can be closed at the initiative of either the client
+or the server. The party initiating the connection closure
+SHOULD use the QUIC GOAWAY mechanism to initiate a graceful
+shutdown of a connection.
 </t>
-        <t>
-          For DNS clients that use library functions such as "getaddrinfo()" and "gethostbyname()",
-          current implementations are known to open and close TCP connections for each DNS
-          query.  To avoid excess QUIC connections, each with a single query,
-          clients SHOULD reuse a single QUIC connection to the
-          recursive resolver.  Alternatively, they may prefer to use UDP
-          to a DNS-over-QUIC-enabled caching resolver on the same machine
-          that then uses a system-wide QUIC connection to the recursive
-          resolver.
-        </t>
-        <t>
-          In order to amortize QUIC and TLS connection setup costs, clients
-          and servers SHOULD NOT immediately close a connection after
-          each response.  Instead, clients and servers SHOULD reuse
-          existing connections for subsequent queries as long as they
-          have sufficient resources.  In some cases, this means that
-          clients and servers may need to keep idle connections open for
-          some amount of time.
-        </t>
-        <t>
-          Proper management of established and idle connections is important
-          to the healthy operation of a DNS server.  An implementor of
-          DNS over QUIC SHOULD follow best practices for DNS over TCP, as
-          described in <xref target="RFC7766"/>.  Failure
-          to do so may lead to resource exhaustion and denial of service.
-        </t>
-        <t>
-          This document does not make specific recommendations for timeout
-          values on idle connections.  Clients and servers should reuse
-          and/or close connections depending on the level of available
-          resources.  Timeouts may be longer during periods of low activity
-          and shorter during periods of high activity.  Current work in
-          this area may also assist DNS-over-TLS clients and servers
-          in selecting useful timeout values <xref
-                target="RFC7828"/> <xref target="TDNS"/>.
-        </t>
-        <t>
-          Clients and servers that keep idle connections open MUST be
-          robust to termination of idle connection by either party.  As
-          with current DNS over TCP, DNS servers MAY close the connection
-          at any time (perhaps due to resource constraints).  As with current
-          DNS over TCP, clients MUST handle abrupt closes and be prepared
-          to reestablish connections and/or retry queries.
-        </t>
-        <t>
-          When reestablishing a DNS-over-QUIC connection that was terminated,
-          clients and servers SHOULD take advantage of the QUIC "resume"
-          mechanisms.
-          
-        </t>
-        <t>
-          When closing a connection, DNS servers SHOULD use the QUIC
-          GOAWAY mechanisms.
-        </t>
-      </section>
+<t>
+The transactions corresponding to stream number higher than indicated
+in the GO AWAY frames MUST be considered failed. Similarly, if
+streams are still open when the CONNECTION_CLOSE is received,
+the corresponding transactions MUST be considered failed. In both cases,
+a Server Failure (ServFail, <xref target="RFC1035" />) SHOULD be
+notified to the initiator of the transaction.
+</t>
+</section>
 
+<section anchor="Connection-resume" title="Connection Resume and 0-RTT" >
+<t>
+A stub resolver MAY take advantage of the connection resume
+mechanisms supported by QUIC transport <xref target="I-D.ietf-quic-transport" />
+and QUIC TLS <xref target="I-D.ietf-quic-tls" />. 
+Stub resolvers SHOULD consider potential privacy issues associated
+with session resume before deciding to use this mechanism. These privacy
+issues are detailed in <xref target="session-resume-privacy" />.
+</t>
+<t>
+When resuming a session, a stub resolver MAY take advantage of the
+0-RTT mechanism supported by QUIC. The 0-RTT mechanism MUST NOT be
+used to send data that is not "replayable" transactions. For example, 
+a stub resolver MAY transmit a Query as 0-RTT, but MUST NOT transmit 
+an Update.
+</t>
+</section>
 
 </section> <!-- end of Specifications -->
 
@@ -530,6 +519,9 @@ TODO: add deployment considerations here, such as how to provision the service,
 how to verify certificates, how to manage fallbacks.
 </t>
 <section title="Use of Zero RTT data" >
+<t>
+TODO: move this text to privacy and security considerations.
+</t>
 <t>
 QUIC enables transmission of "Zero RTT" data. TLS 1.3 also does, and in fact QUIC's security
 negotiation reuses TLS 1.3. The issue of using 0-RTT data with TLS 1.3 was analyzed by
@@ -568,7 +560,7 @@ There is no need to authenticate the client's identity in either scenario.
 </t>
 <t>
 In the recursive resolver to authoritative server scenario, the server's identity can be 
-verified using the usual TLS mechanisms, using either X.509 certifcate or the
+verified using the usual TLS mechanisms, using either X.509 certificate or the
 DANE mechanisms <xref target="RFC6698"/>. The server's authority to provide 
 answers for the client's queries can be verified using DNS Security Extensions (DNSSEC) 
 <xref target="RFC4033" />, and there is not much point to replicate that mechanism using QUIC
@@ -576,7 +568,7 @@ security negotiation.
 </t>
 </section>
 
-<section anchor="fall-back" title="Fall Back procedures">
+<section anchor="fall-back" title="Fall Back to other protocols">
 <t>
 If the establishment of the DNS over QUIC session fails, clients
 SHOULD attempt to fall back to DNS over TLS, as specified in
@@ -595,8 +587,67 @@ SHOULD attempt to fall back to DNS over TLS, as specified in
 </section>
 
 
+<section anchor="Connection-Close-Usage" title="Guidance on Connection Reuse, Close, and Reestablishment">
 
+<t>
+For DNS clients that use library functions such as "getaddrinfo()" and "gethostbyname()",
+current implementations are known to open and close TCP connections for each DNS
+query.  To avoid excess QUIC connections, each with a single query,
+clients SHOULD reuse a single QUIC connection to the
+recursive resolver.  Alternatively, they may prefer to use UDP
+to a DNS-over-QUIC-enabled caching resolver on the same machine
+that then uses a system-wide QUIC connection to the recursive
+resolver.
+</t>
+<t>
+In order to amortize QUIC and TLS connection setup costs, clients
+and servers SHOULD NOT immediately close a connection after
+each response.  Instead, clients and servers SHOULD reuse
+existing connections for subsequent queries as long as they
+have sufficient resources.  In some cases, this means that
+clients and servers may need to keep idle connections open for
+some amount of time.
+</t>
+<t>
+Proper management of established and idle connections is important
+to the healthy operation of a DNS server.  An implementor of
+DNS over QUIC SHOULD follow best practices for DNS over TCP, as
+described in <xref target="RFC7766"/>.  Failure
+to do so may lead to resource exhaustion and denial of service.
+</t>
+<t>
+This document does not make specific recommendations for timeout
+values on idle connections.  Clients and servers should reuse
+and/or close connections depending on the level of available
+resources.  Timeouts may be longer during periods of low activity
+and shorter during periods of high activity.  Current work in
+this area may also assist DNS-over-TLS clients and servers
+in selecting useful timeout values <xref
+target="RFC7828"/> <xref target="TDNS"/>.
+</t>
+<t>
+Clients and servers that keep idle connections open MUST be
+robust to termination of idle connection by either party.  As
+with current DNS over TCP, DNS servers MAY close the connection
+at any time (perhaps due to resource constraints).  As with current
+DNS over TCP, clients MUST handle abrupt closes and be prepared
+to reestablish connections and/or retry queries.
+</t>
+<t>
+When reestablishing a DNS-over-QUIC connection that was terminated,
+clients and servers SHOULD take advantage of the QUIC "resume"
+mechanisms.   
+</t>
+<t>
+TODO: QUIC provides an efficient mechanism for resuming connections,
+including the possibility of sending 0-RTT data. Does that change
+the tradeoff? Is it plausible to use shorter timers than specified 
+for TCP?
+</t>
 </section>
+
+
+</section> <!-- end of usage -->
 
 
 <section title="Security Considerations">
@@ -609,13 +660,69 @@ TBD
 <t>
 TBD 
 </t>
+<section title="Session Resume Considerations" anchor="session-resume-privacy" >
+<t>
+TODO: 
+SHOULD take advantage of TLS 1.3 mechanisms to prevent linkability
+between sessions.
+SHOULD consider that session resume will allow the server to link the
+previous session and the new session. Probably OK if the stub client's 
+connectivity did not change. Depends on level of trust between
+stub and recursive otehrwise. 
+</t>
 </section>
 
+</section> <!-- end of privacy -->
+
 <section title="IANA Considerations" anchor="iana">
-<t> 
-TBD
-</t> 
+
+<section anchor="registration-of-dnsquic-identification-string" 
+title="Registration of DNS over QUIC Identification String">
+
+<t>This document creates a new registration for the identification of DNS over QUIC in
+the "Application Layer Protocol Negotiation (ALPN) Protocol IDs" registry
+established in <xref target="RFC7301"/>.</t>
+
+<t>The "dq" string identifies DNS over QUIC:</t>
+
+<t><list style="hanging">
+  <t hangText='Protocol:'>
+  DNS over QUIC</t>
+  <t hangText='Identification Sequence:'>
+  0x64 0x71 ("dq")</t>
+  <t hangText='Specification:'>
+  This document</t>
+</list></t>
+
 </section>
+
+
+    <section anchor="IANA-port" title="Reservation of port 953">
+
+      <t>
+        IANA is required to add the following value to the "Service Name
+        and Transport Protocol Port Number Registry" in the System
+        Range.  The registry for that range requires IETF Review or IESG Approval 
+        <xref target="RFC6335"/>, and such a review was requested using the
+        early allocation process <xref target="RFC7120"/> for the well-known TCP port
+        in this document.
+      </t>
+
+    <figure>
+    <artwork><![CDATA[
+    Service Name           domain-s
+    Port Number            953
+    Transport Protocol(s)  TCP/UDP
+    Assignee               IESG
+    Contact                IETF Chair
+    Description            DNS query-response protocol run over QUIC
+    Reference              This document
+      ]]></artwork>
+    </figure>
+
+    </section>
+
+</section> <!-- end of IANA -->
 
 <section title="Acknowledgments">
 <t>
@@ -638,18 +745,22 @@ Thanks to our wide cast of supporters.
        &I-D.ietf-quic-transport;
        &I-D.ietf-quic-tls;
        &I-D.ietf-dprive-dtls-and-tls-profiles;
+       &rfc7301;
 </references>
 
 <references title="Informative References">
       &rfc4033;
       &rfc5936;
+      &rfc6335;
       &rfc6698;
+      &rfc7120;
       &rfc7626;
       &rfc7828;
       &rfc7766;
       &rfc7858;
       &I-D.ietf-quic-http;
       &I-D.ietf-quic-recovery;
+      &I-D.ietf-dnssd-push;
 
 <reference anchor="DNS0RTT" target="https://www.ietf.org/mail-archive/web/dns-privacy/current/msg01276.html">
   <front>
