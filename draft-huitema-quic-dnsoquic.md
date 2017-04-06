@@ -79,13 +79,18 @@ document presents a mapping of the DNS protocol [@!RFC1035] over QUIC
 transport [@!I-D.ietf-quic-transport].  The goals of this mapping are:
 
 1.  Provide the same DNS privacy protection as DNS over TLS
-    [@?RFC7858].
+    [@?RFC7858]. This includes to option for the client to 
+    authenticate the server by means of an authentication domain
+    name [@!I-D.ietf-dprive-dtls-and-tls-profiles].
 
-2.  Explore the potential performance gains of using QUIC as a DNS
+2.  Provide an improved level of source address validation for DNS
+    servers over DNS over UDP [@!RFC1035].
+
+3.  Explore the potential performance gains of using QUIC as a DNS
     transport, versus other solutions like DNS over UDP [@!RFC1035] or
     DNS over TLS [@?RFC7858].
 
-3.  Participate in the definition of QUIC protocols and API, by
+4.  Participate in the definition of QUIC protocols and API, by
     outlining a use case for QUIC different from HTTP over QUIC
     [@?I-D.ietf-quic-http].
 
@@ -132,58 +137,69 @@ TODO: Make this usage more consistent.
 
 # Design Considerations
 
-   This section and its subsection present the design guidelines that
-   were used for the proposed mapping of DNS over QUIC.  This section is
-   informative in nature.
+This section and its subsection present the design guidelines that
+were used for the proposed mapping of DNS over QUIC.  This section is
+informative in nature.
 
 ## Scope is limited to the stub to resolver scenario
 
-   Usage scenarios for the DNS protocol can be broadly classified in three
-   groups: stub to recursive resolver, recursive resolver to
-   authoritative server, and server to server.  Our design focuses on the "stub
-   to recursive resolver" scenario, and specifically to the scenario in
-   which the choice of recursive resolver is manually configured in the
-   stub.  In this case, the configuration will specify the name of the
-   resolver, its address, how security credentials are verified, and of
-   course the use of QUIC as a transport.
+Usage scenarios for the DNS protocol can be broadly classified in three
+groups: stub to recursive resolver, recursive resolver to
+authoritative server, and server to server.  Our design focuses on the "stub
+to recursive resolver" scenario, and specifically to the scenario in
+which the choice of recursive resolver is manually configured in the
+stub.  In this case, the configuration will specify the name of the
+resolver, its address, how security credentials are verified, and of
+course the use of QUIC as a transport.
 
-   No attempt is made to address the scenario in which the stub dynamically
-   discovers the resolver using DHCP or IPv6 Router Advertisements.
-   These scenarios would require a way to dynamically signal support for
-   QUIC transport in these resolvers.  This is left for future study.
+No attempt is made to address the scenario in which the stub dynamically
+discovers the resolver using DHCP or IPv6 Router Advertisements.
+These scenarios would require a way to dynamically signal support for
+QUIC transport in these resolvers.  This is left for future study.
 
-   No attempt is made to address the recursive to authoritative scenarios.
-   Authoritative resolvers are discovered dynamically through NS
-   records.  In the absence of an agreed way for authoritative to signal
-   support for QUIC transport, recursive resolvers would have to resort
-   to some trial and error process.  At this stage of QUIC deployment,
-   this would be mostly errors, and does not seem attractive.  This
-   could change in the future.
+QUESTION: [@!I-D.ietf-dprive-dtls-and-tls-profiles] covers static and 
+dynamic configuration including DHCP. Should we remove the discussion
+of configuration here and just refer to that?
 
-   The DNS protocol is also used for zone transfers.  In the zone
-   transfer scenario ([@?RFC5936]), the client emits a single AXFR query,
-   and the server responds with a series of AXFR responses.  This
-   creates a unique profile, in which a query results in several
-   responses.  Supporting that profile would complicate the mapping of
-   DNS queries over QUIC streams.  Zone transfers are not used in the
-   stub to recursive scenario that is the focus here, and seem to be currently
-   well served by the DNS over TCP.  There is no attempt to support them
-   in this proposed mapping of DNS to QUIC.
+No attempt is made to address the recursive to authoritative scenarios.
+Authoritative resolvers are discovered dynamically through NS
+records. It is noted that at the time of writing work is ongoing in 
+the DPRIVE working group to attempt to address the analogous problem for
+DNS over TLS [@?I-D.bortzmeyer-dprive-step-2]. In the absence of an agreed way 
+for authoritative to signal
+support for QUIC transport, recursive resolvers would have to resort
+to some trial and error process.  At this stage of QUIC deployment,
+this would be mostly errors, and does not seem attractive.  This
+could change in the future.
+
+The DNS protocol is also used for zone transfers.  In the zone
+transfer scenario ([@?RFC5936]), the client emits a single AXFR query,
+and the server responds with a series of AXFR responses.  This
+creates a unique profile, in which a query results in several
+responses.  Supporting that profile would complicate the mapping of
+DNS queries over QUIC streams.  Zone transfers are not used in the
+stub to recursive scenario that is the focus here, and seem to be currently
+well served by the DNS over TCP.  There is no attempt to support them
+in this proposed mapping of DNS to QUIC.
 
 ## Provide DNS Privacy
 
-  DNS privacy considerations are described in [@?RFC7626].  [@?RFC7858]
-  defines how to mitigate some of these issues by transmitting DNS messages
-  over TLS and TCP.  QUIC connection setup includes the negotiation of
-  security parameters using TLS, as specified in [@!I-D.ietf-quic-tls],
-  enabling encryption of the QUIC transport.  Transmitting DNS messages
-  over QUIC will provide the same privacy protections as [@?RFC7858].
+DNS privacy considerations are described in [@?RFC7626].  [@?RFC7858]
+defines how to mitigate some of these issues by transmitting DNS messages
+over TLS and TCP and [@!I-D.ietf-dprive-dtls-and-tls-profiles] specifies
+Strict and Opportunistic profiles for DNS over TLS including how stub 
+resolvers can authenticate recursive resolvers.  QUIC connection 
+setup includes the negotiation of
+security parameters using TLS, as specified in [@!I-D.ietf-quic-tls],
+enabling encryption of the QUIC transport.  Transmitting DNS messages
+over QUIC will provide the same privacy protections as [@?RFC7858]
+and [@!I-D.ietf-dprive-dtls-and-tls-profiles].
 
 ## Design for minimum latency
 
- QUIC is specifically designed to reduce the delay between HTTP
- queries and HTTP responses.  This is achieved through three main
- components:
+QUIC is specifically designed to reduce the delay between HTTP
+queries and HTTP responses.  This is achieved through three main
+components:
 
  1.  Support for 0-RTT data during session resume.
 
@@ -213,55 +229,55 @@ three ways:
 
 ## Development of QUIC protocols and API
 
- QUIC is defined as a layered protocol, with application specific
- mapping layered on top of the generic QUIC transport.  The only
- mapping defined at this stage is HTTP over QUIC [@?I-D.ietf-quic-http].
- Adding a different mapping for a different application contributes to
- the development of QUIC.
+QUIC is defined as a layered protocol, with application specific
+mapping layered on top of the generic QUIC transport.  The only
+mapping defined at this stage is HTTP over QUIC [@?I-D.ietf-quic-http].
+Adding a different mapping for a different application contributes to
+the development of QUIC.
 
- In the HTTP over QUIC mappings, the stream number 3 is used for
- control messages, in which client or server announce their intent to
- send headers and bodies of requests and responses and specify the
- number of the streams that will carry these headers and response.
- The advantage is that client and server can then schedule processing
- of the requests and responses according to various policies and
- priorities, and can tightly control the usage of streams.  This comes
- at the cost of some complexity, and also some performance since the
- control stream is exposed to head-of-line blocking.
+In the HTTP over QUIC mappings, the stream number 3 is used for
+control messages, in which client or server announce their intent to
+send headers and bodies of requests and responses and specify the
+number of the streams that will carry these headers and response.
+The advantage is that client and server can then schedule processing
+of the requests and responses according to various policies and
+priorities, and can tightly control the usage of streams.  This comes
+at the cost of some complexity, and also some performance since the
+control stream is exposed to head-of-line blocking.
 
- In this document a different design is deliberately explored, in which there is
- no control stream.  Clients and servers can initiate queries as
- determined by the DNS application logic, opening new streams as
- necessary.  This provides for maximum parallelism between queries, as
- noted in (#design-for-minimum-latency).  It also places constraints on the API.
- Instead of merely listening for control messages on a control stream,
- client and servers will have to be notified of the opening of a new
- stream by their peer.  Instead of orderly closing the control stream,
- client and server will have to use orderly connection closure
- mechanisms and manage the potential loss of data if closing on one
- end conflicts with opening of a stream on the other end.
+In this document a different design is deliberately explored, in which there is
+no control stream.  Clients and servers can initiate queries as
+determined by the DNS application logic, opening new streams as
+necessary.  This provides for maximum parallelism between queries, as
+noted in (#design-for-minimum-latency).  It also places constraints on the API.
+Instead of merely listening for control messages on a control stream,
+client and servers will have to be notified of the opening of a new
+stream by their peer.  Instead of orderly closing the control stream,
+client and server will have to use orderly connection closure
+mechanisms and manage the potential loss of data if closing on one
+end conflicts with opening of a stream on the other end.
 
 
 ## No specific middlebox bypass mechanism
 
- Being different from HTTP over QUIC is a design choice.  The
- advantage is that the mapping can be defined for minimal overhead and
- maximum performance.  The downside is that the difference can be
- noted by firewalls and middleboxes.  There may be environments in
- which HTTP over QUIC will be allowed, but DNS over QUIC will be
- disallowed and blocked by these middle boxes.
+Being different from HTTP over QUIC is a design choice.  The
+advantage is that the mapping can be defined for minimal overhead and
+maximum performance.  The downside is that the difference can be
+noted by firewalls and middleboxes.  There may be environments in
+which HTTP over QUIC will be allowed, but DNS over QUIC will be
+disallowed and blocked by these middle boxes.
 
- It is recognised that this might be a problem, but there is currently no
- indication on how widespread that problem might be.  It might be that
- the problem will be so acute that the only realistic solution would
- be to communicate with independent recursive resolvers using DNS over
- HTTPS, or maybe DNS over HTTP over QUIC.  Or it might be that the
- problem is rare enough and the performance gains significant enough
- that the correct solution is to use DNS over QUIC most of the time,
- and to fall back on DNS over HTTPS some of the time.  Measurements
- and experimentations will inform that decision.  In between, we
- believe that a clean design is most likely to inform the QUIC
- development, as explained in (#development-of-quic-protocols-and-api).
+It is recognised that this might be a problem, but there is currently no
+indication on how widespread that problem might be.  It might be that
+the problem will be so acute that the only realistic solution would
+be to communicate with independent recursive resolvers using DNS over
+HTTPS, or maybe DNS over HTTP over QUIC.  Or it might be that the
+problem is rare enough and the performance gains significant enough
+that the correct solution is to use DNS over QUIC most of the time,
+and to fall back on DNS over HTTPS some of the time.  Measurements
+and experimentations will inform that decision.  In between, we
+believe that a clean design is most likely to inform the QUIC
+development, as explained in (#development-of-quic-protocols-and-api).
 
 
 # Specifications
@@ -397,8 +413,10 @@ authenticate the client's identity in either scenario.
 ## Fall Back to other protocols
 
 If the establishment of the DNS over QUIC connection fails, clients
-SHOULD attempt to fall back to DNS over TLS, as specified in
-[@?RFC7858].
+SHOULD attempt to fall back to DNS over TLS and then potentially clear 
+text, as specified in [@?RFC7858] and 
+[@!I-D.ietf-dprive-dtls-and-tls-profiles], depending on their privacy
+profile.
 
 DNS clients SHOULD remember server IP addresses that don't support
 DNS over QUIC, including timeouts, connection refusals, and QUIC
@@ -409,9 +427,11 @@ be more aggressive about retrying DNS over QUIC connection failures.
 
 ## Guidance on Connection Reuse, Close, and Reestablishment
 
-For DNS clients that use library functions such as "getaddrinfo()"
-and "gethostbyname()", current implementations are known to open and
-close TCP connections for each DNS query.  To avoid excess QUIC
+Historic implementations of DNS stub resolvers are known to open and
+close TCP connections for each DNS query. [@?RFC7766] provides updated
+guidance on DNS over TCP much of which is applicable to DNS over QUIC. 
+
+To avoid excess QUIC
 connections, each with a single query, clients SHOULD reuse a single
 QUIC connection to the recursive resolver.  Alternatively, they may
 prefer to use UDP to a DNS over QUIC-enabled caching resolver on the
@@ -419,9 +439,9 @@ same machine that then uses a system-wide QUIC connection to the
 recursive resolver.
 
 In order to amortize QUIC and TLS connection setup costs, clients and
-servers SHOULD NOT immediately close a connection after each
+servers SHOULD NOT immediately close a QUIC connection after each
 response.  Instead, clients and servers SHOULD reuse existing
-connections for subsequent queries as long as they have sufficient
+QUIC connections for subsequent queries as long as they have sufficient
 resources.  In some cases, this means that clients and servers may
 need to keep idle connections open for some amount of time.
 
@@ -437,7 +457,7 @@ close connections depending on the level of available resources.
 Timeouts may be longer during periods of low activity and shorter
 during periods of high activity.  Current work in this area may also
 assist DNS over TLS clients and servers in selecting useful timeout
-values [@?RFC7828] [@TDNS].
+values [@?RFC7828] [@?I-D.ietf-dnsop-session-signal] [@TDNS].
 
 Clients and servers that keep idle connections open MUST be robust to
 termination of idle connection by either party.  As with current DNS
@@ -457,7 +477,7 @@ for TCP?
 
 # Security Considerations
 
-The security considerations of DNSover QUIC should be comparable to
+The security considerations of DNS over QUIC should be comparable to
 those of DNS over TLS [@?RFC7858].
 
 # Privacy Considerations
@@ -466,13 +486,9 @@ DNS over TLS is specifically designed to protect the DNS traffic
 between stub and resolver from observations by third parties, and
 thus protect the privacy of queries from the stub.  However, the recursive
 resolver has full visibility of the stub's traffic, and could be used
-as an observation point, as discussed in (#backend-observation-of-dns-traffic).  
-Also, the
-queries sent by the stub resolver may generate corresponding
-queries from the recursive resolver to authoritative servers.
-Adversaries can try to infer the stub to resolver traffic from their
-observation of the resolver to authoritative traffic, as disccused in
-(#backend-observation-of-dns-traffic).
+as an observation point, as discussed in [@?RFC7626]. These considerations
+do not differ between DNS over TLS and DNS over QUIC and are not discussed
+further here. 
 
 QUIC incorporates the mechanisms of TLS 1.3 [@?I-D.ietf-tls-tls13] and
 this enables QUIC transmission of "Zero RTT" data.  This can
@@ -487,45 +503,6 @@ provide interesting latency gains, but it raises two concerns:
 These issues are developed (#privacy-issues-with-0rtt-data) and 
 (#privacy-issues-with-session-resume).
 
-## Privacy of Resolver Data
-
-The recursive resolver could easily capture a log of the traffic sent
-by the stub resolver, and make it available to third parties.  This
-would negate the privacy benefits of encrypting the data between stub
-and resolver.
-
-A first mitigation against that risk is the publication by the
-operator of the resolver of a satisfactory privacy policy, explaining
-to potential users how the data will be protected.  For example, a
-resolver may decide to not keep logs or to only keep them for short
-periods, and may commit to not disclose the stub's data to third
-parties.
-
-A policy voluntarily adopted by the resolver may not be sufficient if
-adversaries manage to somehow gain control of the resolver, for
-example using some kind of computer virus.  Mitigations against such
-attacks will protective actions by the stubs.  Stubs may for example
-add cover traffic to the normal set of DNS queries, or they may split
-their traffic between several resolvers.  Such mitigations will
-require further study.
-
-## Backend observation of DNS traffic
-
-Queries sent by the stub to the recursive may be served from the
-recursive's cache, or may be served by forwarding the query to an
-authoritative server.  Adversaries could observe the outgoing queries
-and try to correlate them with the encrypted traffic received by the
-recursive resolver.  In the extreme case of a resolver with only one
-active stub client, this correlation is trivial.  It gets
-progressively harder when resolvers serve larger number of clients.
-
-Recursive resolvers MAY consider techniques like proactive caching to
-reduce the effectiveness of this attack.  Stub clients MAY prefer
-using resolvers that manage a large number of other clients, as this
-will make the adversaries job harder.  In the future, stub clients
-MAY attempt to mitigate this issue by using the cover traffic and
-split traffic strategies discussed in (#privacy-of-resolver-data).
-
 ## Privacy Issues With 0RTT data
 
 The zero-RTT data can be replayed by adversaries.  That data may
@@ -535,8 +512,7 @@ recursive resolver outgoing traffic is observable, and thus find out
 what name was queried for in the 0-RTT data.
 
 This risk is in fact a subset of the general problem of observing the
-behavior of the recursive resolver discussed in 
-(#backend-observation-of-dns-traffic).  The
+behavior of the recursive resolver discussed in  [@?RFC7626]. The
 attack is partially mitigated by reducing the observability of this
 traffic.  However, the risk is amplified for 0-RTT data, because the
 attacker might replay it at chosen times, several times.
@@ -544,6 +520,9 @@ attacker might replay it at chosen times, several times.
 The recommendation in [@?I-D.ietf-tls-tls13] is that the capability to
 use 0-RTT data should be turned off by default, on only enabled if
 the user clearly understands the associated risks.
+
+QUESTION: Should 0-RTT only be used with Opportunistic profiles (i.e.
+disabled by default for Strict only)?
 
 ## Privacy Issues With Session Resume
 
