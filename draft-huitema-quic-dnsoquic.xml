@@ -62,6 +62,10 @@
 <!ENTITY I-D.ietf-dnssd-push PUBLIC ''  
    "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dnssd-push.xml">
 
+<!ENTITY I-D.ietf-tls-tls13 PUBLIC ''  
+   "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-tls-tls13.xml">
+
+
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -518,37 +522,7 @@ an Update.
 TODO: add deployment considerations here, such as how to provision the service,
 how to verify certificates, how to manage fallbacks.
 </t>
-<section title="Use of Zero RTT data" >
-<t>
-TODO: move this text to privacy and security considerations.
-</t>
-<t>
-QUIC enables transmission of "Zero RTT" data. TLS 1.3 also does, and in fact QUIC's security
-negotiation reuses TLS 1.3. The issue of using 0-RTT data with TLS 1.3 was analyzed by
-Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIV" working group <xref target="DNS0RTT" />.
-In this message, DKG lists two concerns:
-</t>
-<t>
-<list style="numbers">
-<t>
-The zero-RTT data can be replayed by adversaries. That data may triggers a request by a
-recursive resolver to an authoritative resolvers. Adversaries may be able to pick a time 
-at which the recursive resolver queries are observable, and thus find out what name was
-queried for in the 0-RTT data.
-</t>
-<t>
-The zero-RTT mechanism relies on TLS resume. Clients and servers can cooperate to avoid
-linkability by third parties, but the server will always be able to link the resumed session 
-to the initial session. This creates a virtual long duration session. The series of requests
-in that section can be used by the server to identify the client.
-</t>
-</list>
-</t>
-<t>
-Clients will have to balance the risks associated to these two attacks versus the performance
-gains resulting from 0-RTT.
-</t>
-</section>
+
 
 <section title="Authentication" >
 <t>
@@ -652,23 +626,115 @@ for TCP?
 
 <section title="Security Considerations">
 <t>
-TBD 
+The security considerations of DNSover QUIC should be comparable to
+those of DNS over TLS <xref target="RFC7858" />.
 </t>
 </section>
 
 <section title="Privacy Considerations">
 <t>
-TBD 
+QUIC over TLS is specifically designed to protect the DNS traffic between stub and resolver from
+observations by third parties, and thus protect the privacy of the stub's users. However, the
+recursive resolver has full visibility of the stub's traffic, and could be used as an observation
+point, as discussed in <xref target="session-resolver-privacy" />. Also, the requests sent
+by the stub resolver may generate corresponding requests from the recursive resolver to
+authoritative servers. Adversaries can try to infer the stub to resolver traffic from their 
+observation of the resolver to authoritative traffic, as disccused in 
+<xref target="session-backend-privacy" />.
 </t>
-<section title="Session Resume Considerations" anchor="session-resume-privacy" >
 <t>
-TODO: 
-SHOULD take advantage of TLS 1.3 mechanisms to prevent linkability
-between sessions.
-SHOULD consider that session resume will allow the server to link the
-previous session and the new session. Probably OK if the stub client's 
-connectivity did not change. Depends on level of trust between
-stub and recursive otehrwise. 
+QUIC incorporates the mechanisms of TLS 1.3
+<xref target="I-D.ietf-tls-tls13" /> and this enables QUIC enables transmission of "Zero RTT" data. 
+This can provide interesting latency gains, but it raises two concerns:
+<list style="numbers">
+<t>
+Adversaries could replay the zero-RTT data and infer its content from the behavior of 
+the receiving server.
+</t>
+<t>
+The zero-RTT mechanism relies on TLS resume, which can provide linkability between
+successive client sessions.
+</t>
+</list>
+</t>
+<t>
+We develop these issues in <xref target="session-0RTT-privacy" /> 
+and <xref target="session-resume-privacy" />.
+</t>
+<section title="Privacy of Resolver Data" anchor="session-resolver-privacy" >
+<t>
+The recursive resolver could easily capture a log of the traffic sent by the stub resolver,
+and make it available to third parties. This would negate the privacy benefits of encrypting
+the data between stub and resolver.
+</t>
+<t>
+A first mitigation against that risk is the publication by the operator of the resolver of 
+a satisfactory privacy policy, explaining to potential users how the data will be protected.
+For example, a resolver may decide to not keep logs or to only keep them for short periods,
+and may commit to not disclose the stub's data to third parties.
+</t>
+<t>
+A policy voluntarily adopted by the resolver may not be sufficient if adversaries manage to 
+somehow gain control of the resolver, for example using some kind of computer virus. Mitigations
+against such attacks will protective actions by the stubs. Stubs may for example add cover
+traffic to the normal set of DNS queries, or they may split their traffic between several
+resolvers. Such mitigations will require further study.
+</t>
+</section>
+<section title="Backend observation of DNS traffic" anchor="session-backend-privacy" >
+<t>
+Queries sent by the stub to the recursive may be served from the recursive's cache, or
+may be served by forwarding the query to an authoritative server. Adversaries could observe the
+outgoing queries and try to correlate them with the encrypted traffic received by
+the recursive resolver. In the extreme case of a resolver with only one active stub client,
+this correlation is trivial. It gets progressively harder when resolvers serve larger 
+number of clients.
+</t>
+<t>
+Recursive resolvers MAY consider techniques like proactive caching to reduce the effectiveness 
+of this attack. Stub clients MAY prefer using resolvers that manage a large number of other 
+clients, as this will make the adversaries job harder. In the future, stub clients
+MAY attempt to mitigate this issue by using the cover traffic and split traffic strategies 
+discussed in <xref target="session-resolver-privacy" />.
+</t>
+</section>
+<section title="Privacy Issues With 0RTT data" anchor="session-0RTT-privacy" >
+<t>
+The zero-RTT data can be replayed by adversaries. That data may triggers a request by a
+recursive resolver to an authoritative resolvers. Adversaries may be able to pick a time 
+at which the recursive resolver outgoing traffic is observable, and thus find out what name was
+queried for in the 0-RTT data.
+</t>
+<t>
+This risk is in fact a subset of the general problem of observing the behavior of the
+recursive resolver discussed in <xref target="session-backend-privacy" />. The attack
+is partially mitigated by reducing the observability of this traffic. However, the
+risk is amplified for 0-RTT data, because the attacker might replay it at chosen times,
+several times.
+</t>
+<t>
+The recommendation in <xref target="I-D.ietf-tls-tls13" /> is that the capability
+to use 0-RTT data should be turned off by default, on only enabled if the user
+clearly understands the associated risks.
+</t>
+</section>
+<section title="Privacy Issues With Session Resume" anchor="session-resume-privacy" >
+<t>
+The QUIC session resume mechanism reduces the cost of reestablishing sessions and enables zero-RTT data.
+There is a linkability issue associated with session resume, if the same resume token
+is used several times, but this risk is mitigated by the mechanisms incorporated in QUIC and in
+TLS 1.3. With these mechanisms, clients and servers can cooperate to avoid
+linkability by third parties. However, the server will always be able to link the resumed session 
+to the initial session. This creates a virtual long duration session. The series of requests
+in that section can be used by the server to identify the client.
+</t>
+<t>
+Enabling the server to link client sessions through session resume is probably not a large
+addiional risk if the client's connectivity did not change between the sessions, since the
+two sessions can probably be correlated by comparing the IP addresses. On the other hand, if
+the addresses did change, the client SHOULD consider whether the linkability risk
+exceeds the privacy benefits. This evaluation will obviously depend on the level of trust between
+stub and recursive. 
 </t>
 </section>
 
@@ -730,9 +796,14 @@ This document liberally borrows text from <xref target="I-D.ietf-quic-http" /> a
 Mike Bishop, and from <xref target="RFC7858" /> authored by Zi Hu, Liang Zhu, John Heidemann,
 Allison Mankin, Duane Wessels, and Paul Hoffman.
 </t>
-    <t>
+<t>
+The privacy issue with 0-RTT data and session resume were analyzed by
+Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIV" working group 
+<xref target="DNS0RTT" />.
+</t>
+<t>
 Thanks to our wide cast of supporters.
-    </t>
+</t>
 </section>
 </middle>
 
@@ -761,6 +832,7 @@ Thanks to our wide cast of supporters.
       &I-D.ietf-quic-http;
       &I-D.ietf-quic-recovery;
       &I-D.ietf-dnssd-push;
+      &I-D.ietf-tls-tls13;
 
 <reference anchor="DNS0RTT" target="https://www.ietf.org/mail-archive/web/dns-privacy/current/msg01276.html">
   <front>
