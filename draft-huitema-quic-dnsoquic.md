@@ -20,7 +20,7 @@
       [author.address]
       email = "huitema@huitema.net"
       [author.address.postal]
-      streets = ["Friday Harbor"]
+      city = "Friday Harbor"
       code = "WA  98250"
       country = "U.S.A"
     [[author]]
@@ -296,7 +296,7 @@ NOT identify themselves using this string.
 Implementations of draft versions of the protocol MUST add the string
 "-" and the corresponding draft number to the identifier.  For
 example, draft-huitema-quic-dnsoquic-00 is identified using the
-string "hq-h00".
+string "dq-h00".
 
 ### Port Selection
 
@@ -315,7 +315,7 @@ NOT be port 53 or port 853.  This recommendation against use of port
 53 for DNS over QUIC is to avoid confusion between DNS over QUIC and
 DNS over UDP as specified in [@!RFC1035].  Similarly, using port 853
 would cause confusion between DNS over QUIC and DNS over DTLS as
-specified in [@!RFC1035].
+specified in [@?I-D.ietf-dprive-dnsodtls].
 
 ## Stream Mapping and Usage
 
@@ -530,7 +530,7 @@ those of DNS over TLS [@?RFC7858].
 
 # Privacy Considerations
 
-DNS over TLS is specifically designed to protect the DNS traffic
+DNS over QUIC is specifically designed to protect the DNS traffic
 between stub and resolver from observations by third parties, and
 thus protect the privacy of queries from the stub.  However, the recursive
 resolver has full visibility of the stub's traffic, and could be used
@@ -548,7 +548,7 @@ provide interesting latency gains, but it raises two concerns:
 2.  The zero-RTT mechanism relies on TLS resume, which can provide
     linkability between successive client sessions.
 
-These issues are developed (#privacy-issues-with-0rtt-data) and 
+These issues are developed in (#privacy-issues-with-0rtt-data) and 
 (#privacy-issues-with-session-resume).
 
 ## Privacy Issues With 0RTT data
@@ -631,7 +631,7 @@ obviously depend on the level of trust between stub and recursive.
 # Acknowledgements
 
 This document liberally borrows text from [@?I-D.ietf-quic-http]
-authored by Mike Bishop, and from [@?RFC7858] authored by Zi Hu, Liang
+edited by Mike Bishop, and from [@?RFC7858] authored by Zi Hu, Liang
 Zhu, John Heidemann, Allison Mankin, Duane Wessels, and Paul Hoffman.
 
 The privacy issue with 0-RTT data and session resume were analyzed by

@@ -371,7 +371,7 @@ Internet-Draft                DNS over QUIC                   April 2017
    Implementations of draft versions of the protocol MUST add the string
    "-" and the corresponding draft number to the identifier.  For
    example, draft-huitema-quic-dnsoquic-00 is identified using the
-   string "hq-h00".
+   string "dq-h00".
 
 5.1.2.  Port Selection
 
@@ -398,7 +398,7 @@ Internet-Draft                DNS over QUIC                   April 2017
    53 for DNS over QUIC is to avoid confusion between DNS over QUIC and
    DNS over UDP as specified in [RFC1035].  Similarly, using port 853
    would cause confusion between DNS over QUIC and DNS over DTLS as
-   specified in [RFC1035].
+   specified in [I-D.ietf-dprive-dnsodtls].
 
 5.2.  Stream Mapping and Usage
 
@@ -652,7 +652,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 8.  Privacy Considerations
 
-   DNS over TLS is specifically designed to protect the DNS traffic
+   DNS over QUIC is specifically designed to protect the DNS traffic
    between stub and resolver from observations by third parties, and
    thus protect the privacy of queries from the stub.  However, the
    recursive resolver has full visibility of the stub's traffic, and
@@ -677,7 +677,7 @@ Internet-Draft                DNS over QUIC                   April 2017
    2.  The zero-RTT mechanism relies on TLS resume, which can provide
        linkability between successive client sessions.
 
-   These issues are developed Section 8.1 and Section 8.2.
+   These issues are developed in Section 8.1 and Section 8.2.
 
 8.1.  Privacy Issues With 0RTT data
 
@@ -767,9 +767,9 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 10.  Acknowledgements
 
-   This document liberally borrows text from [I-D.ietf-quic-http]
-   authored by Mike Bishop, and from [RFC7858] authored by Zi Hu, Liang
-   Zhu, John Heidemann, Allison Mankin, Duane Wessels, and Paul Hoffman.
+   This document liberally borrows text from [I-D.ietf-quic-http] edited
+   by Mike Bishop, and from [RFC7858] authored by Zi Hu, Liang Zhu, John
+   Heidemann, Allison Mankin, Duane Wessels, and Paul Hoffman.
 
    The privacy issue with 0-RTT data and session resume were analyzed by
    Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIV" working
@@ -852,6 +852,11 @@ Internet-Draft                DNS over QUIC                   April 2017
               Pusateri, T. and S. Cheshire, "DNS Push Notifications",
               draft-ietf-dnssd-push-10 (work in progress), March 2017.
 
+   [I-D.ietf-dprive-dnsodtls]
+              Reddy, T., Wing, D., and P. Patil, "Specification for DNS
+              over Datagram Transport Layer Security (DTLS)", draft-
+              ietf-dprive-dnsodtls-15 (work in progress), December 2016.
+
    [I-D.ietf-dprive-padding-policy]
               Mayrhofer, A., "Padding Policy for EDNS(0)", draft-ietf-
               dprive-padding-policy-00 (work in progress), December
@@ -883,13 +888,8 @@ Internet-Draft                DNS over QUIC                   April 2017
               RFC 6335, DOI 10.17487/RFC6335, August 2011,
               <http://www.rfc-editor.org/info/rfc6335>.
 
-   [RFC7120]  Cotton, M., "Early IANA Allocation of Standards Track Code
-              Points", BCP 100, RFC 7120, DOI 10.17487/RFC7120, January
-              2014, <http://www.rfc-editor.org/info/rfc7120>.
 
-   [RFC7626]  Bortzmeyer, S., "DNS Privacy Considerations", RFC 7626,
-              DOI 10.17487/RFC7626, August 2015,
-              <http://www.rfc-editor.org/info/rfc7626>.
+
 
 
 
@@ -897,6 +897,14 @@ Huitema, et al.          Expires October 7, 2017               [Page 16]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
+
+   [RFC7120]  Cotton, M., "Early IANA Allocation of Standards Track Code
+              Points", BCP 100, RFC 7120, DOI 10.17487/RFC7120, January
+              2014, <http://www.rfc-editor.org/info/rfc7120>.
+
+   [RFC7626]  Bortzmeyer, S., "DNS Privacy Considerations", RFC 7626,
+              DOI 10.17487/RFC7626, August 2015,
+              <http://www.rfc-editor.org/info/rfc7626>.
 
    [RFC7766]  Dickinson, J., Dickinson, S., Bellis, R., Mankin, A., and
               D. Wessels, "DNS Transport over TCP - Implementation
@@ -927,8 +935,7 @@ Authors' Addresses
 
    Christian Huitema
    Private Octopus Inc.
-   Friday Harbor
-   WA  98250
+   Friday Harbor  WA  98250
    U.S.A
 
    Email: huitema@huitema.net
@@ -940,18 +947,17 @@ Authors' Addresses
    Email: mshore@fastly.com
 
 
-   Allison Mankin
-   Salesforce
-
-   Email: amankin@salesforce.com
-
-
-
 
 
 Huitema, et al.          Expires October 7, 2017               [Page 17]
 
 Internet-Draft                DNS over QUIC                   April 2017
+
+
+   Allison Mankin
+   Salesforce
+
+   Email: amankin@salesforce.com
 
 
    Sara Dickinson
@@ -968,12 +974,6 @@ Internet-Draft                DNS over QUIC                   April 2017
    Google
 
    Email: jri@google.com
-
-
-
-
-
-
 
 
 
