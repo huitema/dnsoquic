@@ -398,7 +398,7 @@ Internet-Draft                DNS over QUIC                   April 2017
    53 for DNS over QUIC is to avoid confusion between DNS over QUIC and
    DNS over UDP as specified in [RFC1035].  Similarly, using port 853
    would cause confusion between DNS over QUIC and DNS over DTLS as
-   specified in [I-D.ietf-dprive-dnsodtls].
+   specified in [RFC8094].
 
 5.2.  Stream Mapping and Usage
 
@@ -852,11 +852,6 @@ Internet-Draft                DNS over QUIC                   April 2017
               Pusateri, T. and S. Cheshire, "DNS Push Notifications",
               draft-ietf-dnssd-push-10 (work in progress), March 2017.
 
-   [I-D.ietf-dprive-dnsodtls]
-              Reddy, T., Wing, D., and P. Patil, "Specification for DNS
-              over Datagram Transport Layer Security (DTLS)", draft-
-              ietf-dprive-dnsodtls-15 (work in progress), December 2016.
-
    [I-D.ietf-dprive-padding-policy]
               Mayrhofer, A., "Padding Policy for EDNS(0)", draft-ietf-
               dprive-padding-policy-00 (work in progress), December
@@ -888,16 +883,6 @@ Internet-Draft                DNS over QUIC                   April 2017
               RFC 6335, DOI 10.17487/RFC6335, August 2011,
               <http://www.rfc-editor.org/info/rfc6335>.
 
-
-
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 16]
-
-Internet-Draft                DNS over QUIC                   April 2017
-
-
    [RFC7120]  Cotton, M., "Early IANA Allocation of Standards Track Code
               Points", BCP 100, RFC 7120, DOI 10.17487/RFC7120, January
               2014, <http://www.rfc-editor.org/info/rfc7120>.
@@ -905,6 +890,13 @@ Internet-Draft                DNS over QUIC                   April 2017
    [RFC7626]  Bortzmeyer, S., "DNS Privacy Considerations", RFC 7626,
               DOI 10.17487/RFC7626, August 2015,
               <http://www.rfc-editor.org/info/rfc7626>.
+
+
+
+Huitema, et al.          Expires October 7, 2017               [Page 16]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
 
    [RFC7766]  Dickinson, J., Dickinson, S., Bellis, R., Mankin, A., and
               D. Wessels, "DNS Transport over TCP - Implementation
@@ -924,6 +916,11 @@ Internet-Draft                DNS over QUIC                   April 2017
               and P. Hoffman, "Specification for DNS over Transport
               Layer Security (TLS)", RFC 7858, DOI 10.17487/RFC7858, May
               2016, <http://www.rfc-editor.org/info/rfc7858>.
+
+   [RFC8094]  Reddy, T., Wing, D., and P. Patil, "DNS over Datagram
+              Transport Layer Security (DTLS)", RFC 8094,
+              DOI 10.17487/RFC8094, February 2017,
+              <http://www.rfc-editor.org/info/rfc8094>.
 
    [TDNS]     Zhu, L., Hu, Z., Heidemann, J., Wessels, D., Mankin, A.,
               and N. Somaiya, "Connection-Oriented DNS to Improve
@@ -945,6 +942,9 @@ Authors' Addresses
    Fastly
 
    Email: mshore@fastly.com
+
+
+
 
 
 

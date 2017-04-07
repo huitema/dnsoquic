@@ -315,7 +315,7 @@ NOT be port 53 or port 853.  This recommendation against use of port
 53 for DNS over QUIC is to avoid confusion between DNS over QUIC and
 DNS over UDP as specified in [@!RFC1035].  Similarly, using port 853
 would cause confusion between DNS over QUIC and DNS over DTLS as
-specified in [@?I-D.ietf-dprive-dnsodtls].
+specified in [@?RFC8094].
 
 ## Stream Mapping and Usage
 
