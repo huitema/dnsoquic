@@ -5,7 +5,7 @@
     docName= "draft-huitema-quic-dnsoquic-00"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-04-05T00:00:00Z
+    date = 2017-04-10T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -430,13 +430,16 @@ be more aggressive about retrying DNS over QUIC connection failures.
 
 ## Response Sizes
 
-DNS over QUIC does not suffer from a limitation on the size of responses that 
+DNS over QUIC does not suffer from the limitation on the size of responses that 
 can be delivered as DNS over UDP [@!RFC1035] does, since large responses will
 be sent in separate STREAM frames in separate packets. 
 
 QUESTION: However this raises a new issue because the responses sent over 
-QUIC can be significantly larger than those sent over TCP (65,635 bytes). Should
-this limit be applied for DNS over QUIC responses or not?
+QUIC can be significantly larger than those sent over TCP (65,635 bytes).
+According to [@!I-D.ietf-quic-transport] "The largest offset delivered on
+a stream - the sum of the re-constructed offset and data length - MUST be less 
+than 2^64". Should a specific limit be applied for DNS over QUIC responses or 
+not?
 
 ## DNS Message IDs
 
