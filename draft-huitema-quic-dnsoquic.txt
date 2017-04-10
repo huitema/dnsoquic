@@ -5,14 +5,14 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                                M. Shore
-Expires: October 7, 2017                                          Fastly
+Expires: October 12, 2017                                         Fastly
                                                                A. Mankin
                                                               Salesforce
                                                             S. Dickinson
                                                               Sinodun IT
                                                               J. Iyengar
                                                                   Google
-                                                           April 5, 2017
+                                                          April 10, 2017
 
 
                      Specification of DNS over QUIC
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on October 7, 2017.
+   This Internet-Draft will expire on October 12, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 1]
+Huitema, et al.         Expires October 12, 2017                [Page 1]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -109,15 +109,15 @@ Table of Contents
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 2]
+Huitema, et al.         Expires October 12, 2017                [Page 2]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
 
    11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
      11.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     11.2.  Informative References . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+     11.2.  Informative References . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
 
@@ -165,7 +165,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 3]
+Huitema, et al.         Expires October 12, 2017                [Page 3]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -221,7 +221,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 4]
+Huitema, et al.         Expires October 12, 2017                [Page 4]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -277,7 +277,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 5]
+Huitema, et al.         Expires October 12, 2017                [Page 5]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -333,7 +333,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 6]
+Huitema, et al.         Expires October 12, 2017                [Page 6]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -389,7 +389,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 7]
+Huitema, et al.         Expires October 12, 2017                [Page 7]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 8]
+Huitema, et al.         Expires October 12, 2017                [Page 8]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-Huitema, et al.          Expires October 7, 2017                [Page 9]
+Huitema, et al.         Expires October 12, 2017                [Page 9]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
@@ -532,15 +532,17 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 6.3.  Response Sizes
 
-   DNS over QUIC does not suffer from a limitation on the size of
+   DNS over QUIC does not suffer from the limitation on the size of
    responses that can be delivered as DNS over UDP [RFC1035] does, since
    large responses will be sent in separate STREAM frames in separate
    packets.
 
    QUESTION: However this raises a new issue because the responses sent
    over QUIC can be significantly larger than those sent over TCP
-   (65,635 bytes).  Should this limit be applied for DNS over QUIC
-   responses or not?
+   (65,635 bytes).  According to [I-D.ietf-quic-transport] "The largest
+   offset delivered on a stream - the sum of the re-constructed offset
+   and data length - MUST be less than 2^64".  Should a specific limit
+   be applied for DNS over QUIC responses or not?
 
 6.4.  DNS Message IDs
 
@@ -551,16 +553,17 @@ Internet-Draft                DNS over QUIC                   April 2017
 
    And similarly for 'Clients MUST match outstanding queries using the
    Message ID and if the response contains a question section, the
-   client MUST match the QNAME, QCLASS, and QTYPE fields.'.  In other
-   words should we involve the stream ID in message matching or not?
 
 
 
 
-Huitema, et al.          Expires October 7, 2017               [Page 10]
+Huitema, et al.         Expires October 12, 2017               [Page 10]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
+
+   client MUST match the QNAME, QCLASS, and QTYPE fields.'.  In other
+   words should we involve the stream ID in message matching or not?
 
 6.5.  Padding
 
@@ -606,18 +609,19 @@ Internet-Draft                DNS over QUIC                   April 2017
    conditions such as defending against an attack or system failure/
    reboot.
 
-   Clients and servers that keep idle connections open MUST be robust to
-   termination of idle connection by either party.  As with current DNS
-   over TCP, DNS servers MAY close the connection at any time (perhaps
-   due to resource constraints).  As with current DNS over TCP, clients
 
 
 
-Huitema, et al.          Expires October 7, 2017               [Page 11]
+
+Huitema, et al.         Expires October 12, 2017               [Page 11]
 
 Internet-Draft                DNS over QUIC                   April 2017
 
 
+   Clients and servers that keep idle connections open MUST be robust to
+   termination of idle connection by either party.  As with current DNS
+   over TCP, DNS servers MAY close the connection at any time (perhaps
+   due to resource constraints).  As with current DNS over TCP, clients
    MUST handle abrupt closes and be prepared to reestablish connections
    and/or retry queries.
 
@@ -660,19 +664,22 @@ Internet-Draft                DNS over QUIC                   April 2017
    These considerations do not differ between DNS over TLS and DNS over
    QUIC and are not discussed further here.
 
+
+
+
+
+
+Huitema, et al.         Expires October 12, 2017               [Page 12]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
+
    QUIC incorporates the mechanisms of TLS 1.3 [I-D.ietf-tls-tls13] and
    this enables QUIC transmission of "Zero RTT" data.  This can provide
    interesting latency gains, but it raises two concerns:
 
    1.  Adversaries could replay the zero-RTT data and infer its content
        from the behavior of the receiving server.
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 12]
-
-Internet-Draft                DNS over QUIC                   April 2017
-
 
    2.  The zero-RTT mechanism relies on TLS resume, which can provide
        linkability between successive client sessions.
@@ -715,20 +722,19 @@ Internet-Draft                DNS over QUIC                   April 2017
 
    Enabling the server to link client sessions through session resume is
    probably not a large additional risk if the client's connectivity did
+
+
+
+Huitema, et al.         Expires October 12, 2017               [Page 13]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
+
    not change between the sessions, since the two sessions can probably
    be correlated by comparing the IP addresses.  On the other hand, if
    the addresses did change, the client SHOULD consider whether the
    linkability risk exceeds the privacy benefits.  This evaluation will
    obviously depend on the level of trust between stub and recursive.
-
-
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 13]
-
-Internet-Draft                DNS over QUIC                   April 2017
-
 
 9.  IANA Considerations
 
@@ -771,20 +777,20 @@ Internet-Draft                DNS over QUIC                   April 2017
    by Mike Bishop, and from [RFC7858] authored by Zi Hu, Liang Zhu, John
    Heidemann, Allison Mankin, Duane Wessels, and Paul Hoffman.
 
+
+
+
+
+Huitema, et al.         Expires October 12, 2017               [Page 14]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
+
    The privacy issue with 0-RTT data and session resume were analyzed by
    Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIV" working
    group [DNS0RTT].
 
    Thanks to our wide cast of supporters.
-
-
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 14]
-
-Internet-Draft                DNS over QUIC                   April 2017
-
 
 11.  References
 
@@ -824,6 +830,18 @@ Internet-Draft                DNS over QUIC                   April 2017
               Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
               July 2014, <http://www.rfc-editor.org/info/rfc7301>.
 
+
+
+
+
+
+
+
+Huitema, et al.         Expires October 12, 2017               [Page 15]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
+
 11.2.  Informative References
 
    [DNS0RTT]  Kahn Gillmor, D., "DNS + 0-RTT", Message DNS-Privacy WG
@@ -834,13 +852,6 @@ Internet-Draft                DNS over QUIC                   April 2017
               Bortzmeyer, S., "Next step for DPRIVE: resolver-to-auth
               link", draft-bortzmeyer-dprive-step-2-05 (work in
               progress), December 2016.
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 15]
-
-Internet-Draft                DNS over QUIC                   April 2017
-
 
    [I-D.ietf-dnsop-session-signal]
               Bellis, R., Cheshire, S., Dickinson, J., Dickinson, S.,
@@ -876,6 +887,17 @@ Internet-Draft                DNS over QUIC                   April 2017
               (AXFR)", RFC 5936, DOI 10.17487/RFC5936, June 2010,
               <http://www.rfc-editor.org/info/rfc5936>.
 
+
+
+
+
+
+
+Huitema, et al.         Expires October 12, 2017               [Page 16]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
+
    [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
               Cheshire, "Internet Assigned Numbers Authority (IANA)
               Procedures for the Management of the Service Name and
@@ -890,13 +912,6 @@ Internet-Draft                DNS over QUIC                   April 2017
    [RFC7626]  Bortzmeyer, S., "DNS Privacy Considerations", RFC 7626,
               DOI 10.17487/RFC7626, August 2015,
               <http://www.rfc-editor.org/info/rfc7626>.
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 16]
-
-Internet-Draft                DNS over QUIC                   April 2017
-
 
    [RFC7766]  Dickinson, J., Dickinson, S., Bellis, R., Mankin, A., and
               D. Wessels, "DNS Transport over TCP - Implementation
@@ -928,6 +943,17 @@ Internet-Draft                DNS over QUIC                   April 2017
               Privacy (SP), DOI 10.1109/SP.2015.18,
               <http://dx.doi.org/10.1109/SP.2015.18>.
 
+
+
+
+
+
+
+Huitema, et al.         Expires October 12, 2017               [Page 17]
+
+Internet-Draft                DNS over QUIC                   April 2017
+
+
 Authors' Addresses
 
    Christian Huitema
@@ -942,16 +968,6 @@ Authors' Addresses
    Fastly
 
    Email: mshore@fastly.com
-
-
-
-
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 17]
-
-Internet-Draft                DNS over QUIC                   April 2017
 
 
    Allison Mankin
@@ -989,20 +1005,4 @@ Internet-Draft                DNS over QUIC                   April 2017
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Huitema, et al.          Expires October 7, 2017               [Page 18]
+Huitema, et al.         Expires October 12, 2017               [Page 18]
