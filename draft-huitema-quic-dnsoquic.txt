@@ -15,8 +15,8 @@ Expires: October 13, 2017                                         Fastly
                                                           April 11, 2017
 
 
-           Specification of DNS in Dedicated QUIC connections
-                     draft-huitema-quic-dnsoquic-00
+          Specification of DNS over Dedicated QUIC Connections
+                     draft-huitema-quic-dnsoquic-01
 
 Abstract
 
@@ -55,7 +55,7 @@ Copyright Notice
 
 Huitema, et al.         Expires October 13, 2017                [Page 1]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -111,7 +111,7 @@ Table of Contents
 
 Huitema, et al.         Expires October 13, 2017                [Page 2]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
@@ -167,7 +167,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 3]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    Specifying the transmission of an application over QUIC requires to
@@ -223,7 +223,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 4]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    trial and error process.  At this stage of QUIC deployment, this
@@ -279,7 +279,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 5]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    1.  Optional support for sending 0-RTT data during session resume
@@ -335,7 +335,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 6]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 4.5.  No Specific Middlebox Bypass Mechanism
@@ -347,7 +347,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
    which HTTP over QUIC will be allowed, but DNS over QUIC will be
    disallowed and blocked by these middle boxes.
 
-   It is recognised that this might be a problem, but there is currently
+   It is recognized that this might be a problem, but there is currently
    no indication on how widespread that problem might be.  It might be
    that the problem will be so acute that the only realistic solution
    would be to communicate with independent recursive resolvers using
@@ -379,8 +379,8 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
    Implementations of draft versions of the protocol MUST add the string
    "-" and the corresponding draft number to the identifier.  For
-   example, draft-huitema-quic-dnsoquic-00 is identified using the
-   string "dq-h00".
+   example, draft-huitema-quic-dnsoquic-001 is identified using the
+   string "dq-h01".
 
 
 
@@ -391,7 +391,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 7]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 5.1.2.  Port Selection
@@ -430,12 +430,12 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
    be sent on that stream.
 
    The server MUST send the response on the same stream, and MUST
-   indicate through the STREAM FIN mechanism mechanism that no further
-   data will be sent on that stream.
+   indicate through the STREAM FIN mechanism that no further data will
+   be sent on that stream.
 
-   Therefore a single client initiated DNS transaction consumes a single
-   stream.  This means that the client's first query occurs on QUIC
-   stream 3, the second on 5, and so on.
+   Therefore, a single client initiated DNS transaction consumes a
+   single stream.  This means that the client's first query occurs on
+   QUIC stream 3, the second on 5, and so on.
 
    DNS query and responses are formatted as specified in [RFC1035].  In
    contrast with DNS over TCP [RFC7766] and DNS over TLS [RFC7858],
@@ -447,7 +447,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 8]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 5.2.1.  Server Initiated Transactions
@@ -463,8 +463,8 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
    be sent on that stream.
 
    The client MUST send the response on the same stream, and MUST
-   indicate through the STREAM FIN mechanism mechanism that no further
-   data will be sent on that stream.
+   indicate through the STREAM FIN mechanism that no further data will
+   be sent on that stream.
 
    Therefore a single server initiated DNS transaction consumes a single
    stream.  This means that the servers's first query occurs on QUIC
@@ -503,7 +503,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017                [Page 9]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 5.4.  Connection Resume and 0-RTT
@@ -552,14 +552,14 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
    large responses will be sent in separate STREAM frames in separate
    packets.
 
-   QUESTION: However this raises a new issue because the responses sent
+   QUESTION: However, this raises a new issue because the responses sent
    over QUIC can be significantly larger than those sent over TCP
 
 
 
 Huitema, et al.         Expires October 13, 2017               [Page 10]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    (65,635 bytes).  According to [I-D.ietf-quic-transport] "The largest
@@ -574,7 +574,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
    Message ID of an in-flight query on that connection in order to avoid
    Message ID collisions.'
 
-   And similarly for 'Clients MUST match outstanding queries using the
+   And similarly, for 'Clients MUST match outstanding queries using the
    Message ID and if the response contains a question section, the
    client MUST match the QNAME, QCLASS, and QTYPE fields.'.  In other
    words should we involve the stream ID in message matching or not?
@@ -615,7 +615,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 11]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 6.6.2.  Connection Close
@@ -644,7 +644,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 6.6.3.  Idle Timeouts
 
    Proper management of established and idle connections is important to
-   the healthy operation of a DNS server.  An implementor of DNS over
+   the healthy operation of a DNS server.  An implementation of DNS over
    QUIC SHOULD follow best practices for DNS over TCP, as described in
    [RFC7766].  Failure to do so may lead to resource exhaustion and
    denial of service.
@@ -671,7 +671,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 12]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 7.  Security Considerations
@@ -727,7 +727,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 13]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
 8.2.  Privacy Issues With Session Resume
@@ -783,7 +783,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 14]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
        Service Name           domain-s
@@ -812,8 +812,8 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
    [I-D.ietf-dprive-dtls-and-tls-profiles]
               Dickinson, S., Gillmor, D., and T. Reddy, "Authentication
               and (D)TLS Profile for DNS-over-(D)TLS", draft-ietf-
-              dprive-dtls-and-tls-profiles-08 (work in progress),
-              January 2017.
+              dprive-dtls-and-tls-profiles-09 (work in progress), April
+              2017.
 
    [I-D.ietf-quic-tls]
               Thomson, M. and S. Turner, "Using Transport Layer Security
@@ -839,7 +839,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 15]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -854,7 +854,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 11.2.  Informative References
 
-   [DNS0RTT]  Kahn Gillmor, D., "DNS + 0-RTT", Message DNS-Privacy WG
+   [DNS0RTT]  Kahn Gillmor, D., "DNS + 0-RTT", Message to DNS-Privacy WG
               mailing list, April 2016, <https://www.ietf.org/mail-
               archive/web/dns-privacy/current/msg01276.html>.
 
@@ -895,7 +895,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 16]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    [I-D.ietf-dprive-padding-policy]
@@ -951,7 +951,7 @@ Internet-Draft            DNS in Dedicated QUIC               April 2017
 
 Huitema, et al.         Expires October 13, 2017               [Page 17]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    [RFC7830]  Mayrhofer, A., "The EDNS(0) Padding Option", RFC 7830,
@@ -1007,7 +1007,7 @@ Authors' Addresses
 
 Huitema, et al.         Expires October 13, 2017               [Page 18]
 
-Internet-Draft            DNS in Dedicated QUIC               April 2017
+Internet-Draft           DNS over Dedicated QUIC              April 2017
 
 
    Sara Dickinson

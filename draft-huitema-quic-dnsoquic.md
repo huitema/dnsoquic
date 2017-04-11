@@ -1,8 +1,8 @@
 %%%
-    Title = "Specification of DNS in Dedicated QUIC connections"
-    abbrev = "DNS in Dedicated QUIC"
+    Title = "Specification of DNS over Dedicated QUIC Connections"
+    abbrev = "DNS over Dedicated QUIC"
     category = "std"
-    docName= "draft-huitema-quic-dnsoquic-00"
+    docName= "draft-huitema-quic-dnsoquic-01"
     ipr = "trust200902"
     area = "Network"
     date = 2017-04-11T00:00:00Z
@@ -262,7 +262,7 @@ noted by firewalls and middleboxes.  There may be environments in
 which HTTP over QUIC will be allowed, but DNS over QUIC will be
 disallowed and blocked by these middle boxes.
 
-It is recognised that this might be a problem, but there is currently no
+It is recognized that this might be a problem, but there is currently no
 indication on how widespread that problem might be.  It might be that
 the problem will be so acute that the only realistic solution would
 be to communicate with independent recursive resolvers using DNS over
@@ -295,8 +295,8 @@ NOT identify themselves using this string.
 
 Implementations of draft versions of the protocol MUST add the string
 "-" and the corresponding draft number to the identifier.  For
-example, draft-huitema-quic-dnsoquic-00 is identified using the
-string "dq-h00".
+example, draft-huitema-quic-dnsoquic-001 is identified using the
+string "dq-h01".
 
 ### Port Selection
 
@@ -333,10 +333,10 @@ indicate through the STREAM FIN mechanism that no further data will
 be sent on that stream.
 
 The server MUST send the response on the same stream, and MUST
-indicate through the STREAM FIN mechanism mechanism that no further
+indicate through the STREAM FIN mechanism that no further
 data will be sent on that stream.
 
-Therefore a single client initiated DNS transaction consumes a single stream.
+Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the 
 client's first query occurs on QUIC stream 3, the second on 5, and so on.
 
@@ -357,7 +357,7 @@ through the STREAM FIN mechanism that no further data will be sent on
 that stream.
 
 The client MUST send the response on the same stream, and MUST
-indicate through the STREAM FIN mechanism mechanism that no further
+indicate through the STREAM FIN mechanism that no further
 data will be sent on that stream.
 
 Therefore a single server initiated DNS transaction consumes a single stream. 
@@ -434,7 +434,7 @@ DNS over QUIC does not suffer from the limitation on the size of responses that
 can be delivered as DNS over UDP [@!RFC1035] does, since large responses will
 be sent in separate STREAM frames in separate packets. 
 
-QUESTION: However this raises a new issue because the responses sent over 
+QUESTION: However, this raises a new issue because the responses sent over 
 QUIC can be significantly larger than those sent over TCP (65,635 bytes).
 According to [@!I-D.ietf-quic-transport] "The largest offset delivered on
 a stream - the sum of the re-constructed offset and data length - MUST be less 
@@ -447,7 +447,7 @@ QUESTION: Should we include the restrictions 'When sending multiple queries over
 a QUIC connection, clients MUST NOT reuse the DNS Message ID of an in-flight 
 query on that connection in order to avoid Message ID collisions.'
 
-And similarly for 'Clients MUST match
+And similarly, for 'Clients MUST match
 outstanding queries using the Message ID and if the response contains a question 
 section, the client MUST match the QNAME, QCLASS, and QTYPE fields.'. In other
 words should we involve the stream ID in message matching or not?
@@ -506,7 +506,7 @@ and/or retry queries.
 ### Idle Timeouts
 
 Proper management of established and idle connections is important to
-the healthy operation of a DNS server.  An implementor of DNS over
+the healthy operation of a DNS server.  An implementation of DNS over
 QUIC SHOULD follow best practices for DNS over TCP, as described in
 [@?RFC7766].  Failure to do so may lead to resource exhaustion and
 denial of service.
@@ -651,7 +651,7 @@ Thanks to our wide cast of supporters.
     </author>
     <date year="2016" month="April" day="06" />
   </front>
-  <seriesInfo name="Message" value="DNS-Privacy WG mailing list"/>
+  <seriesInfo name="Message to" value="DNS-Privacy WG mailing list"/>
 </reference>
 
 <reference anchor="TDNS" target="http://dx.doi.org/10.1109/SP.2015.18">
