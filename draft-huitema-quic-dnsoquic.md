@@ -1,11 +1,11 @@
 %%%
-    Title = "Specification of DNS over QUIC"
-    abbrev = "DNS over QUIC"
+    Title = "Specification of DNS in Dedicated QUIC connections"
+    abbrev = "DNS in Dedicated QUIC"
     category = "std"
     docName= "draft-huitema-quic-dnsoquic-00"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-04-10T00:00:00Z
+    date = 2017-04-11T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -109,9 +109,9 @@ stub clients and recursive servers. The specific non-goals are:
     traffic by middleboxes.
 
 Users interested in zone transfers should continue using TCP based
-solutions, and users interested in evading middleboxes should
-consider using solutions like DNS over HTTPS or DNS over HTTP over
-QUIC (TODO: References required).
+solutions. Users interested in evading middleboxes should
+consider using solutions like DNS over HTTPS [@?I-D.hoffman-dns-over-http]
+[@?I-D.hoffman-dns-in-existing-http2], or DNS in existing QUIC connections [@?I-D.hoffman-dns-in-existing-quic].
 
 Specifying the transmission of an application over QUIC requires to
 specify how the application messages are mapped to QUIC streams, and
