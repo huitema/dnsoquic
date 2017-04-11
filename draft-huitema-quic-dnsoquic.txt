@@ -304,27 +304,27 @@ Internet-Draft           DNS over Dedicated QUIC              April 2017
    Adding a different mapping for a different application contributes to
    the development of QUIC.
 
-   In the HTTP over QUIC mappings, the stream number 3 is used for
-   control messages, in which client or server announce their intent to
-   send headers and bodies of requests and responses and specify the
-   number of the streams that will carry these headers and response.
-   The advantage is that client and server can then schedule processing
-   of the requests and responses according to various policies and
-   priorities, and can tightly control the usage of streams.  This comes
-   at the cost of some complexity, and also some performance since the
-   control stream is exposed to head-of-line blocking.
+   HTTP/QUIC uses a dedicated control channel on a long-lived stream to
+   maintain connection state beyond the lifetime of individual requests,
+   such as relative priority of requests, settings, and other metadata.
+   These additional capabilities come at the cost of some complexity,
+   and also some performance since the control stream is exposed to
+   head-of-line blocking.
 
    In this document a different design is deliberately explored, in
    which there is no control stream.  Clients and servers can initiate
    queries as determined by the DNS application logic, opening new
    streams as necessary.  This provides for maximum parallelism between
    queries, as noted in Section 4.3.  It also places constraints on the
-   API.  Instead of merely listening for control messages on a control
-   stream, client and servers will have to be notified of the opening of
-   a new stream by their peer.  Instead of orderly closing the control
+   API.  Client and servers will have to be notified of the opening of a
+   new stream by their peer.  Instead of orderly closing the control
    stream, client and server will have to use orderly connection closure
    mechanisms and manage the potential loss of data if closing on one
    end conflicts with opening of a stream on the other end.
+
+   QUESTION: The server originated PUSH requests are expected to be
+   delivered in order.  Is it possible to guarantee this order without a
+   control stream?
 
 
 
