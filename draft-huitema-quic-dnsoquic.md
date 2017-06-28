@@ -2,10 +2,10 @@
     Title = "Specification of DNS over Dedicated QUIC Connections"
     abbrev = "DNS over Dedicated QUIC"
     category = "std"
-    docName= "draft-huitema-quic-dnsoquic-01"
+    docName= "draft-huitema-quic-dnsoquic-02"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-04-11T00:00:00Z
+    date = 2017-06-28T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -110,8 +110,7 @@ stub clients and recursive servers. The specific non-goals are:
 
 Users interested in zone transfers should continue using TCP based
 solutions. Users interested in evading middleboxes should
-consider using solutions like DNS over HTTPS [@?I-D.hoffman-dns-over-http]
-[@?I-D.hoffman-dns-in-existing-http2], or DNS in existing QUIC connections [@?I-D.hoffman-dns-in-existing-quic].
+consider using solutions like DNS over HTTPS [@?I-D.hoffman-dns-over-https].
 
 Specifying the transmission of an application over QUIC requires to
 specify how the application messages are mapped to QUIC streams, and
@@ -301,7 +300,7 @@ string "dq-h01".
 
 By default, a DNS server that supports DNS/QUIC MUST listen for and
 accept QUIC connections on the dedicated UDP port TBD (number to be
-defined in (#iana-considerations), unless it has mutual
+defined in (#iana-considerations)), unless it has mutual
 agreement with its clients to use a port other than TBD for DNS over
 QUIC.  In order to use a port other than TBD, both clients and
 servers would need a configuration option in their software.
@@ -442,23 +441,31 @@ not?
 
 ## DNS Message IDs
 
-QUESTION: Should we include the restrictions 'When sending multiple queries over 
-a QUIC connection, clients MUST NOT reuse the DNS Message ID of an in-flight 
-query on that connection in order to avoid Message ID collisions.'
+When sending multiple queries over a QUIC connection, clients MUST NOT reuse
+the DNS Message ID of an in-flight 
+query on that connection in order to avoid Message ID collisions.
 
-And similarly, for 'Clients MUST match
-outstanding queries using the Message ID and if the response contains a question 
-section, the client MUST match the QNAME, QCLASS, and QTYPE fields.'. In other
-words should we involve the stream ID in message matching or not?
+Clients MUST match responses to
+outstanding queries using the STREAM ID and Message ID and if the response contains a question 
+section, the client MUST match the QNAME, QCLASS, and QTYPE fields. Failure to match
+is a DNS over QUIC protocol error. Clients observing such errors SHOULD close the connection
+immediately, indicating the application specific error code 0x00000001.
+The client should also mark the server as inappropriate
+for future use of DNS over QUIC.
 
-## Padding
+## Padding {#padding}
 
 There are mechanisms specified for both padding individual DNS messages
 [@?RFC7830], [@?I-D.ietf-dprive-padding-policy] and padding within QUIC
 packets (see Section 8.6 of [@!I-D.ietf-quic-transport]), which may contain
 multiple frames.
 
-QUESTION: What should the padding guidelines be here? 
+Implementations SHOULD NOT use DNS options far
+padding individual DNS messages, because QUIC transport
+MAY transmit multiple STREAM frames containing separare DNS messages in
+a single QUIC packet. Instead, implementations SHOULD use QUIC PADDING frames
+to align the packet length to a small set of fixed sizes, aligned with
+the recommendations of [@?I-D.ietf-dprive-padding-policy].
 
 ## Connection Handling
 
@@ -518,12 +525,20 @@ during periods of high activity.  Current work in this area may also
 assist DNS over TLS clients and servers in selecting useful timeout
 values [@?RFC7828] [@?I-D.ietf-dnsop-session-signal] [@TDNS].
 
-TODO: Clarify what timers (idle timeouts, response timeouts) apply at the stream level and at the connection level.
+TODO: Clarify what timers (idle timeouts, response timeouts) apply at the
+stream level and at the connection level.
 
 TODO: QUIC provides an efficient mechanism for resuming connections,
 including the possibility of sending 0-RTT data.  Does that change
 the tradeoff?  Is it plausible to use shorter timers than specified
 for TCP?
+
+## Flow Control Mechanisms
+
+Servers MAY use the "maximum concurrent streams" option of the QUIC
+transport to limit the number of concurrent streams opened by the
+client. This mechanism will effectively limit the number of concurrent
+DNS queries that a server can accept.
 
 # Security Considerations
 
@@ -595,6 +610,18 @@ the addresses did change, the client SHOULD consider whether the
 linkability risk exceeds the privacy benefits.  This evaluation will
 obviously depend on the level of trust between stub and recursive.
 
+## Traffic Analysis
+
+Even though QUIC packets are encrypted, adversaries can gain information from
+observing packet lengths, in both queries and responses, as well as packet
+timing. Many DNS requests are emitted by web browsers. Loading a specific
+web page may require resolving dozen of DNS names. If an application
+adopts a simple mapping of one query or response per packet, or "one 
+QUIC STREAM frame per packet", then the succession of packet lengths may
+provide enough information to identify the requested site.
+
+Implementations SHOULD use the mechanisms defined in (#padding) to
+mitigate this attack.
 
 # IANA Considerations
 
@@ -620,7 +647,7 @@ obviously depend on the level of trust between stub and recursive.
    [@?RFC6335], and such a review was requested using the early allocation
    process [@?RFC7120] for the well-known UDP port in this document. Since
    port 853 is reserved for 'DNS query-response protocol run over TLS' 
-   consideration is requested for reserving port 953 for 'DNS query-response 		  
+   consideration is requested for reserving port TBD for 'DNS query-response 		  
    protocol run over QUIC'.
 
        Service Name           domain-s
@@ -629,6 +656,14 @@ obviously depend on the level of trust between stub and recursive.
        Contact                IETF Chair
        Description            DNS query-response protocol run over QUIC
        Reference              This document
+
+### Port number 784 for experimentations
+
+**RFC Editor's Note:** Please remove this section prior to
+ publication of a final version of this document.
+
+Early experiments MAY use port 784. This port is marked in the IANA 
+registry as unassigned.
 
 # Acknowledgements
 
