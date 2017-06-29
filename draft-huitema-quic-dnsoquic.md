@@ -5,7 +5,7 @@
     docName= "draft-huitema-quic-dnsoquic-02"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-06-28T00:00:00Z
+    date = 2017-06-29T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -535,10 +535,10 @@ for TCP?
 
 ## Flow Control Mechanisms
 
-Servers MAY use the "maximum concurrent streams" option of the QUIC
-transport to limit the number of concurrent streams opened by the
-client. This mechanism will effectively limit the number of concurrent
-DNS queries that a server can accept.
+Servers MAY use the "maximum stream ID" option of the QUIC
+transport to limit the number of streams opened by the
+client. This mechanism will effectively limit the number of 
+DNS queries that a client can send.
 
 # Security Considerations
 
