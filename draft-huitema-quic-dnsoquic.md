@@ -76,52 +76,53 @@ similar to classic DNS over UDP.
 
 Domain Name System (DNS) concepts are specified in [@!RFC1034].  This
 document presents a mapping of the DNS protocol [@!RFC1035] over QUIC
-transport [@!I-D.ietf-quic-transport].  The goals of this mapping are:
+transport [@!I-D.ietf-quic-transport] [@!I-D.ietf-quic-tls].  The
+goals of this mapping are:
 
-1.  Provide the same DNS privacy protection as DNS over TLS
+1.  Provide the same DNS privacy protection as DNS over TLS (DNS/TLS)
     [@?RFC7858]. This includes to option for the client to 
     authenticate the server by means of an authentication domain
     name [@!I-D.ietf-dprive-dtls-and-tls-profiles].
 
 2.  Provide an improved level of source address validation for DNS
-    servers compared to DNS over UDP [@!RFC1035].
+    servers compared to DNS/UDP [@!RFC1035].
 
 3.  Provide a transport that is not constrained by path MTU limitations on the 
     size of DNS responses it can send.
 
 4.  Explore the potential performance gains of using QUIC as a DNS
-    transport, versus other solutions like DNS over UDP [@!RFC1035] or
-    DNS over TLS [@?RFC7858].
+    transport, versus other solutions like DNS/UDP [@!RFC1035] or
+    DNS/TLS [@?RFC7858].
 
 5.  Participate in the definition of QUIC protocols and API, by
     outlining a use case for QUIC different from HTTP over QUIC
     [@?I-D.ietf-quic-http].
 
-In order to achieve these goals, the focus is limited to the "stub to
-recursive resolver" scenario also addressed by [@?RFC7858], that is
-the protocol described here works for queries and responses between
-stub clients and recursive servers. The specific non-goals are:
+In order to achieve these goals, the focus of this document is limited
+to the "stub to recursive resolver" scenario also addressed by [@?RFC7858].
+That is, the protocol described here works for queries and responses between
+stub clients and recursive servers. The specific non-goals of this document are:
 
 1.  No attempt is made to support zone transfers [@?RFC5936], as these
     are not relevant to the stub to recursive resolver scenario.
 
-2.  No attempt is made to evade potential blocking of DNS over QUIC
+2.  No attempt is made to evade potential blocking of DNS/QUIC
     traffic by middleboxes.
 
 Users interested in zone transfers should continue using TCP based
 solutions. Users interested in evading middleboxes should
-consider using solutions like DNS over HTTPS [@?I-D.hoffman-dns-over-https].
+consider using solutions like DNS/HTTPS [@?I-D.hoffman-dns-over-https].
 
-Specifying the transmission of an application over QUIC requires to
-specify how the application messages are mapped to QUIC streams, and
+Specifying the transmission of an application over QUIC requires
+specifying how the application's messages are mapped to QUIC streams, and
 generally how the application will use QUIC.  This is done for HTTP
 in [@?I-D.ietf-quic-http].  The purpose of this document is to define
-the way DNS can be transmitted over QUIC.
+the way DNS messages can be transmitted over QUIC.
 
 In this document, (#design-considerations) presents the reasoning that guided 
-the proposed design.  (#specifications) specifies the actual mapping of DNS over 
-QUIC. (#implementation-requirements) presents guidelines on the implementation, 
-usage and deployment of DNS over QUIC.
+the proposed design.  (#specifications) specifies the actual mapping of DNS/QUIC.
+(#implementation-requirements) presents guidelines on the implementation, 
+usage and deployment of DNS/QUIC.
 
 
 # Key Words
@@ -130,17 +131,11 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in [@!RFC2119].
 
-# Terminology
-
-The term DNS/QUIC is used interchangeably with 'DNS over QUIC' throughout 
-this document.
-
-TODO: Make this usage more consistent.
 
 # Design Considerations
 
 This section and its subsection present the design guidelines that
-were used for the proposed mapping of DNS over QUIC.  This section is
+were used for the proposed mapping of DNS/QUIC.  This section is
 informative in nature.
 
 ## Scope is Limited to the Stub to Resolver Scenario
@@ -151,13 +146,13 @@ authoritative server, and server to server.  This design focuses only on the
 "stub to recursive resolver" scenario following the approach taken in
 [@?RFC7858] and [@!I-D.ietf-dprive-dtls-and-tls-profiles].
 
-QUESTION: Should this document specify any aspects of configuration of discoverability differently to DNS over TLS?
+QUESTION: Should this document specify any aspects of configuration of discoverability differently to DNS/TLS?
 
 No attempt is made to address the recursive to authoritative scenarios.
 Authoritative resolvers are discovered dynamically through NS
 records. It is noted that at the time of writing work is ongoing in 
 the DPRIVE working group to attempt to address the analogous problem for
-DNS over TLS [@?I-D.bortzmeyer-dprive-step-2]. In the absence of an agreed way 
+DNS/TLS [@?I-D.bortzmeyer-dprive-step-2]. In the absence of an agreed way 
 for authoritative to signal
 support for QUIC transport, recursive resolvers would have to resort
 to some trial and error process.  At this stage of QUIC deployment,
@@ -171,7 +166,7 @@ creates a unique profile, in which a query results in several
 responses.  Supporting that profile would complicate the mapping of
 DNS queries over QUIC streams.  Zone transfers are not used in the
 stub to recursive scenario that is the focus here, and seem to be currently
-well served by the DNS over TCP.  There is no attempt to support them
+well served by the DNS/TCP.  There is no attempt to support them
 in this proposed mapping of DNS to QUIC.
 
 ## Provide DNS Privacy
@@ -179,7 +174,7 @@ in this proposed mapping of DNS to QUIC.
 DNS privacy considerations are described in [@?RFC7626].  [@?RFC7858]
 defines how to mitigate some of these issues by transmitting DNS messages
 over TLS and TCP and [@!I-D.ietf-dprive-dtls-and-tls-profiles] specifies
-Strict and Opportunistic profiles for DNS over TLS including how stub 
+Strict and Opportunistic profiles for DNS/TLS including how stub 
 resolvers can authenticate recursive resolvers.  
 
 QUIC connection setup includes the negotiation of
@@ -195,7 +190,7 @@ QUIC is specifically designed to reduce the delay between HTTP
 queries and HTTP responses.  This is achieved through three main
 components:
 
- 1.  Support for 0-RTT data during session resume.
+ 1.  Support for 0-RTT data during session resumption.
 
  2.  Support for advanced error recovery procedures as specified in
      [@?I-D.ietf-quic-recovery].
@@ -203,10 +198,10 @@ components:
  3.  Mitigation of head-of-line blocking by allowing parallel
      delivery of data on multiple streams.
 
-The mapping of DNS to QUIC will take advantage of these features in
+This mapping of DNS to QUIC will take advantage of these features in
 three ways:
 
- 1.  Optional support for sending 0-RTT data during session resume
+ 1.  Optional support for sending 0-RTT data during session resumption
      (the security and privacy implications of this are discussed 
      in later sections).
 
@@ -223,7 +218,7 @@ to QUIC streams in (#stream-mapping-and-usage).
 
 ## Development of QUIC Protocols and API
 
-QUIC is defined as a layered protocol, with application specific
+QUIC is defined as a layered protocol, with application-specific
 mapping layered on top of the generic QUIC transport.  The only
 mapping defined at this stage is HTTP over QUIC [@?I-D.ietf-quic-http].
 Adding a different mapping for a different application contributes to
@@ -253,22 +248,22 @@ Is it possible to guarantee this order without a control stream?
 
 ## No Specific Middlebox Bypass Mechanism
 
-Being different from HTTP over QUIC is a design choice.  The
+Being different from HTTP/QUIC is a design choice.  The
 advantage is that the mapping can be defined for minimal overhead and
 maximum performance.  The downside is that the difference can be
 noted by firewalls and middleboxes.  There may be environments in
-which HTTP over QUIC will be allowed, but DNS over QUIC will be
+which HTTP/QUIC will be allowed, but DNS/QUIC will be
 disallowed and blocked by these middle boxes.
 
 It is recognized that this might be a problem, but there is currently no
-indication on how widespread that problem might be.  It might be that
-the problem will be so acute that the only realistic solution would
-be to communicate with independent recursive resolvers using DNS over
-HTTPS, or maybe DNS over HTTP over QUIC.  Or it might be that the
-problem is rare enough and the performance gains significant enough
-that the correct solution is to use DNS over QUIC most of the time,
-and to fall back on DNS over HTTPS some of the time.  Measurements
-and experimentations will inform that decision.  In between, we
+indication on how widespread that problem might be. The problem might be
+acute enough that the only realistic solution would
+be to communicate with independent recursive resolvers using DNS/HTTPS,
+or maybe DNS/HTTP/QUIC.  Or the problem might be rare enough and the
+performance gains significant enough
+that the appropriate solution would be to use DNS/QUIC most of the time,
+and fall back to DNS/HTTPS some of the time.  Measurements
+and experimentation will inform that decision.  In the meanwhile, we
 believe that a clean design is most likely to inform the QUIC
 development, as explained in (#development-of-quic-protocols-and-api).
 
@@ -301,18 +296,18 @@ string "dq-h01".
 By default, a DNS server that supports DNS/QUIC MUST listen for and
 accept QUIC connections on the dedicated UDP port TBD (number to be
 defined in (#iana-considerations)), unless it has mutual
-agreement with its clients to use a port other than TBD for DNS over
-QUIC.  In order to use a port other than TBD, both clients and
+agreement with its clients to use a port other than TBD for DNS/QUIC.
+In order to use a port other than TBD, both clients and
 servers would need a configuration option in their software.
 
-By default, a DNS client desiring to use DNS over QUIC with a
+By default, a DNS client desiring to use DNS/QUIC with a
 particular server MUST establish a QUIC connection to UDP port TBD on
 the server, unless it has mutual agreement with its server to use a
-port other than port TBD for DNS over QUIC.  Such another port MUST
+port other than port TBD for DNS/QUIC.  Such another port MUST
 NOT be port 53 or port 853.  This recommendation against use of port
-53 for DNS over QUIC is to avoid confusion between DNS over QUIC and
-DNS over UDP as specified in [@!RFC1035].  Similarly, using port 853
-would cause confusion between DNS over QUIC and DNS over DTLS as
+53 for DNS/QUIC is to avoid confusion between DNS/QUIC and
+DNS/UDP as specified in [@!RFC1035].  Similarly, using port 853
+would cause confusion between DNS/QUIC and DNS/DTLS as
 specified in [@?RFC8094].
 
 ## Stream Mapping and Usage
@@ -339,7 +334,7 @@ This means that the
 client's first query occurs on QUIC stream 3, the second on 5, and so on.
 
 DNS query and responses are formatted as specified in [@!RFC1035].  In
-contrast with DNS over TCP [@?RFC7766] and DNS over TLS [@?RFC7858],
+contrast with DNS/TCP [@?RFC7766] and DNS/TLS [@?RFC7858],
 these messages are sent without a two bytes length field prepended.
 
 ### Server Initiated Transactions
@@ -371,7 +366,7 @@ stream.  The corresponding transaction MUST be abandoned.  A Server
 Failure (SERVFAIL, [@!RFC1035]) SHOULD be notified to the initiator of
 the transaction.
 
-## Closing the DNS over QUIC Connection
+## Closing the DNS/QUIC Connection
 
 QUIC connections are closed using the CONNECTION_CLOSE mechanisms
 specified in [@!I-D.ietf-quic-transport].  Connections can be closed at
@@ -413,30 +408,30 @@ authenticate the client's identity in either scenario.
 
 ## Fall Back to Other Protocols on Connection Failure
 
-If the establishment of the DNS over QUIC connection fails, clients
-SHOULD attempt to fall back to DNS over TLS and then potentially clear 
+If the establishment of the DNS/QUIC connection fails, clients
+SHOULD attempt to fall back to DNS/TLS and then potentially clear 
 text, as specified in [@?RFC7858] and 
 [@!I-D.ietf-dprive-dtls-and-tls-profiles], depending on their privacy
 profile.
 
 DNS clients SHOULD remember server IP addresses that don't support
-DNS over QUIC, including timeouts, connection refusals, and QUIC
-handshake failures, and not request DNS over QUIC from them for a
+DNS/QUIC, including timeouts, connection refusals, and QUIC
+handshake failures, and not request DNS/QUIC from them for a
 reasonable period (such as one hour per server).  DNS clients
 following an out-of-band key-pinned privacy profile ([@?RFC7858]) MAY
-be more aggressive about retrying DNS over QUIC connection failures.
+be more aggressive about retrying DNS/QUIC connection failures.
 
 ## Response Sizes
 
-DNS over QUIC does not suffer from the limitation on the size of responses that 
-can be delivered as DNS over UDP [@!RFC1035] does, since large responses will
+DNS/QUIC does not suffer from the limitation on the size of responses that 
+can be delivered as DNS/UDP [@!RFC1035] does, since large responses will
 be sent in separate STREAM frames in separate packets. 
 
 QUESTION: However, this raises a new issue because the responses sent over 
 QUIC can be significantly larger than those sent over TCP (65,635 bytes).
 According to [@!I-D.ietf-quic-transport] "The largest offset delivered on
 a stream - the sum of the re-constructed offset and data length - MUST be less 
-than 2^64". Should a specific limit be applied for DNS over QUIC responses or 
+than 2^64". Should a specific limit be applied for DNS/QUIC responses or 
 not?
 
 ## DNS Message IDs
@@ -448,10 +443,10 @@ query on that connection in order to avoid Message ID collisions.
 Clients MUST match responses to
 outstanding queries using the STREAM ID and Message ID and if the response contains a question 
 section, the client MUST match the QNAME, QCLASS, and QTYPE fields. Failure to match
-is a DNS over QUIC protocol error. Clients observing such errors SHOULD close the connection
+is a DNS/QUIC protocol error. Clients observing such errors SHOULD close the connection
 immediately, indicating the application specific error code 0x00000001.
 The client should also mark the server as inappropriate
-for future use of DNS over QUIC.
+for future use of DNS/QUIC.
 
 ## Padding {#padding}
 
@@ -470,8 +465,8 @@ the recommendations of [@?I-D.ietf-dprive-padding-policy].
 ## Connection Handling
 
 [@?RFC7766] provides updated
-guidance on DNS over TCP much of which is applicable to DNS over QUIC. This 
-section attempts to specify how those considerations apply to DNS over QUIC.
+guidance on DNS/TCP much of which is applicable to DNS/QUIC. This 
+section attempts to specify how those considerations apply to DNS/QUIC.
 
 ### Connection Reuse
 
@@ -505,15 +500,15 @@ reboot.
 Clients and servers that keep idle connections open MUST be robust to
 termination of idle connection by either party.  As with current DNS
 over TCP, DNS servers MAY close the connection at any time (perhaps
-due to resource constraints).  As with current DNS over TCP, clients
+due to resource constraints).  As with current DNS/TCP, clients
 MUST handle abrupt closes and be prepared to reestablish connections
 and/or retry queries.
 
 ### Idle Timeouts
 
 Proper management of established and idle connections is important to
-the healthy operation of a DNS server.  An implementation of DNS over
-QUIC SHOULD follow best practices for DNS over TCP, as described in
+the healthy operation of a DNS server.  An implementation of DNS/QUIC
+SHOULD follow best practices for DNS/TCP, as described in
 [@?RFC7766].  Failure to do so may lead to resource exhaustion and
 denial of service.
 
@@ -522,7 +517,7 @@ values on idle connections.  Clients and servers should reuse and/or
 close connections depending on the level of available resources.
 Timeouts may be longer during periods of low activity and shorter
 during periods of high activity.  Current work in this area may also
-assist DNS over TLS clients and servers in selecting useful timeout
+assist DNS/TLS clients and servers in selecting useful timeout
 values [@?RFC7828] [@?I-D.ietf-dnsop-session-signal] [@TDNS].
 
 TODO: Clarify what timers (idle timeouts, response timeouts) apply at the
@@ -542,17 +537,17 @@ DNS queries that a client can send.
 
 # Security Considerations
 
-The security considerations of DNS over QUIC should be comparable to
-those of DNS over TLS [@?RFC7858].
+The security considerations of DNS/QUIC should be comparable to
+those of DNS/TLS [@?RFC7858].
 
 # Privacy Considerations
 
-DNS over QUIC is specifically designed to protect the DNS traffic
+DNS/QUIC is specifically designed to protect the DNS traffic
 between stub and resolver from observations by third parties, and
 thus protect the privacy of queries from the stub.  However, the recursive
 resolver has full visibility of the stub's traffic, and could be used
 as an observation point, as discussed in [@?RFC7626]. These considerations
-do not differ between DNS over TLS and DNS over QUIC and are not discussed
+do not differ between DNS/TLS and DNS/QUIC and are not discussed
 further here. 
 
 QUIC incorporates the mechanisms of TLS 1.3 [@?I-D.ietf-tls-tls13] and
@@ -625,15 +620,15 @@ mitigate this attack.
 
 # IANA Considerations
 
-## Registration of DNS over QUIC Identification String
+## Registration of DNS/QUIC Identification String
 
    This document creates a new registration for the identification of
-   DNS over QUIC in the "Application Layer Protocol Negotiation (ALPN)
+   DNS/QUIC in the "Application Layer Protocol Negotiation (ALPN)
    Protocol IDs" registry established in [@!RFC7301].
 
-   The "dq" string identifies DNS over QUIC:
+   The "dq" string identifies DNS/QUIC:
 
-   Protocol:  DNS over QUIC
+   Protocol:  DNS/QUIC
 
    Identification Sequence:  0x64 0x71 ("dq")
 
