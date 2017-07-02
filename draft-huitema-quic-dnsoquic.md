@@ -66,7 +66,7 @@ This document describes the use of QUIC to provide transport privacy
 for DNS.  The encryption provided by QUIC has similar properties to
 that provided by TLS, while QUIC transport eliminates the 
 head-of-line blocking issues inherent with TCP and provides more efficient
-error corrections than UDP.  DNS over QUIC has privacy properties
+error corrections than UDP.  DNS over QUIC (DNS/QUIC) has privacy properties
 similar to DNS over TLS specified in RFC7858, and performance
 similar to classic DNS over UDP.
 
@@ -80,7 +80,7 @@ transport [@!I-D.ietf-quic-transport] [@!I-D.ietf-quic-tls].  The
 goals of this mapping are:
 
 1.  Provide the same DNS privacy protection as DNS over TLS (DNS/TLS)
-    [@?RFC7858]. This includes to option for the client to 
+    [@?RFC7858]. This includes an option for the client to 
     authenticate the server by means of an authentication domain
     name [@!I-D.ietf-dprive-dtls-and-tls-profiles].
 
@@ -91,7 +91,7 @@ goals of this mapping are:
     size of DNS responses it can send.
 
 4.  Explore the potential performance gains of using QUIC as a DNS
-    transport, versus other solutions like DNS/UDP [@!RFC1035] or
+    transport, versus other solutions like DNS over UDP (DNS/UDP) [@!RFC1035] or
     DNS/TLS [@?RFC7858].
 
 5.  Participate in the definition of QUIC protocols and API, by
@@ -166,7 +166,7 @@ creates a unique profile, in which a query results in several
 responses.  Supporting that profile would complicate the mapping of
 DNS queries over QUIC streams.  Zone transfers are not used in the
 stub to recursive scenario that is the focus here, and seem to be currently
-well served by the DNS/TCP.  There is no attempt to support them
+well served by the DNS over TCP (DNS/TCP).  There is no attempt to support them
 in this proposed mapping of DNS to QUIC.
 
 ## Provide DNS Privacy
@@ -174,7 +174,7 @@ in this proposed mapping of DNS to QUIC.
 DNS privacy considerations are described in [@?RFC7626].  [@?RFC7858]
 defines how to mitigate some of these issues by transmitting DNS messages
 over TLS and TCP and [@!I-D.ietf-dprive-dtls-and-tls-profiles] specifies
-Strict and Opportunistic profiles for DNS/TLS including how stub 
+Strict and Opportunistic Usage Profiles for DNS/TLS including how stub 
 resolvers can authenticate recursive resolvers.  
 
 QUIC connection setup includes the negotiation of
@@ -455,9 +455,9 @@ There are mechanisms specified for both padding individual DNS messages
 packets (see Section 8.6 of [@!I-D.ietf-quic-transport]), which may contain
 multiple frames.
 
-Implementations SHOULD NOT use DNS options far
+Implementations SHOULD NOT use DNS options for
 padding individual DNS messages, because QUIC transport
-MAY transmit multiple STREAM frames containing separare DNS messages in
+MAY transmit multiple STREAM frames containing separate DNS messages in
 a single QUIC packet. Instead, implementations SHOULD use QUIC PADDING frames
 to align the packet length to a small set of fixed sizes, aligned with
 the recommendations of [@?I-D.ietf-dprive-padding-policy].
@@ -551,7 +551,7 @@ do not differ between DNS/TLS and DNS/QUIC and are not discussed
 further here. 
 
 QUIC incorporates the mechanisms of TLS 1.3 [@?I-D.ietf-tls-tls13] and
-this enables QUIC transmission of "Zero RTT" data.  This can
+this enables QUIC transmission of "Zero-RTT" data.  This can
 provide interesting latency gains, but it raises two concerns:
 
 1.  Adversaries could replay the zero-RTT data and infer its content
@@ -560,10 +560,10 @@ provide interesting latency gains, but it raises two concerns:
 2.  The zero-RTT mechanism relies on TLS resume, which can provide
     linkability between successive client sessions.
 
-These issues are developed in (#privacy-issues-with-0rtt-data) and 
+These issues are developed in (#privacy-issues-with-zero-rtt-data) and 
 (#privacy-issues-with-session-resume).
 
-## Privacy Issues With 0RTT data
+## Privacy Issues With Zero RTT data
 
 The zero-RTT data can be replayed by adversaries.  That data may
 triggers a query by a recursive resolver to an authoritative
