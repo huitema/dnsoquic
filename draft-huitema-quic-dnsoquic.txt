@@ -5,14 +5,14 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                                M. Shore
-Expires: December 31, 2017                                        Fastly
+Expires: January 3, 2018                                          Fastly
                                                                A. Mankin
                                                               Salesforce
                                                             S. Dickinson
                                                               Sinodun IT
                                                               J. Iyengar
                                                                   Google
-                                                           June 29, 2017
+                                                            July 2, 2017
 
 
           Specification of DNS over Dedicated QUIC Connections
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on December 31, 2017.
+   This Internet-Draft will expire on January 3, 2018.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 1]
+Huitema, et al.          Expires January 3, 2018                [Page 1]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 2]
+Huitema, et al.          Expires January 3, 2018                [Page 2]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
        8.2.1.  Port number 784 for experimentations  . . . . . . . .  15
@@ -165,9 +165,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 3]
+Huitema, et al.          Expires January 3, 2018                [Page 3]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    Specifying the transmission of an application over QUIC requires
@@ -221,9 +221,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 4]
+Huitema, et al.          Expires January 3, 2018                [Page 4]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    creates a unique profile, in which a query results in several
@@ -277,9 +277,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 5]
+Huitema, et al.          Expires January 3, 2018                [Page 5]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    3.  Mapping of each DNS Query/Response transaction to a separate
@@ -333,9 +333,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 6]
+Huitema, et al.          Expires January 3, 2018                [Page 6]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    communicate with independent recursive resolvers using DNS/HTTPS, or
@@ -389,9 +389,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 7]
+Huitema, et al.          Expires January 3, 2018                [Page 7]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
 4.2.  Stream Mapping and Usage
@@ -418,17 +418,15 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
    single stream.  This means that the client's first query occurs on
    QUIC stream 3, the second on 5, and so on.
 
-   DNS query and responses are formatted as specified in [RFC1035].  In
-   contrast with DNS/TCP [RFC7766] and DNS/TLS [RFC7858], these messages
-   are sent without a two bytes length field prepended.
-
 4.2.1.  Server Initiated Transactions
 
    There are planned traffic patterns in which a server sends
    unsolicited queries to a client, such as for example PUSH messages
-   defined in [I-D.ietf-dnssd-push].  When a server wishes to send such
-   queries it MUST select the next available server stream, in
-   conformance with Section 10.2 of [I-D.ietf-quic-transport].
+   defined in [I-D.ietf-dnssd-push].  These occur when a client
+   subscribes to changes for a particular DNS RRset or resource record
+   type.  When a PUSH server wishes to send such updates it MUST select
+   the next available server stream, in conformance with Section 10.2 of
+   [I-D.ietf-quic-transport].
 
    The server MUST send the DNS query over the selected stream, and MUST
    indicate through the STREAM FIN mechanism that no further data will
@@ -445,9 +443,11 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 8]
+
+
+Huitema, et al.          Expires January 3, 2018                [Page 8]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
 4.2.2.  Stream Reset
@@ -501,9 +501,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017               [Page 9]
+Huitema, et al.          Expires January 3, 2018                [Page 9]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
 5.2.  Fall Back to Other Protocols on Connection Failure
@@ -557,9 +557,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017              [Page 10]
+Huitema, et al.          Expires January 3, 2018               [Page 10]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    Implementations SHOULD NOT use DNS options for padding individual DNS
@@ -613,9 +613,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017              [Page 11]
+Huitema, et al.          Expires January 3, 2018               [Page 11]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
 5.6.3.  Idle Timeouts
@@ -669,9 +669,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017              [Page 12]
+Huitema, et al.          Expires January 3, 2018               [Page 12]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    QUIC incorporates the mechanisms of TLS 1.3 [I-D.ietf-tls-tls13] and
@@ -725,9 +725,9 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017              [Page 13]
+Huitema, et al.          Expires January 3, 2018               [Page 13]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
    not change between the sessions, since the two sessions can probably
@@ -781,17 +781,23 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-Huitema, et al.         Expires December 31, 2017              [Page 14]
+Huitema, et al.          Expires January 3, 2018               [Page 14]
 
-Internet-Draft           DNS over Dedicated QUIC               June 2017
+Internet-Draft           DNS over Dedicated QUIC               July 2017
 
 
        Service Name           domain-s
+
        Transport Protocol(s)  TCP/UDP
+
        Assignee               IESG
+
        Contact                IETF Chair
+
        Description            DNS query-response protocol run over QUIC
+
        Reference              This document
+
 
 8.2.1.  Port number 784 for experimentations
 
@@ -827,20 +833,19 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
               (TLS) to Secure QUIC", draft-ietf-quic-tls-04 (work in
               progress), June 2017.
 
+
+
+
+
+Huitema, et al.          Expires January 3, 2018               [Page 15]
+
+Internet-Draft           DNS over Dedicated QUIC               July 2017
+
+
    [I-D.ietf-quic-transport]
               Iyengar, J. and M. Thomson, "QUIC: A UDP-Based Multiplexed
               and Secure Transport", draft-ietf-quic-transport-04 (work
               in progress), June 2017.
-
-
-
-
-
-
-Huitema, et al.         Expires December 31, 2017              [Page 15]
-
-Internet-Draft           DNS over Dedicated QUIC               June 2017
-
 
    [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
               STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
@@ -886,17 +891,17 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
               Pusateri, T. and S. Cheshire, "DNS Push Notifications",
               draft-ietf-dnssd-push-11 (work in progress), June 2017.
 
+
+
+Huitema, et al.          Expires January 3, 2018               [Page 16]
+
+Internet-Draft           DNS over Dedicated QUIC               July 2017
+
+
    [I-D.ietf-dprive-padding-policy]
               Mayrhofer, A., "Padding Policy for EDNS(0)", draft-ietf-
               dprive-padding-policy-00 (work in progress), December
               2016.
-
-
-
-Huitema, et al.         Expires December 31, 2017              [Page 16]
-
-Internet-Draft           DNS over Dedicated QUIC               June 2017
-
 
    [I-D.ietf-quic-http]
               Bishop, M., "Hypertext Transfer Protocol (HTTP) over
@@ -942,17 +947,16 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
               DOI 10.17487/RFC7828, April 2016,
               <http://www.rfc-editor.org/info/rfc7828>.
 
+
+
+Huitema, et al.          Expires January 3, 2018               [Page 17]
+
+Internet-Draft           DNS over Dedicated QUIC               July 2017
+
+
    [RFC7830]  Mayrhofer, A., "The EDNS(0) Padding Option", RFC 7830,
               DOI 10.17487/RFC7830, May 2016,
               <http://www.rfc-editor.org/info/rfc7830>.
-
-
-
-
-Huitema, et al.         Expires December 31, 2017              [Page 17]
-
-Internet-Draft           DNS over Dedicated QUIC               June 2017
-
 
    [RFC7858]  Hu, Z., Zhu, L., Heidemann, J., Mankin, A., Wessels, D.,
               and P. Hoffman, "Specification for DNS over Transport
@@ -992,6 +996,20 @@ Authors' Addresses
    Email: amankin@salesforce.com
 
 
+
+
+
+
+
+
+
+
+
+Huitema, et al.          Expires January 3, 2018               [Page 18]
+
+Internet-Draft           DNS over Dedicated QUIC               July 2017
+
+
    Sara Dickinson
    Sinodun IT
    Magdalen Centre
@@ -1000,14 +1018,6 @@ Authors' Addresses
    U.K.
 
    Email: sara@sinodun.com
-
-
-
-
-
-Huitema, et al.         Expires December 31, 2017              [Page 18]
-
-Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
    Jana Iyengar
@@ -1051,14 +1061,4 @@ Internet-Draft           DNS over Dedicated QUIC               June 2017
 
 
 
-
-
-
-
-
-
-
-
-
-
-Huitema, et al.         Expires December 31, 2017              [Page 19]
+Huitema, et al.          Expires January 3, 2018               [Page 19]
