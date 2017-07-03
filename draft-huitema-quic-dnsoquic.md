@@ -5,7 +5,7 @@
     docName= "draft-huitema-quic-dnsoquic-02"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-06-29T00:00:00Z
+    date = 2017-07-02T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -333,16 +333,15 @@ Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the 
 client's first query occurs on QUIC stream 3, the second on 5, and so on.
 
-DNS query and responses are formatted as specified in [@!RFC1035].  In
-contrast with DNS/TCP [@?RFC7766] and DNS/TLS [@?RFC7858],
-these messages are sent without a two bytes length field prepended.
-
 ### Server Initiated Transactions
 
 There are planned traffic patterns in which a server sends
 unsolicited queries to a client, such as for example PUSH messages
-defined in [@?I-D.ietf-dnssd-push].  When a server wishes to send such
-queries it MUST select the next available server stream, in
+defined in [@?I-D.ietf-dnssd-push]. 
+These occur when a client subscribes to
+changes for a particular DNS RRset or resource record type. When a 
+PUSH server wishes to send such
+updates it MUST select the next available server stream, in
 conformance with Section 10.2 of [@!I-D.ietf-quic-transport].  
 
 The server MUST send the DNS query over the selected stream, and MUST indicate
