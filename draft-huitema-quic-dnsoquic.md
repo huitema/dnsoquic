@@ -2,10 +2,10 @@
     Title = "Specification of DNS over Dedicated QUIC Connections"
     abbrev = "DNS over Dedicated QUIC"
     category = "std"
-    docName= "draft-huitema-quic-dnsoquic-02"
+    docName= "draft-huitema-quic-dnsoquic-03"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-07-02T00:00:00Z
+    date = 2017-12-27T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -111,7 +111,7 @@ stub clients and recursive servers. The specific non-goals of this document are:
 
 Users interested in zone transfers should continue using TCP based
 solutions. Users interested in evading middleboxes should
-consider using solutions like DNS/HTTPS [@?I-D.hoffman-dns-over-https].
+consider using solutions like DNS/HTTPS [@?I-D.ietf-doh-dns-over-https].
 
 Specifying the transmission of an application over QUIC requires
 specifying how the application's messages are mapped to QUIC streams, and
@@ -224,15 +224,19 @@ mapping defined at this stage is HTTP over QUIC [@?I-D.ietf-quic-http].
 Adding a different mapping for a different application contributes to
 the development of QUIC.
 
-HTTP/QUIC uses a dedicated control channel on a long-lived stream to 
-maintain connection state beyond the lifetime of individual requests, 
-such as relative priority of requests, settings, and other metadata. 
-These additional capabilities come at the cost of some complexity, 
-and also some performance since the
-control stream is exposed to head-of-line blocking. 
+HTTP/QUIC parallels the definition of HTTP/2.0, in which HTTP queries
+and responses are carried as series of frames. The HTTP/QUIC mapping provide
+with some simplication compared to HTTP/TLS/TCP,
+as QUIC already provides concepts like stream identification or end
+of stream marks. Dedicated control channel are used to carry connection data,
+such as settings or the relative priority of queries. It would be
+completely possible to use the HTTP/QUIC mapping to carry DNS requests
+as HTTP queries, as specified in [@?I-D.ietf-doh-dns-over-https]. We are
+somewhat concerned that this mapping carries the overhead of HTTP into
+the DNS protocol, resulting in additional complexity and overhead.
 
-In this document a different design is deliberately explored, in which there is
-no control stream.  Clients and servers can initiate queries as
+In this document a different design is deliberately explored, in which 
+clients and servers can initiate queries as
 determined by the DNS application logic, opening new streams as
 necessary.  This provides for maximum parallelism between queries, as
 noted in (#design-for-minimum-latency).  It also places constraints on the API.
@@ -241,10 +245,6 @@ stream by their peer.  Instead of orderly closing the control stream,
 client and server will have to use orderly connection closure
 mechanisms and manage the potential loss of data if closing on one
 end conflicts with opening of a stream on the other end.
-
-QUESTION: The server originated PUSH requests are expected to be delivered in order. 
-Is it possible to guarantee this order without a control stream?
-
 
 ## No Specific Middlebox Bypass Mechanism
 
@@ -262,11 +262,17 @@ be to communicate with independent recursive resolvers using DNS/HTTPS,
 or maybe DNS/HTTP/QUIC.  Or the problem might be rare enough and the
 performance gains significant enough
 that the appropriate solution would be to use DNS/QUIC most of the time,
-and fall back to DNS/HTTPS some of the time.  Measurements
-and experimentation will inform that decision.  In the meanwhile, we
+and fall back to DNS/HTTPS some of the time. Measurements
+and experimentation will inform that decision.  
+
+It may indeed turn out that the complexity and overhead concerns are
+negligible compared to the potential advantages of DNS/HTTPS, such
+as integration with web services or firewall traversal, and that DNS/QUIC
+does not provide sufficient performance gains to justify a new protocol. We
+will evaluate that once implementations are available and can be compared.
+In the meanwhile, we
 believe that a clean design is most likely to inform the QUIC
 development, as explained in (#development-of-quic-protocols-and-api).
-
 
 # Specifications
 
@@ -288,7 +294,7 @@ NOT identify themselves using this string.
 
 Implementations of draft versions of the protocol MUST add the string
 "-" and the corresponding draft number to the identifier.  For
-example, draft-huitema-quic-dnsoquic-001 is identified using the
+example, draft-huitema-quic-dnsoquic-01 is identified using the
 string "dq-h01".
 
 ### Port Selection
@@ -318,8 +324,8 @@ QUIC stream features detailed in Section 10 of [@!I-D.ietf-quic-transport].
 The stub to resolver DNS traffic follows a simple pattern in which
 the client sends a query, and the server provides a response.  This design
 specifies that for each subsequent query on a QUIC connection the client MUST 
-select the next available client stream, in
-conformance with Section 10.2 of [@!I-D.ietf-quic-transport].
+select the next available client-initiated bidirectional stream, in
+conformance with [@!I-D.ietf-quic-transport].
 
 The client MUST send the DNS query over the selected stream, and MUST
 indicate through the STREAM FIN mechanism that no further data will
@@ -331,7 +337,7 @@ data will be sent on that stream.
 
 Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the 
-client's first query occurs on QUIC stream 3, the second on 5, and so on.
+client's first query occurs on QUIC stream 4, the second on 8, and so on.
 
 ### Server Initiated Transactions
 
@@ -341,8 +347,9 @@ defined in [@?I-D.ietf-dnssd-push].
 These occur when a client subscribes to
 changes for a particular DNS RRset or resource record type. When a 
 PUSH server wishes to send such
-updates it MUST select the next available server stream, in
-conformance with Section 10.2 of [@!I-D.ietf-quic-transport].  
+updates it MUST select the next available server initiated
+bidirectional stream, in
+conformance with [@!I-D.ietf-quic-transport].  
 
 The server MUST send the DNS query over the selected stream, and MUST indicate
 through the STREAM FIN mechanism that no further data will be sent on
@@ -354,7 +361,7 @@ data will be sent on that stream.
 
 Therefore a single server initiated DNS transaction consumes a single stream. 
 This means that the 
-servers's first query occurs on QUIC stream 2, the second on 4, and so on.
+servers's first query occurs on QUIC stream 1, the second on 5, and so on.
 
 ### Stream Reset
 
@@ -430,7 +437,7 @@ QUESTION: However, this raises a new issue because the responses sent over
 QUIC can be significantly larger than those sent over TCP (65,635 bytes).
 According to [@!I-D.ietf-quic-transport] "The largest offset delivered on
 a stream - the sum of the re-constructed offset and data length - MUST be less 
-than 2^64". Should a specific limit be applied for DNS/QUIC responses or 
+than 2^62". Should a specific limit be applied for DNS/QUIC responses or 
 not?
 
 ## DNS Message IDs
