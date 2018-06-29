@@ -2,10 +2,10 @@
     Title = "Specification of DNS over Dedicated QUIC Connections"
     abbrev = "DNS over Dedicated QUIC"
     category = "std"
-    docName= "draft-huitema-quic-dnsoquic-03"
+    docName= "draft-huitema-quic-dnsoquic-04"
     ipr = "trust200902"
     area = "Network"
-    date = 2017-12-27T00:00:00Z
+    date = 2018-06-29T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -62,13 +62,12 @@
 
 .# Abstract
 
-This document describes the use of QUIC to provide transport privacy
-for DNS.  The encryption provided by QUIC has similar properties to
-that provided by TLS, while QUIC transport eliminates the 
-head-of-line blocking issues inherent with TCP and provides more efficient
-error corrections than UDP.  DNS over QUIC (DNS/QUIC) has privacy properties
-similar to DNS over TLS specified in RFC7858, and performance
-similar to classic DNS over UDP.
+This document describes the use of QUIC to provide transport privacy for DNS.
+The encryption provided by QUIC has similar properties to that provided by TLS,
+while QUIC transport eliminates the head-of-line blocking issues inherent with
+TCP and provides more efficient error corrections than UDP. DNS over QUIC
+(DNS/QUIC) has privacy properties similar to DNS over TLS specified in RFC7858,
+and performance similar to classic DNS over UDP.
 
 {mainmatter}
 
@@ -82,7 +81,7 @@ goals of this mapping are:
 1.  Provide the same DNS privacy protection as DNS over TLS (DNS/TLS)
     [@?RFC7858]. This includes an option for the client to 
     authenticate the server by means of an authentication domain
-    name [@!I-D.ietf-dprive-dtls-and-tls-profiles].
+    name [@!RFC8310].
 
 2.  Provide an improved level of source address validation for DNS
     servers compared to DNS/UDP [@!RFC1035].
@@ -119,17 +118,17 @@ generally how the application will use QUIC.  This is done for HTTP
 in [@?I-D.ietf-quic-http].  The purpose of this document is to define
 the way DNS messages can be transmitted over QUIC.
 
-In this document, (#design-considerations) presents the reasoning that guided 
-the proposed design.  (#specifications) specifies the actual mapping of DNS/QUIC.
-(#implementation-requirements) presents guidelines on the implementation, 
-usage and deployment of DNS/QUIC.
+In this document, (#design-considerations) presents the reasoning that guided
+the proposed design. (#specifications) specifies the actual mapping of DNS/QUIC.
+(#implementation-requirements) presents guidelines on the implementation, usage
+and deployment of DNS/QUIC.
 
 
 # Key Words
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@!RFC2119].
+document are to be interpreted as described in [@!RFC8174].
 
 
 # Design Considerations
@@ -144,45 +143,42 @@ Usage scenarios for the DNS protocol can be broadly classified in three
 groups: stub to recursive resolver, recursive resolver to
 authoritative server, and server to server.  This design focuses only on the 
 "stub to recursive resolver" scenario following the approach taken in
-[@?RFC7858] and [@!I-D.ietf-dprive-dtls-and-tls-profiles].
+[@?RFC7858] and [@!RFC8310].
 
-QUESTION: Should this document specify any aspects of configuration of discoverability differently to DNS/TLS?
+QUESTION: Should this document specify any aspects of configuration of
+discoverability differently to DNS/TLS?
 
 No attempt is made to address the recursive to authoritative scenarios.
-Authoritative resolvers are discovered dynamically through NS
-records. It is noted that at the time of writing work is ongoing in 
-the DPRIVE working group to attempt to address the analogous problem for
-DNS/TLS [@?I-D.bortzmeyer-dprive-step-2]. In the absence of an agreed way 
-for authoritative to signal
-support for QUIC transport, recursive resolvers would have to resort
-to some trial and error process.  At this stage of QUIC deployment,
-this would be mostly errors, and does not seem attractive.  This
+Authoritative resolvers are discovered dynamically through NS records. It is
+noted that at the time of writing work is ongoing in the DPRIVE working group to
+attempt to address the analogous problem for DNS/TLS
+[@?I-D.bortzmeyer-dprive-resolver-to-auth]. In the absence of an agreed way for
+authoritative to signal support for QUIC transport, recursive resolvers would
+have to resort to some trial and error process. At this stage of QUIC
+deployment, this would be mostly errors, and does not seem attractive. This
 could change in the future.
 
-The DNS protocol is also used for zone transfers.  In the zone
-transfer scenario ([@?RFC5936]), the client emits a single AXFR query,
-and the server responds with a series of AXFR responses.  This
-creates a unique profile, in which a query results in several
-responses.  Supporting that profile would complicate the mapping of
-DNS queries over QUIC streams.  Zone transfers are not used in the
-stub to recursive scenario that is the focus here, and seem to be currently
-well served by the DNS over TCP (DNS/TCP).  There is no attempt to support them
-in this proposed mapping of DNS to QUIC.
+The DNS protocol is also used for zone transfers. In the zone transfer scenario
+([@?RFC5936]), the client emits a single AXFR query, and the server responds
+with a series of AXFR responses. This creates a unique profile, in which a query
+results in several responses. Supporting that profile would complicate the
+mapping of DNS queries over QUIC streams. Zone transfers are not used in the
+stub to recursive scenario that is the focus here, and seem to be currently well
+served by the DNS over TCP (DNS/TCP). There is no attempt to support them in
+this proposed mapping of DNS to QUIC.
 
 ## Provide DNS Privacy
 
-DNS privacy considerations are described in [@?RFC7626].  [@?RFC7858]
-defines how to mitigate some of these issues by transmitting DNS messages
-over TLS and TCP and [@!I-D.ietf-dprive-dtls-and-tls-profiles] specifies
-Strict and Opportunistic Usage Profiles for DNS/TLS including how stub 
-resolvers can authenticate recursive resolvers.  
+DNS privacy considerations are described in [@?RFC7626]. [@?RFC7858] defines how
+to mitigate some of these issues by transmitting DNS messages over TLS and TCP
+and [@!RFC8310] specifies Strict and Opportunistic Usage Profiles for DNS/TLS
+including how stub resolvers can authenticate recursive resolvers.
 
-QUIC connection setup includes the negotiation of
-security parameters using TLS, as specified in [@!I-D.ietf-quic-tls],
-enabling encryption of the QUIC transport.  Transmitting DNS messages
-over QUIC will provide essentially the same privacy protections as [@?RFC7858]
-and [@!I-D.ietf-dprive-dtls-and-tls-profiles]. Further discussion on this is 
-provided in (#privacy-considerations).
+QUIC connection setup includes the negotiation of security parameters using TLS,
+as specified in [@!I-D.ietf-quic-tls], enabling encryption of the QUIC
+transport. Transmitting DNS messages over QUIC will provide essentially the same
+privacy protections as [@?RFC7858] and [@!RFC8310]. Further discussion on this
+is provided in (#privacy-considerations).
 
 ## Design for Minimum Latency
 
@@ -226,7 +222,7 @@ the development of QUIC.
 
 HTTP/QUIC parallels the definition of HTTP/2.0, in which HTTP queries
 and responses are carried as series of frames. The HTTP/QUIC mapping provide
-with some simplication compared to HTTP/TLS/TCP,
+with some simplification compared to HTTP/TLS/TCP,
 as QUIC already provides concepts like stream identification or end
 of stream marks. Dedicated control channel are used to carry connection data,
 such as settings or the relative priority of queries. It would be
@@ -409,7 +405,7 @@ transmit an Update.
 
 For the stub to recursive resolver scenario, the authentication
 requirements are the same as described in [@?RFC7858] and
-[@!I-D.ietf-dprive-dtls-and-tls-profiles].  There is no need to
+[@!RFC8310].  There is no need to
 authenticate the client's identity in either scenario.
 
 ## Fall Back to Other Protocols on Connection Failure
@@ -417,7 +413,7 @@ authenticate the client's identity in either scenario.
 If the establishment of the DNS/QUIC connection fails, clients
 SHOULD attempt to fall back to DNS/TLS and then potentially clear 
 text, as specified in [@?RFC7858] and 
-[@!I-D.ietf-dprive-dtls-and-tls-profiles], depending on their privacy
+[@!RFC8310], depending on their privacy
 profile.
 
 DNS clients SHOULD remember server IP addresses that don't support
