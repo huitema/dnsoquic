@@ -2,7 +2,7 @@
     Title = "Specification of DNS over Dedicated QUIC Connections"
     abbrev = "DNS over Dedicated QUIC"
     category = "std"
-    docName= "draft-huitema-quic-dnsoquic-04"
+    docName= "draft-huitema-quic-dnsoquic-05"
     ipr = "trust200902"
     area = "Network"
     date = 2018-06-29T00:00:00Z
@@ -53,9 +53,9 @@
     initials="J."
     surname="Iyengar"
     fullname="Jana Iyengar"
-    organization = "Google"
+    organization = "Fastly"
       [author.address]
-      email = "jri@google.com"
+      email = "jri.ietf@gmail.com"
 
 %%%
 

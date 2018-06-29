@@ -16,7 +16,7 @@ Expires: December 31, 2018                                        Fastly
 
 
           Specification of DNS over Dedicated QUIC Connections
-                     draft-huitema-quic-dnsoquic-04
+                     draft-huitema-quic-dnsoquic-05
 
 Abstract
 
