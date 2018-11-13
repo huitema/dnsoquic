@@ -453,7 +453,7 @@ for future use of DNS/QUIC.
 ## Padding {#padding}
 
 There are mechanisms specified for both padding individual DNS messages
-[@?RFC7830], [@?I-D.ietf-dprive-padding-policy] and padding within QUIC
+[@?RFC7830], [@?RFC8467] and padding within QUIC
 packets (see Section 8.6 of [@!I-D.ietf-quic-transport]), which may contain
 multiple frames.
 
@@ -462,7 +462,7 @@ padding individual DNS messages, because QUIC transport
 MAY transmit multiple STREAM frames containing separate DNS messages in
 a single QUIC packet. Instead, implementations SHOULD use QUIC PADDING frames
 to align the packet length to a small set of fixed sizes, aligned with
-the recommendations of [@?I-D.ietf-dprive-padding-policy].
+the recommendations of [@?RFC8467].
 
 ## Connection Handling
 
