@@ -2,10 +2,10 @@
     Title = "Specification of DNS over Dedicated QUIC Connections"
     abbrev = "DNS over Dedicated QUIC"
     category = "std"
-    docName= "draft-huitema-quic-dnsoquic-05"
+    docName= "draft-huitema-quic-dnsoquic-06"
     ipr = "trust200902"
     area = "Network"
-    date = 2018-06-29T00:00:00Z
+    date = 2019-03-07T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
@@ -110,7 +110,7 @@ stub clients and recursive servers. The specific non-goals of this document are:
 
 Users interested in zone transfers should continue using TCP based
 solutions. Users interested in evading middleboxes should
-consider using solutions like DNS/HTTPS [@?I-D.ietf-doh-dns-over-https].
+consider using solutions like DNS/HTTPS [@?RFC8484].
 
 Specifying the transmission of an application over QUIC requires
 specifying how the application's messages are mapped to QUIC streams, and
@@ -227,7 +227,7 @@ as QUIC already provides concepts like stream identification or end
 of stream marks. Dedicated control channel are used to carry connection data,
 such as settings or the relative priority of queries. It would be
 completely possible to use the HTTP/QUIC mapping to carry DNS requests
-as HTTP queries, as specified in [@?I-D.ietf-doh-dns-over-https]. We are
+as HTTP queries, as specified in [@?RFC8484]. We are
 somewhat concerned that this mapping carries the overhead of HTTP into
 the DNS protocol, resulting in additional complexity and overhead.
 
@@ -453,7 +453,7 @@ for future use of DNS/QUIC.
 ## Padding {#padding}
 
 There are mechanisms specified for both padding individual DNS messages
-[@?RFC7830], [@?I-D.ietf-dprive-padding-policy] and padding within QUIC
+[@?RFC7830], [@?RFC8467] and padding within QUIC
 packets (see Section 8.6 of [@!I-D.ietf-quic-transport]), which may contain
 multiple frames.
 
@@ -462,7 +462,7 @@ padding individual DNS messages, because QUIC transport
 MAY transmit multiple STREAM frames containing separate DNS messages in
 a single QUIC packet. Instead, implementations SHOULD use QUIC PADDING frames
 to align the packet length to a small set of fixed sizes, aligned with
-the recommendations of [@?I-D.ietf-dprive-padding-policy].
+the recommendations of [@?RFC8467].
 
 ## Connection Handling
 
@@ -552,7 +552,7 @@ as an observation point, as discussed in [@?RFC7626]. These considerations
 do not differ between DNS/TLS and DNS/QUIC and are not discussed
 further here. 
 
-QUIC incorporates the mechanisms of TLS 1.3 [@?I-D.ietf-tls-tls13] and
+QUIC incorporates the mechanisms of TLS 1.3 [@?RFC8446] and
 this enables QUIC transmission of "Zero-RTT" data.  This can
 provide interesting latency gains, but it raises two concerns:
 
@@ -579,7 +579,7 @@ attack is partially mitigated by reducing the observability of this
 traffic.  However, the risk is amplified for 0-RTT data, because the
 attacker might replay it at chosen times, several times.
 
-The recommendation in [@?I-D.ietf-tls-tls13] is that the capability to
+The recommendation in [@?RFC8446] is that the capability to
 use 0-RTT data should be turned off by default, on only enabled if
 the user clearly understands the associated risks.
 
