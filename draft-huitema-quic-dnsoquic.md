@@ -5,7 +5,7 @@
     docName= "draft-huitema-quic-dnsoquic-06"
     ipr = "trust200902"
     area = "Network"
-    date = 2019-03-07T00:00:00Z
+    date = 2019-03-10T00:00:00Z
     [pi]
     toc = "yes"
     compact = "yes"
