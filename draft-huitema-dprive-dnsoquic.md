@@ -1,66 +1,83 @@
-%%%
-    Title = "Specification of DNS over Dedicated QUIC Connections"
-    abbrev = "DNS over Dedicated QUIC"
-    category = "std"
-    docName= "draft-huitema-quic-dnsoquic-06"
-    ipr = "trust200902"
-    area = "Network"
-    date = 2019-03-10T00:00:00Z
-    [pi]
-    toc = "yes"
-    compact = "yes"
-    symrefs = "yes"
-    sortrefs = "yes"
-    subcompact = "no"
-    [[author]]
-    initials="C."
-    surname="Huitema"
-    fullname="Christian Huitema"
-    organization = "Private Octopus Inc."
-      [author.address]
-      email = "huitema@huitema.net"
-      [author.address.postal]
-      city = "Friday Harbor"
-      code = "WA  98250"
-      country = "U.S.A"
-    [[author]]
-    initials="M."
-    surname="Shore"
-    fullname="Melinda Shore"
-    organization = "Fastly"
-      [author.address]
-      email = " mshore@fastly.com"
-    [[author]]
-    initials="A."
-    surname="Mankin"
-    fullname="Allison Mankin"
-    organization = "Salesforce"
-      [author.address]
-      email = "amankin@salesforce.com"
-    [[author]]
-    initials="S."
-    surname="Dickinson"
-    fullname="Sara Dickinson"
-    organization = "Sinodun IT"
-      [author.address]
-      email = "sara@sinodun.com"
-      [author.address.postal]
-      streets = ["Magdalen Centre", "Oxford Science Park"]
-      city = "Oxford"
-      code = "OX4 4GA"
-      country = "U.K."
-    [[author]]
-    initials="J."
-    surname="Iyengar"
-    fullname="Jana Iyengar"
-    organization = "Fastly"
-      [author.address]
-      email = "jri.ietf@gmail.com"
+---
+title: Specification of DNS over Dedicated QUIC Connections
+abbrev: DNS over Dedicated QUIC
+category: std
+docName: draft-huitema-dprive-dnsoquic-00
+    
+stand_alone: yes
 
-%%%
+ipr: trust200902
+area: Transport
+kw: Internet-Draft
 
+coding: us-ascii
+pi: [toc, sortrefs, symrefs, comments]
 
-.# Abstract
+author:
+      -
+        ins: C. Huitema
+        name: Christian Huitema
+        org: Private Octopus Inc.
+        street: 427 Golfcourse Rd
+        city: Friday Harbor
+        code: WA 98250
+        country: U.S.A
+        email: huitema@huitema.net
+      -
+        ins: A. Mankin
+        name: Allison Mankin
+        org: Salesforce
+        email: amankin@salesforce.com
+      -
+        ins: S. Dickinson
+        name: Sara Dickinson
+        org: Sinodun IT
+        street: Magdalen Centre
+        street: Oxford Science Park
+        city: Oxford
+        code: OX4 4GA
+        country: U.K.
+
+informative:
+  DNS0RTT:
+    target: https://www.ietf.org/mail-archive/web/dns-privacy/current/msg01276.html
+    title: DNS + 0-RTT
+    author:
+       -
+        ins: D. Kahn Gillmor
+        name: Daniel Kahn Gillmor
+    date: 2016-04-06
+    seriesinfo:
+        Message: to DNS-Privacy WG mailing list
+
+  TDNS:
+    target: http://dx.doi.org/10.1109/SP.2015.18
+    title: Connection-Oriented DNS to Improve Privacy and Security
+    author:
+       -
+        ins: L. Zhu
+        name: Liang Zhu
+       -
+        ins: Z. Hu
+        name: Zi Hu
+       -
+        ins: J. Heidemann
+        name: John Heidemann
+       -
+        ins: D. Wessels
+        name: Duane Wessels
+       -
+        ins: A. Mankin
+        name: Allison Mankin
+       -
+        ins: N. Somaiya 
+        name: Nikita Somaiya
+    date: 2015-05-21
+    seriesinfo:
+        2015: IEEE Symposium on Security and Privacy (SP)
+        DOI: 10.1109/SP.2015.18
+
+--- abstract
 
 This document describes the use of QUIC to provide transport privacy for DNS.
 The encryption provided by QUIC has similar properties to that provided by TLS,
@@ -69,40 +86,36 @@ TCP and provides more efficient error corrections than UDP. DNS over QUIC
 (DNS/QUIC) has privacy properties similar to DNS over TLS specified in RFC7858,
 and performance similar to classic DNS over UDP.
 
-{mainmatter}
+--- middle
 
 # Introduction
 
-Domain Name System (DNS) concepts are specified in [@!RFC1034].  This
-document presents a mapping of the DNS protocol [@!RFC1035] over QUIC
-transport [@!I-D.ietf-quic-transport] [@!I-D.ietf-quic-tls].  The
+Domain Name System (DNS) concepts are specified in {{!RFC1034}}.  This
+document presents a mapping of the DNS protocol {{!RFC1035}} over QUIC
+transport {{!I-D.ietf-quic-transport}} {{!I-D.ietf-quic-tls}}.  The
 goals of this mapping are:
 
 1.  Provide the same DNS privacy protection as DNS over TLS (DNS/TLS)
-    [@?RFC7858]. This includes an option for the client to 
+    {{?RFC7858}}. This includes an option for the client to 
     authenticate the server by means of an authentication domain
-    name [@!RFC8310].
+    name {{!RFC8310}}.
 
 2.  Provide an improved level of source address validation for DNS
-    servers compared to DNS/UDP [@!RFC1035].
+    servers compared to DNS/UDP {{!RFC1035}}.
 
 3.  Provide a transport that is not constrained by path MTU limitations on the 
     size of DNS responses it can send.
 
 4.  Explore the potential performance gains of using QUIC as a DNS
-    transport, versus other solutions like DNS over UDP (DNS/UDP) [@!RFC1035] or
-    DNS/TLS [@?RFC7858].
-
-5.  Participate in the definition of QUIC protocols and API, by
-    outlining a use case for QUIC different from HTTP over QUIC
-    [@?I-D.ietf-quic-http].
+    transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}} or
+    DNS/TLS {{?RFC7858].
 
 In order to achieve these goals, the focus of this document is limited
-to the "stub to recursive resolver" scenario also addressed by [@?RFC7858].
+to the "stub to recursive resolver" scenario also addressed by {{?RFC7858}}.
 That is, the protocol described here works for queries and responses between
 stub clients and recursive servers. The specific non-goals of this document are:
 
-1.  No attempt is made to support zone transfers [@?RFC5936], as these
+1.  No attempt is made to support zone transfers {{?RFC5936}}, as these
     are not relevant to the stub to recursive resolver scenario.
 
 2.  No attempt is made to evade potential blocking of DNS/QUIC
@@ -110,12 +123,12 @@ stub clients and recursive servers. The specific non-goals of this document are:
 
 Users interested in zone transfers should continue using TCP based
 solutions. Users interested in evading middleboxes should
-consider using solutions like DNS/HTTPS [@?RFC8484].
+consider using solutions like DNS/HTTPS {{?RFC8484}}.
 
 Specifying the transmission of an application over QUIC requires
 specifying how the application's messages are mapped to QUIC streams, and
 generally how the application will use QUIC.  This is done for HTTP
-in [@?I-D.ietf-quic-http].  The purpose of this document is to define
+in {{?I-D.ietf-quic-http}}.  The purpose of this document is to define
 the way DNS messages can be transmitted over QUIC.
 
 In this document, (#design-considerations) presents the reasoning that guided
@@ -128,7 +141,7 @@ and deployment of DNS/QUIC.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@!RFC8174].
+document are to be interpreted as described in {{!RFC8174}}.
 
 
 # Design Considerations
@@ -143,7 +156,7 @@ Usage scenarios for the DNS protocol can be broadly classified in three
 groups: stub to recursive resolver, recursive resolver to
 authoritative server, and server to server.  This design focuses only on the 
 "stub to recursive resolver" scenario following the approach taken in
-[@?RFC7858] and [@!RFC8310].
+{{?RFC7858}} and {{!RFC8310}}.
 
 QUESTION: Should this document specify any aspects of configuration of
 discoverability differently to DNS/TLS?
@@ -152,14 +165,14 @@ No attempt is made to address the recursive to authoritative scenarios.
 Authoritative resolvers are discovered dynamically through NS records. It is
 noted that at the time of writing work is ongoing in the DPRIVE working group to
 attempt to address the analogous problem for DNS/TLS
-[@?I-D.bortzmeyer-dprive-resolver-to-auth]. In the absence of an agreed way for
+{{?I-D.bortzmeyer-dprive-resolver-to-auth}}. In the absence of an agreed way for
 authoritative to signal support for QUIC transport, recursive resolvers would
 have to resort to some trial and error process. At this stage of QUIC
 deployment, this would be mostly errors, and does not seem attractive. This
 could change in the future.
 
 The DNS protocol is also used for zone transfers. In the zone transfer scenario
-([@?RFC5936]), the client emits a single AXFR query, and the server responds
+{{?RFC5936}}, the client emits a single AXFR query, and the server responds
 with a series of AXFR responses. This creates a unique profile, in which a query
 results in several responses. Supporting that profile would complicate the
 mapping of DNS queries over QUIC streams. Zone transfers are not used in the
@@ -169,15 +182,15 @@ this proposed mapping of DNS to QUIC.
 
 ## Provide DNS Privacy
 
-DNS privacy considerations are described in [@?RFC7626]. [@?RFC7858] defines how
+DNS privacy considerations are described in {{?RFC7626}}. {{?RFC7858}} defines how
 to mitigate some of these issues by transmitting DNS messages over TLS and TCP
-and [@!RFC8310] specifies Strict and Opportunistic Usage Profiles for DNS/TLS
+and {{!RFC8310}} specifies Strict and Opportunistic Usage Profiles for DNS/TLS
 including how stub resolvers can authenticate recursive resolvers.
 
 QUIC connection setup includes the negotiation of security parameters using TLS,
-as specified in [@!I-D.ietf-quic-tls], enabling encryption of the QUIC
+as specified in {{!I-D.ietf-quic-tls}}, enabling encryption of the QUIC
 transport. Transmitting DNS messages over QUIC will provide essentially the same
-privacy protections as [@?RFC7858] and [@!RFC8310]. Further discussion on this
+privacy protections as {{?RFC7858}} and {{!RFC8310}}. Further discussion on this
 is provided in (#privacy-considerations).
 
 ## Design for Minimum Latency
@@ -189,7 +202,7 @@ components:
  1.  Support for 0-RTT data during session resumption.
 
  2.  Support for advanced error recovery procedures as specified in
-     [@?I-D.ietf-quic-recovery].
+     {{?I-D.ietf-quic-recovery}}.
 
  3.  Mitigation of head-of-line blocking by allowing parallel
      delivery of data on multiple streams.
@@ -206,47 +219,20 @@ three ways:
      generating the sustained traffic required to benefit from
      advanced recovery features.
 
- 3.  Mapping of each DNS Query/Response transaction to a separate stream,
+ 3.  Fast resumption of QUIC connections to manage the disconnect-on-idle
+     feature of QUIC without incurring retransmission time-outs.
+
+ 4.  Mapping of each DNS Query/Response transaction to a separate stream,
      to mitigate head-of-line blocking.
 
 These considerations will be reflected in the mapping of DNS traffic
 to QUIC streams in (#stream-mapping-and-usage).
 
-## Development of QUIC Protocols and API
-
-QUIC is defined as a layered protocol, with application-specific
-mapping layered on top of the generic QUIC transport.  The only
-mapping defined at this stage is HTTP over QUIC [@?I-D.ietf-quic-http].
-Adding a different mapping for a different application contributes to
-the development of QUIC.
-
-HTTP/QUIC parallels the definition of HTTP/2.0, in which HTTP queries
-and responses are carried as series of frames. The HTTP/QUIC mapping provide
-with some simplification compared to HTTP/TLS/TCP,
-as QUIC already provides concepts like stream identification or end
-of stream marks. Dedicated control channel are used to carry connection data,
-such as settings or the relative priority of queries. It would be
-completely possible to use the HTTP/QUIC mapping to carry DNS requests
-as HTTP queries, as specified in [@?RFC8484]. We are
-somewhat concerned that this mapping carries the overhead of HTTP into
-the DNS protocol, resulting in additional complexity and overhead.
-
-In this document a different design is deliberately explored, in which 
-clients and servers can initiate queries as
-determined by the DNS application logic, opening new streams as
-necessary.  This provides for maximum parallelism between queries, as
-noted in (#design-for-minimum-latency).  It also places constraints on the API.
-Client and servers will have to be notified of the opening of a new
-stream by their peer.  Instead of orderly closing the control stream,
-client and server will have to use orderly connection closure
-mechanisms and manage the potential loss of data if closing on one
-end conflicts with opening of a stream on the other end.
-
 ## No Specific Middlebox Bypass Mechanism
 
-Being different from HTTP/QUIC is a design choice.  The
-advantage is that the mapping can be defined for minimal overhead and
-maximum performance.  The downside is that the difference can be
+The mapping of DNS over QUIC is defined for minimal overhead and
+maximum performance. This means a different traffic profile than HTTP over 
+QUIC. This difference can be
 noted by firewalls and middleboxes.  There may be environments in
 which HTTP/QUIC will be allowed, but DNS/QUIC will be
 disallowed and blocked by these middle boxes.
@@ -275,7 +261,7 @@ development, as explained in (#development-of-quic-protocols-and-api).
 ## Connection Establishment
 
 DNS/QUIC connections are established as described in
-[@!I-D.ietf-quic-transport].  During connection establishment, DNS/QUIC
+{{!I-D.ietf-quic-transport}}.  During connection establishment, DNS/QUIC
 support is indicated by selecting the ALPN token "dq" in the crypto
 handshake.
 
@@ -290,8 +276,8 @@ NOT identify themselves using this string.
 
 Implementations of draft versions of the protocol MUST add the string
 "-" and the corresponding draft number to the identifier.  For
-example, draft-huitema-quic-dnsoquic-01 is identified using the
-string "dq-h01".
+example, draft-huitema-dprive-dnsoquic-00 is identified using the
+string "dq-h00".
 
 ### Port Selection
 
@@ -308,20 +294,20 @@ the server, unless it has mutual agreement with its server to use a
 port other than port TBD for DNS/QUIC.  Such another port MUST
 NOT be port 53 or port 853.  This recommendation against use of port
 53 for DNS/QUIC is to avoid confusion between DNS/QUIC and
-DNS/UDP as specified in [@!RFC1035].  Similarly, using port 853
+DNS/UDP as specified in {{!RFC1035}}.  Similarly, using port 853
 would cause confusion between DNS/QUIC and DNS/DTLS as
-specified in [@?RFC8094].
+specified in {{?RFC8094}}.
 
 ## Stream Mapping and Usage
 
 The mapping of DNS traffic over QUIC streams takes advantage of the
-QUIC stream features detailed in Section 10 of [@!I-D.ietf-quic-transport].
+QUIC stream features detailed in Section 2 of {{!I-D.ietf-quic-transport}}.
 
 The stub to resolver DNS traffic follows a simple pattern in which
 the client sends a query, and the server provides a response.  This design
 specifies that for each subsequent query on a QUIC connection the client MUST 
 select the next available client-initiated bidirectional stream, in
-conformance with [@!I-D.ietf-quic-transport].
+conformance with {{!I-D.ietf-quic-transport}}.
 
 The client MUST send the DNS query over the selected stream, and MUST
 indicate through the STREAM FIN mechanism that no further data will
@@ -332,20 +318,20 @@ indicate through the STREAM FIN mechanism that no further
 data will be sent on that stream.
 
 Therefore, a single client initiated DNS transaction consumes a single stream.
-This means that the 
-client's first query occurs on QUIC stream 4, the second on 8, and so on.
+This means that the client's first query occurs on QUIC stream 0, the second on 4,
+and so on.
 
 ### Server Initiated Transactions
 
 There are planned traffic patterns in which a server sends
 unsolicited queries to a client, such as for example PUSH messages
-defined in [@?I-D.ietf-dnssd-push]. 
+defined in {{?I-D.ietf-dnssd-push}}. 
 These occur when a client subscribes to
 changes for a particular DNS RRset or resource record type. When a 
 PUSH server wishes to send such
 updates it MUST select the next available server initiated
 bidirectional stream, in
-conformance with [@!I-D.ietf-quic-transport].  
+conformance with {{!I-D.ietf-quic-transport}}.  
 
 The server MUST send the DNS query over the selected stream, and MUST indicate
 through the STREAM FIN mechanism that no further data will be sent on
@@ -365,30 +351,49 @@ Stream transmission may be abandoned by either party, using the
 stream "reset" facility.  A stream reset indicates that one party is
 unwilling to continue processing the transaction associated with the
 stream.  The corresponding transaction MUST be abandoned.  A Server
-Failure (SERVFAIL, [@!RFC1035]) SHOULD be notified to the initiator of
+Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified to the initiator of
 the transaction.
 
-## Closing the DNS/QUIC Connection
+## Connection Management
 
-QUIC connections are closed using the CONNECTION_CLOSE mechanisms
-specified in [@!I-D.ietf-quic-transport].  Connections can be closed at
-the initiative of either the client or the server (also see 
-(#connection-close)).  The party
-initiating the connection closure SHOULD use the QUIC GOAWAY
-mechanism to initiate a graceful shutdown of a connection.
+Section 10 of the QUIC transport specifications {{!I-D.ietf-quic-transport}}
+specifies that connections can be closed in three ways:
 
-The transactions corresponding to stream number higher than indicated
-in the GO AWAY frames MUST be considered failed.  Similarly, if
-streams are still open when the CONNECTION_CLOSE is received, the
-corresponding transactions MUST be considered failed.  In both cases,
-a Server Failure (SERVFAIL, [@!RFC1035]) SHOULD be notified to the
-initiator of the transaction.
+* idle timeout
+* immediate close
+* stateless reset
 
-## Connection Resume and 0-RTT
+Clients and servers implementing DNS over QUIC SHOULD negotiate use of
+the idle timeout. Closing on idle-timeout is done without any packet exchange,
+which minimizes protocol overhead. This document does not recommend 
+a specific value of the idle timer. 
+
+Clients SHOULD monitor the idle time incurred on their connection to
+the server, defined by the time spend since the last packet from
+the server has been received. When a client prepares to send a new DNS
+query to the server, it will check whether the idle time is sufficient
+lower than the idle timer. If it is, the client will send the DNS
+query over the existing connection. If not, the client will establish
+a new connection and send the query over that connection. 
+
+Clients MAY discard their connection to the server before the idle
+timeout expires. If they do that, they SHOULD close the connection
+explicitly, using QUIC's CONNECTION_CLOSE mechanisms, and indicating
+the Application reason "No Error".
+
+Clients and servers may close the connection for a variety of other
+reasons, indicated using QUIC's CONNECTION_CLOSE. Client and servers
+that send packets over a connection discarded by their peer MAY
+receive a stateless reset indication. If a connection fails,
+all queries in progress over the connection MUST be considered failed,
+and aServer Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified
+to the initiator of the transaction.
+
+## Connection Resume and 0-RTT 
 
 A stub resolver MAY take advantage of the connection resume
-mechanisms supported by QUIC transport [@!I-D.ietf-quic-transport] and
-QUIC TLS [@!I-D.ietf-quic-tls].  Stub resolvers SHOULD consider
+mechanisms supported by QUIC transport {{!I-D.ietf-quic-transport}} and
+QUIC TLS {{!I-D.ietf-quic-tls}}.  Stub resolvers SHOULD consider
 potential privacy issues associated with session resume before
 deciding to use this mechanism.  These privacy issues are detailed in
 (#privacy-issues-with-session-resume).
@@ -404,57 +409,56 @@ transmit an Update.
 ## Authentication
 
 For the stub to recursive resolver scenario, the authentication
-requirements are the same as described in [@?RFC7858] and
-[@!RFC8310].  There is no need to
+requirements are the same as described in {{?RFC7858}} and
+{{!RFC8310}}.  There is no need to
 authenticate the client's identity in either scenario.
 
 ## Fall Back to Other Protocols on Connection Failure
 
 If the establishment of the DNS/QUIC connection fails, clients
 SHOULD attempt to fall back to DNS/TLS and then potentially clear 
-text, as specified in [@?RFC7858] and 
-[@!RFC8310], depending on their privacy
+text, as specified in {{?RFC7858}} and 
+{{!RFC8310}}, depending on their privacy
 profile.
 
 DNS clients SHOULD remember server IP addresses that don't support
 DNS/QUIC, including timeouts, connection refusals, and QUIC
 handshake failures, and not request DNS/QUIC from them for a
 reasonable period (such as one hour per server).  DNS clients
-following an out-of-band key-pinned privacy profile ([@?RFC7858]) MAY
+following an out-of-band key-pinned privacy profile ({{?RFC7858}}) MAY
 be more aggressive about retrying DNS/QUIC connection failures.
 
 ## Response Sizes
 
-DNS/QUIC does not suffer from the limitation on the size of responses that 
-can be delivered as DNS/UDP [@!RFC1035] does, since large responses will
-be sent in separate STREAM frames in separate packets. 
+DNS/QUIC does not suffer from the same limitations on the size of queries and
+responses that as DNS/UDP {{!RFC1035}} does. Queries and Responses are sent
+on QUIC streams, which in theory can carry up to 2^62 bytes. However,
+clients or servers MAY impose a limit on the maximum size of data that
+they can accept over a given stream. This is controlled in QUIC by
+the transport parameters:
 
-QUESTION: However, this raises a new issue because the responses sent over 
-QUIC can be significantly larger than those sent over TCP (65,635 bytes).
-According to [@!I-D.ietf-quic-transport] "The largest offset delivered on
-a stream - the sum of the re-constructed offset and data length - MUST be less 
-than 2^62". Should a specific limit be applied for DNS/QUIC responses or 
-not?
+* initial_max_stream_data_bidi_local: when set by the client, specifies
+  the amount of data that servers can send on a "response" stream without
+  waiting for a MAX_STREAM_DATA frame.
+
+* initial_max_stream_data_bidi_remote: when set by the server, specifies
+  the amount of data that clients can send on a "query" stream without
+  waiting for a MAX_STREAM_DATA frame.
+
+Clients and servers SHOULD treat these parameters as the practical maximum
+of queries and responses. If the EDNS parameters of a Query indicate a lower
+message size, servers MUST comply with that indication.
 
 ## DNS Message IDs
 
-When sending multiple queries over a QUIC connection, clients MUST NOT reuse
-the DNS Message ID of an in-flight 
-query on that connection in order to avoid Message ID collisions.
-
-Clients MUST match responses to
-outstanding queries using the STREAM ID and Message ID and if the response contains a question 
-section, the client MUST match the QNAME, QCLASS, and QTYPE fields. Failure to match
-is a DNS/QUIC protocol error. Clients observing such errors SHOULD close the connection
-immediately, indicating the application specific error code 0x00000001.
-The client should also mark the server as inappropriate
-for future use of DNS/QUIC.
+When sending queries over a QUIC connection, the DNS Message ID MUST be set to
+zero.
 
 ## Padding {#padding}
 
 There are mechanisms specified for both padding individual DNS messages
-[@?RFC7830], [@?RFC8467] and padding within QUIC
-packets (see Section 8.6 of [@!I-D.ietf-quic-transport]), which may contain
+{{?RFC7830}}, {{?RFC8467}} and padding within QUIC
+packets (see Section 8.6 of {{!I-D.ietf-quic-transport}}), which may contain
 multiple frames.
 
 Implementations SHOULD NOT use DNS options for
@@ -462,11 +466,11 @@ padding individual DNS messages, because QUIC transport
 MAY transmit multiple STREAM frames containing separate DNS messages in
 a single QUIC packet. Instead, implementations SHOULD use QUIC PADDING frames
 to align the packet length to a small set of fixed sizes, aligned with
-the recommendations of [@?RFC8467].
+the recommendations of {{?RFC8467}}.
 
 ## Connection Handling
 
-[@?RFC7766] provides updated
+{{?RFC7766}} provides updated
 guidance on DNS/TCP much of which is applicable to DNS/QUIC. This 
 section attempts to specify how those considerations apply to DNS/QUIC.
 
@@ -511,7 +515,7 @@ and/or retry queries.
 Proper management of established and idle connections is important to
 the healthy operation of a DNS server.  An implementation of DNS/QUIC
 SHOULD follow best practices for DNS/TCP, as described in
-[@?RFC7766].  Failure to do so may lead to resource exhaustion and
+{{?RFC7766}}.  Failure to do so may lead to resource exhaustion and
 denial of service.
 
 This document does not make specific recommendations for timeout
@@ -520,17 +524,20 @@ close connections depending on the level of available resources.
 Timeouts may be longer during periods of low activity and shorter
 during periods of high activity.  Current work in this area may also
 assist DNS/TLS clients and servers in selecting useful timeout
-values [@?RFC7828] [@?I-D.ietf-dnsop-session-signal] [@TDNS].
+values {{?RFC7828}} {{?RFC8490}} {{TDNS}}.
 
-TODO: Clarify what timers (idle timeouts, response timeouts) apply at the
-stream level and at the connection level.
+Clients that are willing to use QUIC's 0-RTT mechanism can reestablish
+connections and send transactions on the new connection with minimal
+delay overhead. These clients MAY chose low values of the idle timer,
+but SHOULD NOT pick value lower than 20 seconds.
 
-TODO: QUIC provides an efficient mechanism for resuming connections,
-including the possibility of sending 0-RTT data.  Does that change
-the tradeoff?  Is it plausible to use shorter timers than specified
-for TCP?
+Per section 10.2 of QUIC transport specification, the effective value of
+the idle timeout is  computed as the minimum of the values advertised by
+the two endpoints.
 
 ## Flow Control Mechanisms
+
+Servers and Clients manage flow control as specified in QUIC.
 
 Servers MAY use the "maximum stream ID" option of the QUIC
 transport to limit the number of streams opened by the
@@ -540,7 +547,7 @@ DNS queries that a client can send.
 # Security Considerations
 
 The security considerations of DNS/QUIC should be comparable to
-those of DNS/TLS [@?RFC7858].
+those of DNS/TLS {{?RFC7858}}.
 
 # Privacy Considerations
 
@@ -548,11 +555,11 @@ DNS/QUIC is specifically designed to protect the DNS traffic
 between stub and resolver from observations by third parties, and
 thus protect the privacy of queries from the stub.  However, the recursive
 resolver has full visibility of the stub's traffic, and could be used
-as an observation point, as discussed in [@?RFC7626]. These considerations
+as an observation point, as discussed in {{?RFC7626}}. These considerations
 do not differ between DNS/TLS and DNS/QUIC and are not discussed
 further here. 
 
-QUIC incorporates the mechanisms of TLS 1.3 [@?RFC8446] and
+QUIC incorporates the mechanisms of TLS 1.3 {{?RFC8446}} and
 this enables QUIC transmission of "Zero-RTT" data.  This can
 provide interesting latency gains, but it raises two concerns:
 
@@ -574,12 +581,12 @@ recursive resolver outgoing traffic is observable, and thus find out
 what name was queried for in the 0-RTT data.
 
 This risk is in fact a subset of the general problem of observing the
-behavior of the recursive resolver discussed in  [@?RFC7626]. The
+behavior of the recursive resolver discussed in  {{?RFC7626}}. The
 attack is partially mitigated by reducing the observability of this
 traffic.  However, the risk is amplified for 0-RTT data, because the
 attacker might replay it at chosen times, several times.
 
-The recommendation in [@?RFC8446] is that the capability to
+The recommendation in {{?RFC8446}} is that the capability to
 use 0-RTT data should be turned off by default, on only enabled if
 the user clearly understands the associated risks.
 
@@ -626,7 +633,7 @@ mitigate this attack.
 
    This document creates a new registration for the identification of
    DNS/QUIC in the "Application Layer Protocol Negotiation (ALPN)
-   Protocol IDs" registry established in [@!RFC7301].
+   Protocol IDs" registry established in {{!RFC7301}}.
 
    The "dq" string identifies DNS/QUIC:
 
@@ -641,10 +648,10 @@ mitigate this attack.
    IANA is required to add the following value to the "Service Name and
    Transport Protocol Port Number Registry" in the System Range.  The
    registry for that range requires IETF Review or IESG Approval
-   [@?RFC6335], and such a review was requested using the early allocation
-   process [@?RFC7120] for the well-known UDP port in this document. Since
+   {{?RFC6335], and such a review was requested using the early allocation
+   process {{?RFC7120] for the well-known UDP port in this document. Since
    port 853 is reserved for 'DNS query-response protocol run over TLS' 
-   consideration is requested for reserving port TBD for 'DNS query-response 		  
+   consideration is requested for reserving port TBD for 'DNS query-response  
    protocol run over QUIC'.
 
        Service Name           domain-s
@@ -664,42 +671,17 @@ registry as unassigned.
 
 # Acknowledgements
 
-This document liberally borrows text from [@?I-D.ietf-quic-http]
-edited by Mike Bishop, and from [@?RFC7858] authored by Zi Hu, Liang
+This document liberally borrows text from {{?I-D.ietf-quic-http}}
+edited by Mike Bishop, and from {{?RFC7858}} authored by Zi Hu, Liang
 Zhu, John Heidemann, Allison Mankin, Duane Wessels, and Paul Hoffman.
 
 The privacy issue with 0-RTT data and session resume were analyzed by
 Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIV" working
-group [@DNS0RTT].
+group {{DNS0RTT}}.
 
 Thanks to our wide cast of supporters.
 
-<reference anchor="DNS0RTT" target="https://www.ietf.org/mail-archive/web/dns-privacy/current/msg01276.html">
-  <front>
-    <title>DNS + 0-RTT</title>
-    <author initials="D." surname="Kahn Gillmor" fullname="Daniel Kahn Gillmor">
-      <organization/>
-    </author>
-    <date year="2016" month="April" day="06" />
-  </front>
-  <seriesInfo name="Message to" value="DNS-Privacy WG mailing list"/>
-</reference>
 
-<reference anchor="TDNS" target="http://dx.doi.org/10.1109/SP.2015.18">
-        <front>
-          <title>Connection-Oriented DNS to Improve Privacy and Security</title>
-          <author initials="L." surname="Zhu" fullname="Liang Zhu"/>
-          <author initials="Z." surname="Hu" fullname="Zi Hu"/>
-          <author initials="J." surname="Heidemann" fullname="John Heidemann"/>
-          <author initials="D." surname="Wessels" fullname="Duane Wessels"/>
-          <author initials="A." surname="Mankin" fullname="Allison Mankin"/>
-          <author initials="N." surname="Somaiya" fullname="Nikita Somaiya"/>
-          <date/>
-        </front>
-        <seriesInfo name="2015 IEEE Symposium" value="on Security and Privacy (SP)" />
-   <seriesInfo name="DOI" value="10.1109/SP.2015.18" />
-      </reference>
-
-{backmatter}
+--- back
 
 
