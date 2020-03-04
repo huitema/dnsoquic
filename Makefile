@@ -1,9 +1,9 @@
 # Draft Makefile. You will need:
-# - mmark (https://github.com/miekg/mmark)
+# - kramdown-rfc2629 (https://github.com/cabo/kramdown-rfc2629)
 # - xml2rfc (https://xml2rfc.tools.ietf.org/)
 
-DRAFT=draft-huitema-quic-dnsoquic
-VERSION=05
+DRAFT=draft-huitema-dprive-dnsoquic
+VERSION=00
 
 XML=$(DRAFT).xml
 HTML=$(DRAFT)-$(VERSION).html
@@ -13,7 +13,7 @@ TXT=$(DRAFT)-$(VERSION).txt
 
 all: $(HTML) $(TXT) 
 
-$(XML): $(DRAFT).md; mmark -xml2 -page $< $@
+$(XML): $(DRAFT).md; kramdown-rfc2629 $< $@
 
 $(HTML): $(XML) ; xml2rfc --html -o $@ $<
 $(TXT): $(XML) ; xml2rfc --text -o $@ $<
