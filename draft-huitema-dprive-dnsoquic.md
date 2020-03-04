@@ -108,7 +108,7 @@ goals of this mapping are:
 
 4.  Explore the potential performance gains of using QUIC as a DNS
     transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}} or
-    DNS/TLS {{?RFC7858].
+    DNS/TLS {{?RFC7858}}.
 
 In order to achieve these goals, the focus of this document is limited
 to the "stub to recursive resolver" scenario also addressed by {{?RFC7858}}.
@@ -122,7 +122,9 @@ stub clients and recursive servers. The specific non-goals of this document are:
     traffic by middleboxes.
 
 Users interested in zone transfers should continue using TCP based
-solutions. Users interested in evading middleboxes should
+solutions and will also want to take note of work in progress to
+encrypt zone transfers using DoT {{?I-D.ietf-dprive-xfr-over-tls}}.
+Users interested in evading middleboxes should
 consider using solutions like DNS/HTTPS {{?RFC8484}}.
 
 Specifying the transmission of an application over QUIC requires
@@ -165,7 +167,7 @@ No attempt is made to address the recursive to authoritative scenarios.
 Authoritative resolvers are discovered dynamically through NS records. It is
 noted that at the time of writing work is ongoing in the DPRIVE working group to
 attempt to address the analogous problem for DNS/TLS
-{{?I-D.bortzmeyer-dprive-resolver-to-auth}}. In the absence of an agreed way for
+{{?I-D.ietf-dprive-phase2-requirements}}. In the absence of an agreed way for
 authoritative to signal support for QUIC transport, recursive resolvers would
 have to resort to some trial and error process. At this stage of QUIC
 deployment, this would be mostly errors, and does not seem attractive. This
@@ -555,7 +557,7 @@ DNS/QUIC is specifically designed to protect the DNS traffic
 between stub and resolver from observations by third parties, and
 thus protect the privacy of queries from the stub.  However, the recursive
 resolver has full visibility of the stub's traffic, and could be used
-as an observation point, as discussed in {{?RFC7626}}. These considerations
+as an observation point, as discussed in {{?I-D.ietf-dprive-rfc7626-bis}}. These considerations
 do not differ between DNS/TLS and DNS/QUIC and are not discussed
 further here. 
 
