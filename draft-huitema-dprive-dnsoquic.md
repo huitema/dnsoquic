@@ -37,6 +37,7 @@ author:
         city: Oxford
         code: OX4 4GA
         country: U.K.
+        email: sara@sinodun.com
 
 informative:
   DNS0RTT:
@@ -83,8 +84,8 @@ This document describes the use of QUIC to provide transport privacy for DNS.
 The encryption provided by QUIC has similar properties to that provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
 TCP and provides more efficient error corrections than UDP. DNS over QUIC
-(DNS/QUIC) has privacy properties similar to DNS over TLS specified in RFC7858,
-and performance similar to classic DNS over UDP.
+(DoQ) has privacy properties similar to DNS over TLS (DoT) specified in RFC7858,
+and performance characteristics similar to classic DNS over UDP.
 
 --- middle
 
@@ -92,23 +93,25 @@ and performance similar to classic DNS over UDP.
 
 Domain Name System (DNS) concepts are specified in {{!RFC1034}}.  This
 document presents a mapping of the DNS protocol {{!RFC1035}} over QUIC
-transport {{!I-D.ietf-quic-transport}} {{!I-D.ietf-quic-tls}}.  The
-goals of this mapping are:
+transport {{!I-D.ietf-quic-transport}} {{!I-D.ietf-quic-tls}}. DNS over QUIC is
+refered here as DoQ, in line with the terminology presented in
+{{!I-D.ietf-dnsop-terminology-ter}}. The
+goals of the DoQ mapping are:
 
-1.  Provide the same DNS privacy protection as DNS over TLS (DNS/TLS)
+1.  Provide the same DNS privacy protection as DNS over TLS (DoT)
     {{?RFC7858}}. This includes an option for the client to 
     authenticate the server by means of an authentication domain
     name {{!RFC8310}}.
 
 2.  Provide an improved level of source address validation for DNS
-    servers compared to DNS/UDP {{!RFC1035}}.
+    servers compared to classic DNS over UDP {{!RFC1035}}.
 
 3.  Provide a transport that is not constrained by path MTU limitations on the 
     size of DNS responses it can send.
 
 4.  Explore the potential performance gains of using QUIC as a DNS
     transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}} or
-    DNS/TLS {{?RFC7858}}.
+    DoT {{?RFC7858}}.
 
 In order to achieve these goals, the focus of this document is limited
 to the "stub to recursive resolver" scenario also addressed by {{?RFC7858}}.
@@ -133,10 +136,10 @@ generally how the application will use QUIC.  This is done for HTTP
 in {{?I-D.ietf-quic-http}}.  The purpose of this document is to define
 the way DNS messages can be transmitted over QUIC.
 
-In this document, (#design-considerations) presents the reasoning that guided
-the proposed design. (#specifications) specifies the actual mapping of DNS/QUIC.
-(#implementation-requirements) presents guidelines on the implementation, usage
-and deployment of DNS/QUIC.
+In this document, {{design-considerations}} presents the reasoning that guided
+the proposed design. {{specifications}} specifies the actual mapping of DoQ.
+{{implementation-requirements}} presents guidelines on the implementation, usage
+and deployment of DoQ.
 
 
 # Key Words
@@ -149,7 +152,7 @@ document are to be interpreted as described in {{!RFC8174}}.
 # Design Considerations
 
 This section and its subsection present the design guidelines that
-were used for the proposed mapping of DNS/QUIC.  This section is
+were used for DoQ.  This section is
 informative in nature.
 
 ## Scope is Limited to the Stub to Resolver Scenario
@@ -161,12 +164,12 @@ authoritative server, and server to server.  This design focuses only on the
 {{?RFC7858}} and {{!RFC8310}}.
 
 QUESTION: Should this document specify any aspects of configuration of
-discoverability differently to DNS/TLS?
+discoverability differently to DoT?
 
 No attempt is made to address the recursive to authoritative scenarios.
 Authoritative resolvers are discovered dynamically through NS records. It is
 noted that at the time of writing work is ongoing in the DPRIVE working group to
-attempt to address the analogous problem for DNS/TLS
+attempt to address the analogous problem for DoT
 {{?I-D.ietf-dprive-phase2-requirements}}. In the absence of an agreed way for
 authoritative to signal support for QUIC transport, recursive resolvers would
 have to resort to some trial and error process. At this stage of QUIC
@@ -179,21 +182,21 @@ with a series of AXFR responses. This creates a unique profile, in which a query
 results in several responses. Supporting that profile would complicate the
 mapping of DNS queries over QUIC streams. Zone transfers are not used in the
 stub to recursive scenario that is the focus here, and seem to be currently well
-served by the DNS over TCP (DNS/TCP). There is no attempt to support them in
+served by using DNS over TCP. There is no attempt to support them in
 this proposed mapping of DNS to QUIC.
 
 ## Provide DNS Privacy
 
 DNS privacy considerations are described in {{?RFC7626}}. {{?RFC7858}} defines how
 to mitigate some of these issues by transmitting DNS messages over TLS and TCP
-and {{!RFC8310}} specifies Strict and Opportunistic Usage Profiles for DNS/TLS
+and {{!RFC8310}} specifies Strict and Opportunistic Usage Profiles for DoT
 including how stub resolvers can authenticate recursive resolvers.
 
 QUIC connection setup includes the negotiation of security parameters using TLS,
 as specified in {{!I-D.ietf-quic-tls}}, enabling encryption of the QUIC
 transport. Transmitting DNS messages over QUIC will provide essentially the same
 privacy protections as {{?RFC7858}} and {{!RFC8310}}. Further discussion on this
-is provided in (#privacy-considerations).
+is provided in {{privacy-considerations}}.
 
 ## Design for Minimum Latency
 
@@ -228,7 +231,7 @@ three ways:
      to mitigate head-of-line blocking.
 
 These considerations will be reflected in the mapping of DNS traffic
-to QUIC streams in (#stream-mapping-and-usage).
+to QUIC streams in {{stream-mapping-and-usage}}.
 
 ## No Specific Middlebox Bypass Mechanism
 
@@ -236,7 +239,7 @@ The mapping of DNS over QUIC is defined for minimal overhead and
 maximum performance. This means a different traffic profile than HTTP over 
 QUIC. This difference can be
 noted by firewalls and middleboxes.  There may be environments in
-which HTTP/QUIC will be allowed, but DNS/QUIC will be
+which HTTP/QUIC will be allowed, but DoQ will be
 disallowed and blocked by these middle boxes.
 
 It is recognized that this might be a problem, but there is currently no
@@ -245,25 +248,22 @@ acute enough that the only realistic solution would
 be to communicate with independent recursive resolvers using DNS/HTTPS,
 or maybe DNS/HTTP/QUIC.  Or the problem might be rare enough and the
 performance gains significant enough
-that the appropriate solution would be to use DNS/QUIC most of the time,
+that the appropriate solution would be to use DoQ most of the time,
 and fall back to DNS/HTTPS some of the time. Measurements
 and experimentation will inform that decision.  
 
 It may indeed turn out that the complexity and overhead concerns are
 negligible compared to the potential advantages of DNS/HTTPS, such
-as integration with web services or firewall traversal, and that DNS/QUIC
+as integration with web services or firewall traversal, and that DoQ
 does not provide sufficient performance gains to justify a new protocol. We
 will evaluate that once implementations are available and can be compared.
-In the meanwhile, we
-believe that a clean design is most likely to inform the QUIC
-development, as explained in (#development-of-quic-protocols-and-api).
 
 # Specifications
 
 ## Connection Establishment
 
-DNS/QUIC connections are established as described in
-{{!I-D.ietf-quic-transport}}.  During connection establishment, DNS/QUIC
+DoQ connections are established as described in
+{{!I-D.ietf-quic-transport}}.  During connection establishment, DoQ
 support is indicated by selecting the ALPN token "dq" in the crypto
 handshake.
 
@@ -273,31 +273,31 @@ handshake.
  publication of a final version of this document.
 
 Only implementations of the final, published RFC can identify
-themselves as "dq".  Until such an RFC exists, implementations MUST
+themselves as "doq".  Until such an RFC exists, implementations MUST
 NOT identify themselves using this string.
 
 Implementations of draft versions of the protocol MUST add the string
 "-" and the corresponding draft number to the identifier.  For
 example, draft-huitema-dprive-dnsoquic-00 is identified using the
-string "dq-h00".
+string "doq-h00".
 
 ### Port Selection
 
-By default, a DNS server that supports DNS/QUIC MUST listen for and
+By default, a DNS server that supports DoQ MUST listen for and
 accept QUIC connections on the dedicated UDP port TBD (number to be
-defined in (#iana-considerations)), unless it has mutual
-agreement with its clients to use a port other than TBD for DNS/QUIC.
+defined in {{iana-considerations}}, unless it has mutual
+agreement with its clients to use a port other than TBD for DoQ.
 In order to use a port other than TBD, both clients and
 servers would need a configuration option in their software.
 
-By default, a DNS client desiring to use DNS/QUIC with a
+By default, a DNS client desiring to use DoQ with a
 particular server MUST establish a QUIC connection to UDP port TBD on
 the server, unless it has mutual agreement with its server to use a
-port other than port TBD for DNS/QUIC.  Such another port MUST
+port other than port TBD for DoQ.  Such another port MUST
 NOT be port 53 or port 853.  This recommendation against use of port
-53 for DNS/QUIC is to avoid confusion between DNS/QUIC and
+53 for DoQ is to avoid confusion between DoQ and
 DNS/UDP as specified in {{!RFC1035}}.  Similarly, using port 853
-would cause confusion between DNS/QUIC and DNS/DTLS as
+would cause confusion between DoQ and DNS/DTLS as
 specified in {{?RFC8094}}.
 
 ## Stream Mapping and Usage
@@ -398,7 +398,7 @@ mechanisms supported by QUIC transport {{!I-D.ietf-quic-transport}} and
 QUIC TLS {{!I-D.ietf-quic-tls}}.  Stub resolvers SHOULD consider
 potential privacy issues associated with session resume before
 deciding to use this mechanism.  These privacy issues are detailed in
-(#privacy-issues-with-session-resume).
+{{privacy-issues-with-session-resume}}.
 
 When resuming a session, a stub resolver MAY take advantage of the
 0-RTT mechanism supported by QUIC.  The 0-RTT mechanism MUST NOT be
@@ -417,22 +417,44 @@ authenticate the client's identity in either scenario.
 
 ## Fall Back to Other Protocols on Connection Failure
 
-If the establishment of the DNS/QUIC connection fails, clients
-SHOULD attempt to fall back to DNS/TLS and then potentially clear 
+If the establishment of the DoQ connection fails, clients
+SHOULD attempt to fall back to DoT and then potentially clear 
 text, as specified in {{?RFC7858}} and 
 {{!RFC8310}}, depending on their privacy
 profile.
 
 DNS clients SHOULD remember server IP addresses that don't support
-DNS/QUIC, including timeouts, connection refusals, and QUIC
-handshake failures, and not request DNS/QUIC from them for a
+DoQ, including timeouts, connection refusals, and QUIC
+handshake failures, and not request DoQ from them for a
 reasonable period (such as one hour per server).  DNS clients
 following an out-of-band key-pinned privacy profile ({{?RFC7858}}) MAY
-be more aggressive about retrying DNS/QUIC connection failures.
+be more aggressive about retrying DoQ connection failures.
+
+## Address Validation
+
+The QUIC transport specification defines Address Validation procedures
+to avoid servers being used in address amplification attacks (see
+section 8 of {{!I-D.ietf-quic-transport}}). DoQ implementations
+MUST conform to this specification, which limits the worst case
+amplification to a factor 3.
+
+DoQ implementations SHOULD consider configuring servers to use
+the Address Validation using Retry Packets procedure defined in
+section 8.1.2 of {{!I-D.ietf-quic-transport}}). This procedure
+imposes a 1-RTT delay for verifying the return routability of the
+source address of a client, similar to the DNS Cookies mechanism
+defined in {{!RFC7873}}.
+
+DoQ implementations that configure Address Validation using Retry
+Packets SHOULD implement the Address Validation for Future Connections
+procedure defined in section 8.1.3 of {{!I-D.ietf-quic-transport}}).
+This define how servers can send NEW TOKEN frames to clients after the
+client address is validated, in order to avoid the 1-RTT penalty during
+subsequent connections by the client from the same address.
 
 ## Response Sizes
 
-DNS/QUIC does not suffer from the same limitations on the size of queries and
+DoQ does not suffer from the same limitations on the size of queries and
 responses that as DNS/UDP {{!RFC1035}} does. Queries and Responses are sent
 on QUIC streams, which in theory can carry up to 2^62 bytes. However,
 clients or servers MAY impose a limit on the maximum size of data that
@@ -473,8 +495,8 @@ the recommendations of {{?RFC8467}}.
 ## Connection Handling
 
 {{?RFC7766}} provides updated
-guidance on DNS/TCP much of which is applicable to DNS/QUIC. This 
-section attempts to specify how those considerations apply to DNS/QUIC.
+guidance on DNS/TCP much of which is applicable to DoQ. This 
+section attempts to specify how those considerations apply to DoQ.
 
 ### Connection Reuse
 
@@ -515,7 +537,7 @@ and/or retry queries.
 ### Idle Timeouts
 
 Proper management of established and idle connections is important to
-the healthy operation of a DNS server.  An implementation of DNS/QUIC
+the healthy operation of a DNS server.  An implementation of DoQ
 SHOULD follow best practices for DNS/TCP, as described in
 {{?RFC7766}}.  Failure to do so may lead to resource exhaustion and
 denial of service.
@@ -525,7 +547,7 @@ values on idle connections.  Clients and servers should reuse and/or
 close connections depending on the level of available resources.
 Timeouts may be longer during periods of low activity and shorter
 during periods of high activity.  Current work in this area may also
-assist DNS/TLS clients and servers in selecting useful timeout
+assist DoT clients and servers in selecting useful timeout
 values {{?RFC7828}} {{?RFC8490}} {{TDNS}}.
 
 Clients that are willing to use QUIC's 0-RTT mechanism can reestablish
@@ -548,17 +570,17 @@ DNS queries that a client can send.
 
 # Security Considerations
 
-The security considerations of DNS/QUIC should be comparable to
-those of DNS/TLS {{?RFC7858}}.
+The security considerations of DoQ should be comparable to
+those of DoT {{?RFC7858}}.
 
 # Privacy Considerations
 
-DNS/QUIC is specifically designed to protect the DNS traffic
+DoQ is specifically designed to protect the DNS traffic
 between stub and resolver from observations by third parties, and
 thus protect the privacy of queries from the stub.  However, the recursive
 resolver has full visibility of the stub's traffic, and could be used
 as an observation point, as discussed in {{?I-D.ietf-dprive-rfc7626-bis}}. These considerations
-do not differ between DNS/TLS and DNS/QUIC and are not discussed
+do not differ between DoT and DoQ and are not discussed
 further here. 
 
 QUIC incorporates the mechanisms of TLS 1.3 {{?RFC8446}} and
@@ -571,8 +593,8 @@ provide interesting latency gains, but it raises two concerns:
 2.  The zero-RTT mechanism relies on TLS resume, which can provide
     linkability between successive client sessions.
 
-These issues are developed in (#privacy-issues-with-zero-rtt-data) and 
-(#privacy-issues-with-session-resume).
+These issues are developed in {{privacy-issues-with-zero-rtt-data}} and 
+{{privacy-issues-with-session-resume}}.
 
 ## Privacy Issues With Zero RTT data
 
@@ -626,20 +648,20 @@ adopts a simple mapping of one query or response per packet, or "one
 QUIC STREAM frame per packet", then the succession of packet lengths may
 provide enough information to identify the requested site.
 
-Implementations SHOULD use the mechanisms defined in (#padding) to
+Implementations SHOULD use the mechanisms defined in {{padding}} to
 mitigate this attack.
 
 # IANA Considerations
 
-## Registration of DNS/QUIC Identification String
+## Registration of DoQ Identification String
 
    This document creates a new registration for the identification of
-   DNS/QUIC in the "Application Layer Protocol Negotiation (ALPN)
+   DoQ in the "Application Layer Protocol Negotiation (ALPN)
    Protocol IDs" registry established in {{!RFC7301}}.
 
-   The "dq" string identifies DNS/QUIC:
+   The "doq" string identifies DoQ:
 
-   Protocol:  DNS/QUIC
+   Protocol:  DoQ
 
    Identification Sequence:  0x64 0x71 ("dq")
 
