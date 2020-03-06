@@ -1,9 +1,9 @@
 # dnsoquic
 DNS over QUIC
 
-This draft uses mmark. To build you will need:
+This draft uses `kramdown-rfc2629`. To build you will need:
 
-* [mmark](https://github.com/miekg/mmark)
+* [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629)
 * [xml2rfc](https://xml2rfc.tools.ietf.org)
 
 To generate text and html versions of the draft from the markdown use
@@ -12,5 +12,8 @@ To generate text and html versions of the draft from the markdown use
     $ make
 
 or use something like:
-
-mmark -xml2 -page draft-huitema-quic-dnsoquic.md > x.xml && xml2rfc --text x.xml && rm x.xml && mv x.txt draft-huitema-quic-dnsoquic.txt
+~~~
+kramdown-rfc2629 draft-huitema-dprive-dnsoquic.md > x.xml &&
+     xml2rfc --text x.xml && rm x.xml &&
+     mv x.txt draft-huitema-dprive-dnsoquic.txt
+~~~
