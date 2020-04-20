@@ -228,7 +228,10 @@ three ways:
      feature of QUIC without incurring retransmission time-outs.
 
  4.  Mapping of each DNS Query/Response transaction to a separate stream,
-     to mitigate head-of-line blocking.
+     to mitigate head-of-line blocking. This enables servers to respond
+     to queries "out of order". It also enables clients to process
+     responses as soon as they arrive, without having to wait for in
+     order delivery of responses previously posted by the server.
 
 These considerations will be reflected in the mapping of DNS traffic
 to QUIC streams in {{stream-mapping-and-usage}}.
@@ -322,6 +325,13 @@ data will be sent on that stream.
 Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on 4,
 and so on.
+
+As specified in section 7 of "DNS Transport over TCP - Implementation
+Requirements" {{!RFC7766}}, resolvers are RECOMMENDED to
+support the preparing of responses in parallel and sending them out
+of order. In DoQ, they do that by sending responses on their specific
+stream as soon as possible, without waiting for availability of responses
+for previously opened streams.
 
 ### Server Initiated Transactions
 
