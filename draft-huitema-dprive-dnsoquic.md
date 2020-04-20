@@ -347,14 +347,32 @@ Therefore a single server initiated DNS transaction consumes a single stream.
 This means that the 
 servers's first query occurs on QUIC stream 1, the second on 5, and so on.
 
-### Stream Reset
+### Transaction Errors
 
-Stream transmission may be abandoned by either party, using the
-stream "reset" facility.  A stream reset indicates that one party is
-unwilling to continue processing the transaction associated with the
-stream.  The corresponding transaction MUST be abandoned.  A Server
+Peers normally complete transactions by sending a DNS response on the
+transaction's stream, including in cases where the DNS response indicates an
+error. There are two exceptions: internal errors, and cancelled transactions.
+
+If a peer is incapable of sending a DNS response due to an internal
+error, it may issue a QUIC Stream Reset indicating with error code DOQ_INTERNAL_ERROR.
+The corresponding transaction MUST be abandoned.  A Server
 Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified to the initiator of
 the transaction.
+
+### Cancelling a Transaction
+
+The initiator of a Transaction MAY indicate that it is not interesting any
+more in receiving the response by either:
+
+* Sending a QUIC Stream Reset frame on the transaction specific stream if the STREAM FIN has not yet been sent,
+
+* or, sending a QUIC Stop Sending frame on the transaction specific stream.
+
+In both case, the error code DOQ_TRANSACTION_CANCELLED is used.
+
+There is no guarantee that the peer will receive the Stop Sending frame before completing the transaction.
+If it does, it SHOULD send a QUIC Stream Reset on the transaction specific stream, using the 
+error code DOQ_TRANSACTION_CANCELLED.
 
 ## Connection Management
 
@@ -405,6 +423,27 @@ When resuming a session, a stub resolver MAY take advantage of the
 used to send data that is not "replayable" transactions.  For
 example, a stub resolver MAY transmit a Query as 0-RTT, but MUST NOT
 transmit an Update.
+
+## DoQ Error Codes
+
+The following error codes are defined for use when abruptly terminating streams,
+aborting reading of streams, or immediately closing connections:
+
+DOQ_NO_ERROR (0x00):
+: No error.  This is used when the connection or stream needs to be closed, but
+  there is no error to signal.
+
+DOQ_INTERNAL_ERROR (0x01):
+: The DoQ implementation encountered an internal error and is incapable of
+  pursuing the transaction or the connection.
+
+DOQ_TRANSACTION_CANCELLED (0x02):
+: Used in a Stop Sending request to signal that the originator of the query is
+  not anymore interested by the result. Also used by the recipient of the
+  request when issuing a Stream Reset in response to a Stop Sending request.
+
+DOQ_TRANSPORT_PARAMETER_ERROR (0x03):
+: One or some of the transport parameters proposed by the peer are not acceptable.
 
 # Implementation Requirements
 
