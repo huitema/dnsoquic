@@ -367,11 +367,14 @@ specifies that connections can be closed in three ways:
 
 Clients and servers implementing DNS over QUIC SHOULD negotiate use of
 the idle timeout. Closing on idle-timeout is done without any packet exchange,
-which minimizes protocol overhead. This document does not recommend 
-a specific value of the idle timer. 
+which minimizes protocol overhead. Per section 10.2 of QUIC transport 
+specification, the effective value of the idle timeout is  computed as the
+minimum of the values advertised by the two endpoints. Practical
+considerations on setting the idle timeout are discussed in
+{{idle-timeouts}}.
 
 Clients SHOULD monitor the idle time incurred on their connection to
-the server, defined by the time spend since the last packet from
+the server, defined by the time spent since the last packet from
 the server has been received. When a client prepares to send a new DNS
 query to the server, it will check whether the idle time is sufficient
 lower than the idle timer. If it is, the client will send the DNS
@@ -505,27 +508,12 @@ close TCP connections for each DNS query. To avoid excess QUIC
 connections, each with a single query, clients SHOULD reuse a single
 QUIC connection to the recursive resolver. 
 
-In order to achieve performance on par with UDP, DNS clients SHOULD
-send their queries concurrently over the QUIC streams on a QUIC connection.
-That is, when a DNS client 
-sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
-for an outstanding reply before sending the next query.
-
-### Connection Close
-
 In order to amortize QUIC and TLS connection setup costs, clients and
 servers SHOULD NOT immediately close a QUIC connection after each
 response.  Instead, clients and servers SHOULD reuse existing
 QUIC connections for subsequent queries as long as they have sufficient
 resources.  In some cases, this means that clients and servers may
 need to keep idle connections open for some amount of time.
-
-Under normal operation DNS clients typically initiate connection
-closing on idle connections; however, DNS servers can close the
-connection if the idle timeout set by local policy is exceeded.
-Also, connections can be closed by either end under unusual
-conditions such as defending against an attack or system failure/
-reboot.
 
 Clients and servers that keep idle connections open MUST be robust to
 termination of idle connection by either party.  As with current DNS
@@ -555,9 +543,13 @@ connections and send transactions on the new connection with minimal
 delay overhead. These clients MAY chose low values of the idle timer,
 but SHOULD NOT pick value lower than 20 seconds.
 
-Per section 10.2 of QUIC transport specification, the effective value of
-the idle timeout is  computed as the minimum of the values advertised by
-the two endpoints.
+## Processing Queries in Parallel
+
+In order to achieve latencies on par with UDP, DNS clients SHOULD
+send their queries concurrently over different QUIC streams on a QUIC connection.
+That is, when a DNS client 
+sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
+for an outstanding reply before sending the next query.
 
 ## Flow Control Mechanisms
 
