@@ -85,7 +85,7 @@ The encryption provided by QUIC has similar properties to that provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
 TCP and provides more efficient error corrections than UDP. DNS over QUIC
 (DoQ) has privacy properties similar to DNS over TLS (DoT) specified in RFC7858,
-and performance characteristics similar to classic DNS over UDP.
+and latency characteristics similar to classic DNS over UDP.
 
 --- middle
 
@@ -109,9 +109,9 @@ goals of the DoQ mapping are:
 3.  Provide a transport that is not constrained by path MTU limitations on the 
     size of DNS responses it can send.
 
-4.  Explore the potential performance gains of using QUIC as a DNS
-    transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}} or
-    DoT {{?RFC7858}}.
+4.  Explore the characteristics of using QUIC as a DNS
+    transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}},
+    DoT {{?RFC7858}}, or DNS over HTTPS (DoH) {{?RFC8484}}.
 
 In order to achieve these goals, the focus of this document is limited
 to the "stub to recursive resolver" scenario also addressed by {{?RFC7858}}.
@@ -127,8 +127,6 @@ stub clients and recursive servers. The specific non-goals of this document are:
 Users interested in zone transfers should continue using TCP based
 solutions and will also want to take note of work in progress to
 encrypt zone transfers using DoT {{?I-D.ietf-dprive-xfr-over-tls}}.
-Users interested in evading middleboxes should
-consider using solutions like DNS/HTTPS {{?RFC8484}}.
 
 Specifying the transmission of an application over QUIC requires
 specifying how the application's messages are mapped to QUIC streams, and
@@ -239,27 +237,11 @@ to QUIC streams in {{stream-mapping-and-usage}}.
 ## No Specific Middlebox Bypass Mechanism
 
 The mapping of DNS over QUIC is defined for minimal overhead and
-maximum performance. This means a different traffic profile than HTTP over 
+maximum performance. This means a different traffic profile than HTTP3 over 
 QUIC. This difference can be
 noted by firewalls and middleboxes.  There may be environments in
-which HTTP/QUIC will be allowed, but DoQ will be
-disallowed and blocked by these middle boxes.
-
-It is recognized that this might be a problem, but there is currently no
-indication on how widespread that problem might be. The problem might be
-acute enough that the only realistic solution would
-be to communicate with independent recursive resolvers using DNS/HTTPS,
-or maybe DNS/HTTP/QUIC.  Or the problem might be rare enough and the
-performance gains significant enough
-that the appropriate solution would be to use DoQ most of the time,
-and fall back to DNS/HTTPS some of the time. Measurements
-and experimentation will inform that decision.  
-
-It may indeed turn out that the complexity and overhead concerns are
-negligible compared to the potential advantages of DNS/HTTPS, such
-as integration with web services or firewall traversal, and that DoQ
-does not provide sufficient performance gains to justify a new protocol. We
-will evaluate that once implementations are available and can be compared.
+which HTTP3 over QUIC will be able to pass through, but DoQ will be
+blocked by these middle boxes. 
 
 # Specifications
 
