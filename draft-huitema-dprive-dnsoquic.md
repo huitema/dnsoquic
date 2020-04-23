@@ -398,6 +398,35 @@ used to send data that is not "replayable" transactions.  For
 example, a stub resolver MAY transmit a Query as 0-RTT, but MUST NOT
 transmit an Update.
 
+## Message Sizes
+
+DoQ Queries and Responses are sent
+on QUIC streams, which in theory can carry up to 2^62 bytes. However, DNS
+messages are restricted in practice to a maximum size of 65535 bytes.
+This maximum size is enforced by the use of a two-octet message length
+field in DNS over TCP {{!RFC1035}} and DNS over TLS {{!RFC7858}}, and
+by the definition of the "application/dns-message" for DNS over HTTP
+{{!RFC8484}}. DoQ enforces the same restriction.
+
+The maximum size of messages is controlled in QUIC by
+the transport parameters:
+
+* initial_max_stream_data_bidi_local: when set by the client, specifies
+  the amount of data that servers can send on a "response" stream without
+  waiting for a MAX_STREAM_DATA frame.
+
+* initial_max_stream_data_bidi_remote: when set by the server, specifies
+  the amount of data that clients can send on a "query" stream without
+  waiting for a MAX_STREAM_DATA frame.
+
+Clients and servers MUST set these two parameters to the value 65535. If
+they receive a different value, they SHOULD close the QUIC connection with an
+application error "Invalid Parameter".
+
+The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify
+the UDP message size. This parameter is ignored by DoQ. DoQ implementations
+always assume that the maximum message size is 65535 bytes.
+
 # Implementation Requirements
 
 ## Authentication
@@ -443,27 +472,6 @@ procedure defined in section 8.1.3 of {{!I-D.ietf-quic-transport}}).
 This define how servers can send NEW TOKEN frames to clients after the
 client address is validated, in order to avoid the 1-RTT penalty during
 subsequent connections by the client from the same address.
-
-## Response Sizes
-
-DoQ does not suffer from the same limitations on the size of queries and
-responses that as DNS/UDP {{!RFC1035}} does. Queries and Responses are sent
-on QUIC streams, which in theory can carry up to 2^62 bytes. However,
-clients or servers MAY impose a limit on the maximum size of data that
-they can accept over a given stream. This is controlled in QUIC by
-the transport parameters:
-
-* initial_max_stream_data_bidi_local: when set by the client, specifies
-  the amount of data that servers can send on a "response" stream without
-  waiting for a MAX_STREAM_DATA frame.
-
-* initial_max_stream_data_bidi_remote: when set by the server, specifies
-  the amount of data that clients can send on a "query" stream without
-  waiting for a MAX_STREAM_DATA frame.
-
-Clients and servers SHOULD treat these parameters as the practical maximum
-of queries and responses. If the EDNS parameters of a Query indicate a lower
-message size, servers MUST comply with that indication.
 
 ## DNS Message IDs
 
