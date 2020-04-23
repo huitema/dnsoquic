@@ -511,6 +511,9 @@ That is, when a DNS client
 sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
 for an outstanding reply before sending the next query.
 
+As specified in {{stream-mapping-and-usage}} servers should send responses
+to queries on different streams as soon as they are available.
+
 ### Connection Close
 
 In order to amortize QUIC and TLS connection setup costs, clients and
