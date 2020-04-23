@@ -249,7 +249,7 @@ blocked by these middle boxes.
 
 DoQ connections are established as described in
 {{!I-D.ietf-quic-transport}}.  During connection establishment, DoQ
-support is indicated by selecting the ALPN token "dq" in the crypto
+support is indicated by selecting the ALPN token "doq" in the crypto
 handshake.
 
 ### Draft Version Identification
@@ -655,7 +655,7 @@ mitigate this attack.
 
    Protocol:  DoQ
 
-   Identification Sequence:  0x64 0x71 ("dq")
+   Identification Sequence:  0x64 0x6F 0x71 ("doq")
 
    Specification:  This document
 
