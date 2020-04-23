@@ -85,7 +85,7 @@ The encryption provided by QUIC has similar properties to that provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
 TCP and provides more efficient error corrections than UDP. DNS over QUIC
 (DoQ) has privacy properties similar to DNS over TLS (DoT) specified in RFC7858,
-and performance characteristics similar to classic DNS over UDP.
+and latency characteristics similar to classic DNS over UDP.
 
 --- middle
 
@@ -109,9 +109,9 @@ goals of the DoQ mapping are:
 3.  Provide a transport that is not constrained by path MTU limitations on the 
     size of DNS responses it can send.
 
-4.  Explore the potential performance gains of using QUIC as a DNS
-    transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}} or
-    DoT {{?RFC7858}}.
+4.  Explore the characteristics of using QUIC as a DNS
+    transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}},
+    DoT {{?RFC7858}}, or DNS over HTTPS (DoH) {{?RFC8484}}.
 
 In order to achieve these goals, the focus of this document is limited
 to the "stub to recursive resolver" scenario also addressed by {{?RFC7858}}.
@@ -127,8 +127,6 @@ stub clients and recursive servers. The specific non-goals of this document are:
 Users interested in zone transfers should continue using TCP based
 solutions and will also want to take note of work in progress to
 encrypt zone transfers using DoT {{?I-D.ietf-dprive-xfr-over-tls}}.
-Users interested in evading middleboxes should
-consider using solutions like DNS/HTTPS {{?RFC8484}}.
 
 Specifying the transmission of an application over QUIC requires
 specifying how the application's messages are mapped to QUIC streams, and
@@ -228,7 +226,10 @@ three ways:
      feature of QUIC without incurring retransmission time-outs.
 
  4.  Mapping of each DNS Query/Response transaction to a separate stream,
-     to mitigate head-of-line blocking.
+     to mitigate head-of-line blocking. This enables servers to respond
+     to queries "out of order". It also enables clients to process
+     responses as soon as they arrive, without having to wait for in
+     order delivery of responses previously posted by the server.
 
 These considerations will be reflected in the mapping of DNS traffic
 to QUIC streams in {{stream-mapping-and-usage}}.
@@ -236,27 +237,11 @@ to QUIC streams in {{stream-mapping-and-usage}}.
 ## No Specific Middlebox Bypass Mechanism
 
 The mapping of DNS over QUIC is defined for minimal overhead and
-maximum performance. This means a different traffic profile than HTTP over 
+maximum performance. This means a different traffic profile than HTTP3 over 
 QUIC. This difference can be
 noted by firewalls and middleboxes.  There may be environments in
-which HTTP/QUIC will be allowed, but DoQ will be
-disallowed and blocked by these middle boxes.
-
-It is recognized that this might be a problem, but there is currently no
-indication on how widespread that problem might be. The problem might be
-acute enough that the only realistic solution would
-be to communicate with independent recursive resolvers using DNS/HTTPS,
-or maybe DNS/HTTP/QUIC.  Or the problem might be rare enough and the
-performance gains significant enough
-that the appropriate solution would be to use DoQ most of the time,
-and fall back to DNS/HTTPS some of the time. Measurements
-and experimentation will inform that decision.  
-
-It may indeed turn out that the complexity and overhead concerns are
-negligible compared to the potential advantages of DNS/HTTPS, such
-as integration with web services or firewall traversal, and that DoQ
-does not provide sufficient performance gains to justify a new protocol. We
-will evaluate that once implementations are available and can be compared.
+which HTTP3 over QUIC will be able to pass through, but DoQ will be
+blocked by these middle boxes. 
 
 # Specifications
 
@@ -264,7 +249,7 @@ will evaluate that once implementations are available and can be compared.
 
 DoQ connections are established as described in
 {{!I-D.ietf-quic-transport}}.  During connection establishment, DoQ
-support is indicated by selecting the ALPN token "dq" in the crypto
+support is indicated by selecting the ALPN token "doq" in the crypto
 handshake.
 
 ### Draft Version Identification
@@ -322,6 +307,13 @@ data will be sent on that stream.
 Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on 4,
 and so on.
+
+As specified in section 7 of "DNS Transport over TCP - Implementation
+Requirements" {{!RFC7766}}, resolvers are RECOMMENDED to
+support the preparing of responses in parallel and sending them out
+of order. In DoQ, they do that by sending responses on their specific
+stream as soon as possible, without waiting for availability of responses
+for previously opened streams.
 
 ### Server Initiated Transactions
 
@@ -409,6 +401,35 @@ used to send data that is not "replayable" transactions.  For
 example, a stub resolver MAY transmit a Query as 0-RTT, but MUST NOT
 transmit an Update.
 
+## Message Sizes
+
+DoQ Queries and Responses are sent
+on QUIC streams, which in theory can carry up to 2^62 bytes. However, DNS
+messages are restricted in practice to a maximum size of 65535 bytes.
+This maximum size is enforced by the use of a two-octet message length
+field in DNS over TCP {{!RFC1035}} and DNS over TLS {{!RFC7858}}, and
+by the definition of the "application/dns-message" for DNS over HTTP
+{{!RFC8484}}. DoQ enforces the same restriction.
+
+The maximum size of messages is controlled in QUIC by
+the transport parameters:
+
+* initial_max_stream_data_bidi_local: when set by the client, specifies
+  the amount of data that servers can send on a "response" stream without
+  waiting for a MAX_STREAM_DATA frame.
+
+* initial_max_stream_data_bidi_remote: when set by the server, specifies
+  the amount of data that clients can send on a "query" stream without
+  waiting for a MAX_STREAM_DATA frame.
+
+Clients and servers MUST set these two parameters to the value 65535. If
+they receive a different value, they SHOULD close the QUIC connection with an
+application error "Invalid Parameter".
+
+The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify
+the UDP message size. This parameter is ignored by DoQ. DoQ implementations
+always assume that the maximum message size is 65535 bytes.
+
 # Implementation Requirements
 
 ## Authentication
@@ -455,27 +476,6 @@ This define how servers can send NEW TOKEN frames to clients after the
 client address is validated, in order to avoid the 1-RTT penalty during
 subsequent connections by the client from the same address.
 
-## Response Sizes
-
-DoQ does not suffer from the same limitations on the size of queries and
-responses that as DNS/UDP {{!RFC1035}} does. Queries and Responses are sent
-on QUIC streams, which in theory can carry up to 2^62 bytes. However,
-clients or servers MAY impose a limit on the maximum size of data that
-they can accept over a given stream. This is controlled in QUIC by
-the transport parameters:
-
-* initial_max_stream_data_bidi_local: when set by the client, specifies
-  the amount of data that servers can send on a "response" stream without
-  waiting for a MAX_STREAM_DATA frame.
-
-* initial_max_stream_data_bidi_remote: when set by the server, specifies
-  the amount of data that clients can send on a "query" stream without
-  waiting for a MAX_STREAM_DATA frame.
-
-Clients and servers SHOULD treat these parameters as the practical maximum
-of queries and responses. If the EDNS parameters of a Query indicate a lower
-message size, servers MUST comply with that indication.
-
 ## DNS Message IDs
 
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
@@ -507,6 +507,17 @@ Historic implementations of DNS stub resolvers are known to open and
 close TCP connections for each DNS query. To avoid excess QUIC
 connections, each with a single query, clients SHOULD reuse a single
 QUIC connection to the recursive resolver. 
+
+In order to achieve performance on par with UDP, DNS clients SHOULD
+send their queries concurrently over the QUIC streams on a QUIC connection.
+That is, when a DNS client 
+sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
+for an outstanding reply before sending the next query.
+
+As specified in {{stream-mapping-and-usage}} servers should send responses
+to queries on different streams as soon as they are available.
+
+### Connection Close
 
 In order to amortize QUIC and TLS connection setup costs, clients and
 servers SHOULD NOT immediately close a QUIC connection after each
@@ -655,7 +666,7 @@ mitigate this attack.
 
    Protocol:  DoQ
 
-   Identification Sequence:  0x64 0x71 ("dq")
+   Identification Sequence:  0x64 0x6F 0x71 ("doq")
 
    Specification:  This document
 
