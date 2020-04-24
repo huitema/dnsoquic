@@ -124,6 +124,9 @@ stub clients and recursive servers. The specific non-goals of this document are:
 2.  No attempt is made to evade potential blocking of DNS/QUIC
     traffic by middleboxes.
 
+3.  No attempt to support server initiated transactions, are these are not
+    relevant for the "stub to recursive resolver" scenario.
+
 Users interested in zone transfers should continue using TCP based
 solutions and will also want to take note of work in progress to
 encrypt zone transfers using DoT {{?I-D.ietf-dprive-xfr-over-tls}}.
@@ -241,7 +244,13 @@ maximum performance. This means a different traffic profile than HTTP3 over
 QUIC. This difference can be
 noted by firewalls and middleboxes.  There may be environments in
 which HTTP3 over QUIC will be able to pass through, but DoQ will be
-blocked by these middle boxes. 
+blocked by these middle boxes.
+
+## No Server Initiated Transactions
+
+As stated in {{introduction}} this document does not specify support for
+server initiated transactions, are these are not relevant for the "stub to
+recursive resolver" scenario.
 
 # Specifications
 
@@ -315,30 +324,6 @@ of order. In DoQ, they do that by sending responses on their specific
 stream as soon as possible, without waiting for availability of responses
 for previously opened streams.
 
-### Server Initiated Transactions
-
-There are planned traffic patterns in which a server sends
-unsolicited queries to a client, such as for example PUSH messages
-defined in {{?I-D.ietf-dnssd-push}}. 
-These occur when a client subscribes to
-changes for a particular DNS RRset or resource record type. When a 
-PUSH server wishes to send such
-updates it MUST select the next available server initiated
-bidirectional stream, in
-conformance with {{!I-D.ietf-quic-transport}}.  
-
-The server MUST send the DNS query over the selected stream, and MUST indicate
-through the STREAM FIN mechanism that no further data will be sent on
-that stream.
-
-The client MUST send the response on the same stream, and MUST
-indicate through the STREAM FIN mechanism that no further
-data will be sent on that stream.
-
-Therefore a single server initiated DNS transaction consumes a single stream. 
-This means that the 
-servers's first query occurs on QUIC stream 1, the second on 5, and so on.
-
 ### Transaction Errors
 
 Peers normally complete transactions by sending a DNS response on the
@@ -377,11 +362,14 @@ specifies that connections can be closed in three ways:
 
 Clients and servers implementing DNS over QUIC SHOULD negotiate use of
 the idle timeout. Closing on idle-timeout is done without any packet exchange,
-which minimizes protocol overhead. This document does not recommend 
-a specific value of the idle timer. 
+which minimizes protocol overhead. Per section 10.2 of QUIC transport 
+specification, the effective value of the idle timeout is  computed as the
+minimum of the values advertised by the two endpoints. Practical
+considerations on setting the idle timeout are discussed in
+{{idle-timeouts}}.
 
 Clients SHOULD monitor the idle time incurred on their connection to
-the server, defined by the time spend since the last packet from
+the server, defined by the time spent since the last packet from
 the server has been received. When a client prepares to send a new DNS
 query to the server, it will check whether the idle time is sufficient
 lower than the idle timer. If it is, the client will send the DNS
@@ -393,7 +381,7 @@ timeout expires. If they do that, they SHOULD close the connection
 explicitly, using QUIC's CONNECTION_CLOSE mechanisms, and indicating
 the Application reason "No Error".
 
-Clients and servers may close the connection for a variety of other
+Clients and servers MAY close the connection for a variety of other
 reasons, indicated using QUIC's CONNECTION_CLOSE. Client and servers
 that send packets over a connection discarded by their peer MAY
 receive a stateless reset indication. If a connection fails,
@@ -562,13 +550,6 @@ QUIC connections for subsequent queries as long as they have sufficient
 resources.  In some cases, this means that clients and servers may
 need to keep idle connections open for some amount of time.
 
-Under normal operation DNS clients typically initiate connection
-closing on idle connections; however, DNS servers can close the
-connection if the idle timeout set by local policy is exceeded.
-Also, connections can be closed by either end under unusual
-conditions such as defending against an attack or system failure/
-reboot.
-
 Clients and servers that keep idle connections open MUST be robust to
 termination of idle connection by either party.  As with current DNS
 over TCP, DNS servers MAY close the connection at any time (perhaps
@@ -588,18 +569,24 @@ This document does not make specific recommendations for timeout
 values on idle connections.  Clients and servers should reuse and/or
 close connections depending on the level of available resources.
 Timeouts may be longer during periods of low activity and shorter
-during periods of high activity.  Current work in this area may also
-assist DoT clients and servers in selecting useful timeout
-values {{?RFC7828}} {{?RFC8490}} {{TDNS}}.
+during periods of high activity. 
 
 Clients that are willing to use QUIC's 0-RTT mechanism can reestablish
 connections and send transactions on the new connection with minimal
 delay overhead. These clients MAY chose low values of the idle timer,
 but SHOULD NOT pick value lower than 20 seconds.
 
-Per section 10.2 of QUIC transport specification, the effective value of
-the idle timeout is  computed as the minimum of the values advertised by
-the two endpoints.
+Clients that want to maintain long duration DoQ connections SHOULD use the
+keep-alive mechanisms defined in Section 10.2 of the QUIC Transport
+Specification {{!I-D.ietf-quic-transport}}.
+
+## Processing Queries in Parallel
+
+In order to achieve latencies on par with UDP, DNS clients SHOULD
+send their queries concurrently over different QUIC streams on a QUIC connection.
+That is, when a DNS client 
+sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
+for an outstanding reply before sending the next query.
 
 ## Flow Control Mechanisms
 
