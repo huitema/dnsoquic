@@ -51,33 +51,6 @@ informative:
     seriesinfo:
         Message: to DNS-Privacy WG mailing list
 
-  TDNS:
-    target: http://dx.doi.org/10.1109/SP.2015.18
-    title: Connection-Oriented DNS to Improve Privacy and Security
-    author:
-       -
-        ins: L. Zhu
-        name: Liang Zhu
-       -
-        ins: Z. Hu
-        name: Zi Hu
-       -
-        ins: J. Heidemann
-        name: John Heidemann
-       -
-        ins: D. Wessels
-        name: Duane Wessels
-       -
-        ins: A. Mankin
-        name: Allison Mankin
-       -
-        ins: N. Somaiya 
-        name: Nikita Somaiya
-    date: 2015-05-21
-    seriesinfo:
-        2015: IEEE Symposium on Security and Privacy (SP)
-        DOI: 10.1109/SP.2015.18
-
 --- abstract
 
 This document describes the use of QUIC to provide transport privacy for DNS.
@@ -110,7 +83,7 @@ goals of the DoQ mapping are:
     size of DNS responses it can send.
 
 4.  Explore the characteristics of using QUIC as a DNS
-    transport, versus other solutions like DNS over UDP (DNS/UDP) {{!RFC1035}},
+    transport, versus other solutions like DNS over UDP {{!RFC1035}},
     DoT {{?RFC7858}}, or DNS over HTTPS (DoH) {{?RFC8484}}.
 
 In order to achieve these goals, the focus of this document is limited
@@ -121,7 +94,7 @@ stub clients and recursive servers. The specific non-goals of this document are:
 1.  No attempt is made to support zone transfers {{?RFC5936}}, as these
     are not relevant to the stub to recursive resolver scenario.
 
-2.  No attempt is made to evade potential blocking of DNS/QUIC
+2.  No attempt is made to evade potential blocking of DNS over QUIC
     traffic by middleboxes.
 
 3.  No attempt to support server initiated transactions, are these are not
@@ -250,7 +223,11 @@ blocked by these middle boxes.
 
 As stated in {{introduction}} this document does not specify support for
 server initiated transactions, are these are not relevant for the "stub to
-recursive resolver" scenario.
+recursive resolver" scenario. Note that DNS Stateful Operations (DSO)
+{{?RFC8490}} are only applicable for DNS over TCP and DNS over TLS. DSO is not
+applicable to DNS over HTTP since HTTP has its own mechanism for managing
+sessions, and this is incompatible with the DSO; the same is true for DNS over
+QUIC.
 
 # Specifications
 
@@ -290,8 +267,8 @@ the server, unless it has mutual agreement with its server to use a
 port other than port TBD for DoQ.  Such another port MUST
 NOT be port 53 or port 853.  This recommendation against use of port
 53 for DoQ is to avoid confusion between DoQ and
-DNS/UDP as specified in {{!RFC1035}}.  Similarly, using port 853
-would cause confusion between DoQ and DNS/DTLS as
+DNS over UDP as specified in {{!RFC1035}}.  Similarly, using port 853
+would cause confusion between DoQ and DNS over DTLS as
 specified in {{?RFC8094}}.
 
 ## Stream Mapping and Usage
@@ -317,24 +294,21 @@ Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on 4,
 and so on.
 
-As specified in section 7 of "DNS Transport over TCP - Implementation
-Requirements" {{!RFC7766}}, resolvers are RECOMMENDED to
-support the preparing of responses in parallel and sending them out
-of order. In DoQ, they do that by sending responses on their specific
-stream as soon as possible, without waiting for availability of responses
-for previously opened streams.
-
 ### Transaction Errors
 
 Peers normally complete transactions by sending a DNS response on the
-transaction's stream, including in cases where the DNS response indicates an
-error. There are two exceptions: internal errors, and cancelled transactions.
+transaction's stream, including cases where the DNS response indicates a
+DNS error. For example, a Server
+Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified to the initiator of
+the transaction. 
+
+There are two exceptions to normal completion of a transaction: internal errors, and cancelled transactions.
+
+### Internal Errors
 
 If a peer is incapable of sending a DNS response due to an internal
 error, it may issue a QUIC Stream Reset indicating with error code DOQ_INTERNAL_ERROR.
-The corresponding transaction MUST be abandoned.  A Server
-Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified to the initiator of
-the transaction.
+The corresponding transaction MUST be abandoned.  
 
 ### Cancelling a Transaction
 
@@ -351,6 +325,28 @@ There is no guarantee that the peer will receive the Stop Sending frame before c
 If it does, it SHOULD send a QUIC Stream Reset on the transaction specific stream, using the 
 error code DOQ_TRANSACTION_CANCELLED.
 
+## DoQ Error Codes
+
+The following error codes are defined for use when abruptly terminating streams,
+aborting reading of streams, or immediately closing connections:
+
+DOQ_NO_ERROR (0x00):
+: No error.  This is used when the connection or stream needs to be closed, but
+  there is no error to signal.
+
+DOQ_INTERNAL_ERROR (0x01):
+: The DoQ implementation encountered an internal error and is incapable of
+  pursuing the transaction or the connection.
+
+DOQ_TRANSACTION_CANCELLED (0x02):
+: Used in a Stop Sending request to signal that the originator of the query is
+  not anymore interested by the result. Also used by the recipient of the
+  request when issuing a Stream Reset in response to a Stop Sending request.
+
+DOQ_TRANSPORT_PARAMETER_ERROR (0x03):
+: One or some of the transport parameters proposed by the peer are not acceptable.
+
+
 ## Connection Management
 
 Section 10 of the QUIC transport specifications {{!I-D.ietf-quic-transport}}
@@ -366,7 +362,7 @@ which minimizes protocol overhead. Per section 10.2 of QUIC transport
 specification, the effective value of the idle timeout is  computed as the
 minimum of the values advertised by the two endpoints. Practical
 considerations on setting the idle timeout are discussed in
-{{idle-timeouts}}.
+{{resource-management-and-idle-timeout-values}}.
 
 Clients SHOULD monitor the idle time incurred on their connection to
 the server, defined by the time spent since the last packet from
@@ -433,26 +429,6 @@ The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify
 the UDP message size. This parameter is ignored by DoQ. DoQ implementations
 always assume that the maximum message size is 65535 bytes.
 
-## DoQ Error Codes
-
-The following error codes are defined for use when abruptly terminating streams,
-aborting reading of streams, or immediately closing connections:
-
-DOQ_NO_ERROR (0x00):
-: No error.  This is used when the connection or stream needs to be closed, but
-  there is no error to signal.
-
-DOQ_INTERNAL_ERROR (0x01):
-: The DoQ implementation encountered an internal error and is incapable of
-  pursuing the transaction or the connection.
-
-DOQ_TRANSACTION_CANCELLED (0x02):
-: Used in a Stop Sending request to signal that the originator of the query is
-  not anymore interested by the result. Also used by the recipient of the
-  request when issuing a Stream Reset in response to a Stop Sending request.
-
-DOQ_TRANSPORT_PARAMETER_ERROR (0x03):
-: One or some of the transport parameters proposed by the peer are not acceptable.
 
 # Implementation Requirements
 
@@ -522,8 +498,8 @@ the recommendations of {{?RFC8467}}.
 ## Connection Handling
 
 {{?RFC7766}} provides updated
-guidance on DNS/TCP much of which is applicable to DoQ. This 
-section attempts to specify how those considerations apply to DoQ.
+guidance on DNS over TCP some of which is applicable to DoQ. This 
+section attempts to specify which and how those considerations apply to DoQ.
 
 ### Connection Reuse
 
@@ -538,32 +514,26 @@ That is, when a DNS client
 sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
 for an outstanding reply before sending the next query.
 
-As specified in {{stream-mapping-and-usage}} servers should send responses
-to queries on different streams as soon as they are available.
-
-### Connection Close
-
-In order to amortize QUIC and TLS connection setup costs, clients and
-servers SHOULD NOT immediately close a QUIC connection after each
-response.  Instead, clients and servers SHOULD reuse existing
-QUIC connections for subsequent queries as long as they have sufficient
-resources.  In some cases, this means that clients and servers may
-need to keep idle connections open for some amount of time.
-
-Clients and servers that keep idle connections open MUST be robust to
-termination of idle connection by either party.  As with current DNS
-over TCP, DNS servers MAY close the connection at any time (perhaps
-due to resource constraints).  As with current DNS/TCP, clients
-MUST handle abrupt closes and be prepared to reestablish connections
-and/or retry queries.
-
-### Idle Timeouts
+### Resource Management and Idle Timeout Values
 
 Proper management of established and idle connections is important to
 the healthy operation of a DNS server.  An implementation of DoQ
-SHOULD follow best practices for DNS/TCP, as described in
-{{?RFC7766}}.  Failure to do so may lead to resource exhaustion and
-denial of service.
+SHOULD follow best practices similar to those specified for DNS overTCP in
+{{?RFC7766}}, in particular with regard to:
+
+* Concurrent Connections (Section 6.2.2)
+* Security Considerations (Section 10)
+
+Failure to do so may lead to resource exhaustion and denial of service.
+
+Clients that want to maintain long duration DoQ connections SHOULD use the idle
+timeout mechanisms defined in Section 10.2 of the QUIC Transport Specification
+{{!I-D.ietf-quic-transport}}. Clients and servers MUST NOT send the
+edns-tcp-keepalive EDNS(0) Option {{?RFC7828}} in any messages sent on a DoQ
+connection (because it is specific to the use of TCP/TLS as a transport). If any
+message sent on a DoQ connection contains an edns-tcp-keepalive EDNS(0) Option,
+this is a fatal error and the recipient of the defective message MUST forcibly
+abort the connection immediately.
 
 This document does not make specific recommendations for timeout
 values on idle connections.  Clients and servers should reuse and/or
@@ -573,20 +543,16 @@ during periods of high activity.
 
 Clients that are willing to use QUIC's 0-RTT mechanism can reestablish
 connections and send transactions on the new connection with minimal
-delay overhead. These clients MAY chose low values of the idle timer,
-but SHOULD NOT pick value lower than 20 seconds.
-
-Clients that want to maintain long duration DoQ connections SHOULD use the
-keep-alive mechanisms defined in Section 10.2 of the QUIC Transport
-Specification {{!I-D.ietf-quic-transport}}.
+delay overhead. These clients MAY chose low values of the idle timer.
 
 ## Processing Queries in Parallel
 
-In order to achieve latencies on par with UDP, DNS clients SHOULD
-send their queries concurrently over different QUIC streams on a QUIC connection.
-That is, when a DNS client 
-sends multiple queries to a server over a QUIC connection, it SHOULD NOT wait
-for an outstanding reply before sending the next query.
+As specified in section 7 of "DNS Transport over TCP - Implementation
+Requirements" {{!RFC7766}}, resolvers are RECOMMENDED to
+support the preparing of responses in parallel and sending them out
+of order. In DoQ, they do that by sending responses on their specific
+stream as soon as possible, without waiting for availability of responses
+for previously opened streams.
 
 ## Flow Control Mechanisms
 
@@ -736,5 +702,6 @@ Thanks to our wide cast of supporters.
 
 
 --- back
+
 
 
