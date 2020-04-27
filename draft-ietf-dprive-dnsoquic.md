@@ -619,7 +619,7 @@ probably not a large additional risk if the client's connectivity did
 not change between the sessions, since the two sessions can probably
 be correlated by comparing the IP addresses.  On the other hand, if
 the addresses did change, the client SHOULD consider whether the
-linkability risk exceeds the privacy benefits.  This evaluation will
+linkability risk exceeds the performance benefits.  This evaluation will
 obviously depend on the level of trust between stub and recursive.
 
 ## Traffic Analysis
