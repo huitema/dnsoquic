@@ -308,31 +308,13 @@ and so on.
 Peers normally complete transactions by sending a DNS response on the
 transaction's stream, including cases where the DNS response indicates a
 DNS error. For example, a Server
-Failure (SERVFAIL {{!RFC1035}}) SHOULD be notified to the initiator of
-the transaction. 
-
-There are two exceptions to normal completion of a transaction: internal errors, and cancelled transactions.
-
-### Internal Errors
+Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified to the initiator of
+the transaction by sending back a response with the Response Code set
+to SERVFAIL.
 
 If a peer is incapable of sending a DNS response due to an internal
-error, it may issue a QUIC Stream Reset indicating with error code DOQ_INTERNAL_ERROR.
+error, it may issue a QUIC Stream Reset with error code DOQ_INTERNAL_ERROR.
 The corresponding transaction MUST be abandoned.  
-
-### Cancelling a Transaction
-
-The initiator of a Transaction MAY indicate that it is not interesting any
-more in receiving the response by either:
-
-* Sending a QUIC Stream Reset frame on the transaction specific stream if the STREAM FIN has not yet been sent,
-
-* or, sending a QUIC Stop Sending frame on the transaction specific stream.
-
-In both case, the error code DOQ_TRANSACTION_CANCELLED is used.
-
-There is no guarantee that the peer will receive the Stop Sending frame before completing the transaction.
-If it does, it SHOULD send a QUIC Stream Reset on the transaction specific stream, using the 
-error code DOQ_TRANSACTION_CANCELLED.
 
 ## DoQ Error Codes
 
@@ -347,12 +329,7 @@ DOQ_INTERNAL_ERROR (0x01):
 : The DoQ implementation encountered an internal error and is incapable of
   pursuing the transaction or the connection.
 
-DOQ_TRANSACTION_CANCELLED (0x02):
-: Used in a Stop Sending request to signal that the originator of the query is
-  not anymore interested by the result. Also used by the recipient of the
-  request when issuing a Stream Reset in response to a Stop Sending request.
-
-DOQ_TRANSPORT_PARAMETER_ERROR (0x03):
+DOQ_TRANSPORT_PARAMETER_ERROR (0x02):
 : One or some of the transport parameters proposed by the peer are not acceptable.
 
 
