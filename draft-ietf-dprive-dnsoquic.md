@@ -2,7 +2,7 @@
 title: Specification of DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-01
+docName: draft-ietf-dprive-dnsoquic-02
     
 stand_alone: yes
 
@@ -127,6 +127,13 @@ and deployment of DoQ.
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in BCP 14 {{!RFC8174}}.
+
+# Document work via GitHub
+
+(THIS SECTION TO BE REMOVED BEFORE PUBLICATION) The Github repository for this
+document is at https://github.com/huitema/dnsoquic.
+Proposed text and editorial changes are very much welcomed there, but any
+functional changes should always first be discussed on the IETF DPRIVE WG (dns-privacy) mailing list.
 
 
 # Design Considerations
@@ -551,6 +558,29 @@ transport to limit the number of streams opened by the
 client. This mechanism will effectively limit the number of 
 DNS queries that a client can send on a single DoQ connection.
 
+# Implementation Status
+
+(THIS SECTION TO BE REMOVED BEFORE PUBLICATION) This section records the status
+of known implementations of the protocol defined by this specification at the
+time of posting of this Internet-Draft, and is based on a proposal described in
+{{?RFC7942}}.
+
+1. AdGuard launched a DoQ recursive resolver service in December 2020. The have released a suite of open source tools that support DoQ:
+    1. [AdGuard C++ DNS libraries](https://github.com/AdguardTeam/DnsLibs) A DNS proxy library that supports all existing DNS protocols including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt and DNS-over-QUIC (experimental).
+    2. [DNS Proxy](https://github.com/AdguardTeam/dnsproxy) A simple DNS proxy server that supports all existing DNS protocols including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt, and DNS-over-QUIC. Moreover, it can work as a DNS-over-HTTPS, DNS-over-TLS or DNS-over-QUIC server.
+    3. [CoreDNS fork for AdGuard DNS](https://github.com/AdguardTeam/coredns) Includes DNS-over-QUIC server-side support.
+    3. [dnslookup](https://github.com/ameshkov/dnslookup) Simple command line utility to make DNS lookups. Supports all known DNS protocols: plain DNS, DoH, DoT, DoQ, DNSCrypt.
+2. [Quicdoq](https://github.com/private-octopus/quicdoq) Quicdoq is a simple open source implementation of DNS over Quic. It is written in C, based on Picoquic.
+3. [Flamethrower](https://github.com/DNS-OARC/flamethrower/tree/dns-over-quic) is an open source DNS performance and functional testing utility written in C++ that has an experimental implementation of DoQ.
+
+## Performance Measurements
+
+To our knowledge, no benchmarking studies comparing DoT, DoH and DoQ are published yet. However anecdotal evidence from the [AdGuard DoQ recursive resolver deployment](https://adguard.com/en/blog/dns-over-quic.html) indicates that it performs well compared to the other encrypted protocols, particularly in mobile environments. Reasons given for this include that DoQ
+
+* Uses less bandwidth due to a more efficient handshake (and due to less per message overhead when compared to DoH). 
+* Performs better in mobile environments due to the increased resilience to packet loss
+* Can maintain connections as users move between mobile networks via its connection management
+
 # Security Considerations
 
 The security considerations of DoQ should be comparable to
@@ -659,11 +689,12 @@ mitigate this attack.
    {{?RFC6335], and such a review was requested using the early allocation
    process {{?RFC7120] for the well-known UDP port in this document. Since
    port 853 is reserved for 'DNS query-response protocol run over TLS' 
-   consideration is requested for reserving port TBD for 'DNS query-response  
+   consideration is requested for reserving port 8853 for 'DNS query-response  
    protocol run over QUIC'.
 
-       Service Name           domain-s
-       Transport Protocol(s)  TCP/UDP
+       Service Name           dns-over-quic
+       Port Number            8853
+       Transport Protocol(s)  UDP
        Assignee               IESG
        Contact                IETF Chair
        Description            DNS query-response protocol run over QUIC
@@ -674,8 +705,10 @@ mitigate this attack.
 **RFC Editor's Note:** Please remove this section prior to
  publication of a final version of this document.
 
-Early experiments MAY use port 784. This port is marked in the IANA 
+Early experiments MAY use port 8853. This port is marked in the IANA 
 registry as unassigned.
+
+(Note that prior to version -02 of this draft, experiments were directed to use port 784.)
 
 # Acknowledgements
 
