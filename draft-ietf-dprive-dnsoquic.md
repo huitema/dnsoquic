@@ -97,7 +97,9 @@ stub clients and recursive servers. The specific non-goals of this document are:
 
 1.  No attempt is made to support AXFR "DNS Zone Transfer Protocol (AXFR)"
     {{?RFC5936}} or IXFR "Incremental Zone Transfer in DNS" {{?RFC1885}}, as these mechanisms
-    are not relevant to the stub to recursive resolver scenario.
+    are not relevant to the stub to recursive resolver scenario. (This may change in
+    future versions of this draft. See {{supporting-axfr}} for a discussion of changes required
+    for AXFR support.)
 
 2.  No attempt is made to evade potential blocking of DNS over QUIC
     traffic by middleboxes.
@@ -334,10 +336,7 @@ DOQ_NO_ERROR (0x00):
 
 DOQ_INTERNAL_ERROR (0x01):
 : The DoQ implementation encountered an internal error and is incapable of
-  pursuing the transaction or the connection.
-
-DOQ_TRANSPORT_PARAMETER_ERROR (0x02):
-: One or some of the transport parameters proposed by the peer are not acceptable.
+  pursuing the transaction or the connection
 
 
 ## Connection Management
@@ -403,8 +402,9 @@ field in DNS over TCP {{!RFC1035}} and DNS over TLS {{!RFC7858}}, and
 by the definition of the "application/dns-message" for DNS over HTTP
 {{!RFC8484}}. DoQ enforces the same restriction.
 
-The maximum size of messages is controlled in QUIC by
-the transport parameters:
+The flow control mechanism of QUIC control how much data can be sent
+by QUIC nodes at a given time. The initial values of per stream
+flow control parameters is defined by two transport parameters:
 
 * initial_max_stream_data_bidi_local: when set by the client, specifies
   the amount of data that servers can send on a "response" stream without
@@ -414,9 +414,8 @@ the transport parameters:
   the amount of data that clients can send on a "query" stream without
   waiting for a MAX_STREAM_DATA frame.
 
-Clients and servers MUST set these two parameters to the value 65535. If
-they receive a different value, they SHOULD close the QUIC connection with an
-application error "Invalid Parameter".
+For better performance, it is RECOMMENDED that clients and servers set
+each of these two parameters to a value of 65535 or greater.
 
 The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify
 the UDP message size. This parameter is ignored by DoQ. DoQ implementations
@@ -565,17 +564,33 @@ of known implementations of the protocol defined by this specification at the
 time of posting of this Internet-Draft, and is based on a proposal described in
 {{?RFC7942}}.
 
-1. AdGuard launched a DoQ recursive resolver service in December 2020. The have released a suite of open source tools that support DoQ:
-    1. [AdGuard C++ DNS libraries](https://github.com/AdguardTeam/DnsLibs) A DNS proxy library that supports all existing DNS protocols including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt and DNS-over-QUIC (experimental).
-    2. [DNS Proxy](https://github.com/AdguardTeam/dnsproxy) A simple DNS proxy server that supports all existing DNS protocols including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt, and DNS-over-QUIC. Moreover, it can work as a DNS-over-HTTPS, DNS-over-TLS or DNS-over-QUIC server.
-    3. [CoreDNS fork for AdGuard DNS](https://github.com/AdguardTeam/coredns) Includes DNS-over-QUIC server-side support.
-    3. [dnslookup](https://github.com/ameshkov/dnslookup) Simple command line utility to make DNS lookups. Supports all known DNS protocols: plain DNS, DoH, DoT, DoQ, DNSCrypt.
-2. [Quicdoq](https://github.com/private-octopus/quicdoq) Quicdoq is a simple open source implementation of DNS over Quic. It is written in C, based on Picoquic.
-3. [Flamethrower](https://github.com/DNS-OARC/flamethrower/tree/dns-over-quic) is an open source DNS performance and functional testing utility written in C++ that has an experimental implementation of DoQ.
+1. AdGuard launched a DoQ recursive resolver service in December 2020. They have
+   released a suite of open source tools that support DoQ:
+    1. [AdGuard C++ DNS libraries](https://github.com/AdguardTeam/DnsLibs) A DNS proxy
+       library that supports all existing DNS protocols including DNS-over-TLS, DNS-over-HTTPS,
+       DNSCrypt and DNS-over-QUIC (experimental).
+    2. [DNS Proxy](https://github.com/AdguardTeam/dnsproxy) A simple DNS proxy server that supports
+       all existing DNS protocols including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt, and DNS-over-QUIC.
+       Moreover, it can work as a DNS-over-HTTPS, DNS-over-TLS or DNS-over-QUIC server.
+    3. [CoreDNS fork for AdGuard DNS](https://github.com/AdguardTeam/coredns) Includes DNS-over-QUIC
+       server-side support.
+    3. [dnslookup](https://github.com/ameshkov/dnslookup) Simple command line utility to make DNS lookups.
+       Supports all known DNS protocols: plain DNS, DoH, DoT, DoQ, DNSCrypt.
+2. [Quicdoq](https://github.com/private-octopus/quicdoq) Quicdoq is a simple open
+   source implementation of DNS over Quic. It is written in C, based on
+   [Picoquic](https://github.com/private-octopus/picoquic).
+3. [Flamethrower](https://github.com/DNS-OARC/flamethrower/tree/dns-over-quic) is an open source
+   DNS performance and functional testing utility written in C++ that has an experimental implementation of DoQ.
+4. [aioquic](https://github.com/aiortc/aioquic) is an implementation of QUIC in Python. It includes
+   example client and server for DNS over QUIC.
+
 
 ## Performance Measurements
 
-To our knowledge, no benchmarking studies comparing DoT, DoH and DoQ are published yet. However anecdotal evidence from the [AdGuard DoQ recursive resolver deployment](https://adguard.com/en/blog/dns-over-quic.html) indicates that it performs well compared to the other encrypted protocols, particularly in mobile environments. Reasons given for this include that DoQ
+To our knowledge, no benchmarking studies comparing DoT, DoH and DoQ are published yet. However anecdotal
+evidence from the [AdGuard DoQ recursive resolver deployment](https://adguard.com/en/blog/dns-over-quic.html)
+indicates that it performs well compared to the other encrypted protocols, particularly in mobile environments.
+Reasons given for this include that DoQ
 
 * Uses less bandwidth due to a more efficient handshake (and due to less per message overhead when compared to DoH). 
 * Performs better in mobile environments due to the increased resilience to packet loss
@@ -686,8 +701,8 @@ mitigate this attack.
    IANA is required to add the following value to the "Service Name and
    Transport Protocol Port Number Registry" in the System Range.  The
    registry for that range requires IETF Review or IESG Approval
-   {{?RFC6335], and such a review was requested using the early allocation
-   process {{?RFC7120] for the well-known UDP port in this document. Since
+   {{?RFC6335}}, and such a review was requested using the early allocation
+   process {{?RFC7120}} for the well-known UDP port in this document. Since
    port 853 is reserved for 'DNS query-response protocol run over TLS' 
    consideration is requested for reserving port 8853 for 'DNS query-response  
    protocol run over QUIC'.
@@ -700,7 +715,7 @@ mitigate this attack.
        Description            DNS query-response protocol run over QUIC
        Reference              This document
 
-### Port number 784 for experimentations
+### Port number 8853 for experimentations
 
 **RFC Editor's Note:** Please remove this section prior to
  publication of a final version of this document.
@@ -721,9 +736,49 @@ Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working
 group {{DNS0RTT}}.
 
 Thanks to Tony Finch for an extensive review of the initial version of this draft.
+Reviews by Paul Hoffman and interoperability tests conducted by Stephane Bortzmeyer
+helped improve the definition of the protocol.
 
 
 --- back
+
+# Supporting AXFR {#supporting-axfr}
+
+This draft version makes no attempt to support AXFR or IXFR queries. As defined in {{?RFC5936}},
+the server responds to AXFR queries with a series of DNS response messages: a first response message,
+marked with QDcount=1, an optional series of other response messages marked with QDcount=0, and a final
+response message marked with QDcount=1. When the DNS protocol is carried over TCP or TLS, these messages
+are carried over a single byte stream and each of them is preceded by a 16 bit length field. The
+encapsulation defined in this draft does not include a length field and assumes exactly one response message
+for each query.
+
+There are two plausible ways to carry the series of AXFR responses in QUIC: keep the current format and use a
+separate QUIC stream for each response; or, relax the restriction of having just one response per QUIC stream.
+This second option is much simpler to engineer. It will not require complex methods to correlate different
+streams, and it will ensure that that the responses in the series are delivered in the intended order. However,
+it requires parsing the response stream to extract separate responses. The practical requirement would be
+that the content of the QUIC stream be exactly the same as the content of a TCP connection that would
+manage exactly one query. The main difference with the current proposal would be to insert a length field
+before each response. So we would get:
+
+* For a query: open a bidirectional stream, send the query encoded as { 16 bit length, DNS query },
+  mark this stream direction as finished.
+
+* For most responses: send the single response message encoded as { 16 bit length, DNS response },
+  mark this stream direction as finished.
+
+* For a response to an AXFR query: send a series of response messages encoded as { 16 bit length, DNS response },
+  using the QDcount convention as specified in {{?RFC5936}}, mark this stream direction as finished when the
+  entire series is sent.
+
+This add a length field that is not in the current draft, which breaks compatibility with the previous versions.
+Draft versions are identified by draft version specific ALPN, which makes this change manageable. However,
+the authors would like to get feedback from developers before making this change.
+
+The change will also add new error conditions: if the stream FIN happens before the bytes specified
+in the message length field are sent; if the client expects a single response message and several are sent;
+and, if the client expects AXFR responses but does not receive the expected pattern of QDcount flagged messages.
+
 
 
 
