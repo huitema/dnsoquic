@@ -2,8 +2,8 @@
 # - kramdown-rfc2629 (https://github.com/cabo/kramdown-rfc2629)
 # - xml2rfc (https://xml2rfc.tools.ietf.org/)
 
-DRAFT=draft-huitema-dprive-dnsoquic
-VERSION=00
+DRAFT=draft-ietf-dprive-dnsoquic
+VERSION=02
 
 XML=$(DRAFT).xml
 HTML=$(DRAFT)-$(VERSION).html
