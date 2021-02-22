@@ -1196,6 +1196,11 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    draft does not include a length field and assumes exactly one
    response message for each query.
 
+   Note that since IXFR can fall back to an AXFR-like response if the
+   server is not able to send an incremental change, this discussion
+   also applies to those AXFR-like responses returned to an IXFR request
+   in that scenario.
+
    There are two plausible ways to carry the series of AXFR responses in
    QUIC: keep the current format and use a separate QUIC stream for each
    response; or, relax the restriction of having just one response per
@@ -1222,11 +1227,6 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
       QDCOUNT convention as specified in [RFC5936], mark this stream
       direction as finished when the entire series is sent.
 
-   This adds a length field that is not in the current draft, which
-   breaks compatibility with the previous versions.  Draft versions are
-   identified by draft version specific ALPN, which makes this change
-
-
 
 
 Huitema, et al.          Expires August 26, 2021               [Page 22]
@@ -1234,6 +1234,9 @@ Huitema, et al.          Expires August 26, 2021               [Page 22]
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
+   This adds a length field that is not in the current draft, which
+   breaks compatibility with the previous versions.  Draft versions are
+   identified by draft version specific ALPN, which makes this change
    manageable.  However, the authors would like to get feedback from
    developers before making this change.
 
@@ -1267,9 +1270,6 @@ Authors' Addresses
    U.K.
 
    Email: sara@sinodun.com
-
-
-
 
 
 

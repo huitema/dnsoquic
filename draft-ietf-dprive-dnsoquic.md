@@ -761,6 +761,8 @@ over a single byte stream and each of them is preceded by a 16 bit length
 field. The encapsulation currently defined in this draft does not include a
 length field and assumes exactly one response message for each query.
 
+Note that since IXFR can fall back to an AXFR-like response if the server is not able to send an incremental change, this discussion also applies to those AXFR-like responses returned to an IXFR request in that scenario.
+
 There are two plausible ways to carry the series of AXFR responses in QUIC:
 keep the current format and use a separate QUIC stream for each response; or,
 relax the restriction of having just one response per QUIC stream. This second
