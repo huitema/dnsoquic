@@ -745,39 +745,54 @@ helped improve the definition of the protocol.
 # Supporting AXFR {#supporting-axfr}
 
 This draft version makes no attempt to support AXFR or IXFR queries. As defined in {{?RFC5936}},
-the server responds to AXFR queries with a series of DNS response messages: a first response message,
-marked with QDcount=1, an optional series of other response messages marked with QDcount=0, and a final
-response message marked with QDcount=1. When the DNS protocol is carried over TCP or TLS, these messages
-are carried over a single byte stream and each of them is preceded by a 16 bit length field. The
-encapsulation defined in this draft does not include a length field and assumes exactly one response message
-for each query.
+the server responds to AXFR queries with a series of DNS response messages where 
 
-There are two plausible ways to carry the series of AXFR responses in QUIC: keep the current format and use a
-separate QUIC stream for each response; or, relax the restriction of having just one response per QUIC stream.
-This second option is much simpler to engineer. It will not require complex methods to correlate different
-streams, and it will ensure that that the responses in the series are delivered in the intended order. However,
-it requires parsing the response stream to extract separate responses. The practical requirement would be
-that the content of the QUIC stream be exactly the same as the content of a TCP connection that would
-manage exactly one query. The main difference with the current proposal would be to insert a length field
-before each response. So we would get:
+"... the first message MUST begin with the SOA resource record of the zone, and
+the last message MUST conclude with the same SOA resource record."
+   
+and the QDCOUNT: 
 
-* For a query: open a bidirectional stream, send the query encoded as { 16 bit length, DNS query },
-  mark this stream direction as finished.
+* MUST be 1 in the first message;
+* MUST be 0 or 1 in all following messages;
+* MUST be 1 if RCODE indicates an error
 
-* For most responses: send the single response message encoded as { 16 bit length, DNS response },
-  mark this stream direction as finished.
+When the DNS protocol is carried over TCP or TLS, these messages are carried
+over a single byte stream and each of them is preceded by a 16 bit length
+field. The encapsulation currently defined in this draft does not include a
+length field and assumes exactly one response message for each query.
 
-* For a response to an AXFR query: send a series of response messages encoded as { 16 bit length, DNS response },
-  using the QDcount convention as specified in {{?RFC5936}}, mark this stream direction as finished when the
-  entire series is sent.
+Note that since IXFR can fall back to an AXFR-like response if the server is not able to send an incremental change, this discussion also applies to those AXFR-like responses returned to an IXFR request in that scenario.
 
-This add a length field that is not in the current draft, which breaks compatibility with the previous versions.
+There are two plausible ways to carry the series of AXFR responses in QUIC:
+keep the current format and use a separate QUIC stream for each response; or,
+relax the restriction of having just one response per QUIC stream. This second
+option is much simpler to engineer. It will not require complex methods to
+correlate different streams, and it will ensure that the responses in the
+series are delivered in the intended order. However, it requires parsing the
+response stream to extract separate responses. The practical requirement would
+be that the content of the QUIC stream be exactly the same as the content of a
+TCP connection that would manage exactly one query. The main difference with
+the current proposal would be to insert a length field before each response. So
+we would get:
+
+* For a query: open a bidirectional stream, send the query encoded as { 16 bit
+  length, DNS query }, mark this stream direction as finished.
+
+* For most responses: send the single response message encoded as { 16 bit
+  length, DNS response }, mark this stream direction as finished.
+
+* For a response to an AXFR query: send a series of response messages encoded
+  as { 16 bit length, DNS response }, using the QDCOUNT convention as specified
+  in {{?RFC5936}}, mark this stream direction as finished when the entire
+  series is sent.
+
+This adds a length field that is not in the current draft, which breaks compatibility with the previous versions.
 Draft versions are identified by draft version specific ALPN, which makes this change manageable. However,
 the authors would like to get feedback from developers before making this change.
 
 The change will also add new error conditions: if the stream FIN happens before the bytes specified
 in the message length field are sent; if the client expects a single response message and several are sent;
-and, if the client expects AXFR responses but does not receive the expected pattern of QDcount flagged messages.
+and, if the client expects AXFR responses but does not receive the expected pattern of QDCOUNT flagged messages.
 
 
 

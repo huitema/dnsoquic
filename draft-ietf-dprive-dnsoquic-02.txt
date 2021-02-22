@@ -5,10 +5,10 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                               A. Mankin
-Expires: August 21, 2021                                      Salesforce
+Expires: August 26, 2021                                      Salesforce
                                                             S. Dickinson
                                                               Sinodun IT
-                                                       February 17, 2021
+                                                       February 22, 2021
 
 
           Specification of DNS over Dedicated QUIC Connections
@@ -39,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 21, 2021.
+   This Internet-Draft will expire on August 26, 2021.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Huitema, et al.          Expires August 21, 2021                [Page 1]
+Huitema, et al.          Expires August 26, 2021                [Page 1]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
@@ -70,7 +70,7 @@ Table of Contents
    2.  Key Words . . . . . . . . . . . . . . . . . . . . . . . . . .   4
    3.  Document work via GitHub  . . . . . . . . . . . . . . . . . .   4
    4.  Design Considerations . . . . . . . . . . . . . . . . . . . .   4
-     4.1.  Scope is Limited to the Stub to Resolver Scenario . . . .   4
+     4.1.  Scope is Limited to the Stub to Resolver Scenario . . . .   5
      4.2.  Provide DNS Privacy . . . . . . . . . . . . . . . . . . .   5
      4.3.  Design for Minimum Latency  . . . . . . . . . . . . . . .   6
      4.4.  No Specific Middlebox Bypass Mechanism  . . . . . . . . .   6
@@ -104,23 +104,24 @@ Table of Contents
      9.2.  Privacy Issues With Session Resume  . . . . . . . . . . .  16
      9.3.  Traffic Analysis  . . . . . . . . . . . . . . . . . . . .  16
    10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
-     10.1.  Registration of DoQ Identification String  . . . . . . .  16
+     10.1.  Registration of DoQ Identification String  . . . . . . .  17
      10.2.  Reservation of Dedicated Port  . . . . . . . . . . . . .  17
 
 
 
-Huitema, et al.          Expires August 21, 2021                [Page 2]
+Huitema, et al.          Expires August 26, 2021                [Page 2]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
-       10.2.1.  Port number 784 for experimentations . . . . . . . .  17
-   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+       10.2.1.  Port number 8853 for experimentations  . . . . . . .  17
+   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  18
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  18
      12.2.  Informative References . . . . . . . . . . . . . . . . .  19
      12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
+   Appendix A.  Supporting AXFR  . . . . . . . . . . . . . . . . . .  21
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 1.  Introduction
 
@@ -159,16 +160,18 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    1.  No attempt is made to support AXFR "DNS Zone Transfer Protocol
        (AXFR)" [RFC5936] or IXFR "Incremental Zone Transfer in DNS"
        [RFC1885], as these mechanisms are not relevant to the stub to
-       recursive resolver scenario.
+       recursive resolver scenario.  (This may change in future versions
 
 
 
 
-
-Huitema, et al.          Expires August 21, 2021                [Page 3]
+Huitema, et al.          Expires August 26, 2021                [Page 3]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
+
+       of this draft.  See Appendix A for a discussion of changes
+       required for AXFR support.)
 
    2.  No attempt is made to evade potential blocking of DNS over QUIC
        traffic by middleboxes.
@@ -212,20 +215,23 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    This section and its subsection present the design guidelines that
    were used for DoQ.  This section is informative in nature.
 
+
+
+
+
+
+
+Huitema, et al.          Expires August 26, 2021                [Page 4]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
+
 4.1.  Scope is Limited to the Stub to Resolver Scenario
 
    Usage scenarios for the DNS protocol can be broadly classified in
    three groups: stub to recursive resolver, recursive resolver to
    authoritative server, and server to server.  This design focuses only
    on the "stub to recursive resolver" scenario following the approach
-
-
-
-Huitema, et al.          Expires August 21, 2021                [Page 4]
-
-Internet-Draft           DNS over Dedicated QUIC           February 2021
-
-
    taken in DoT [RFC7858] and "Usage Profiles for DNS over TLS and DNS
    over DTLS" [RFC8310].
 
@@ -267,20 +273,17 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    [I-D.ietf-quic-tls], enabling encryption of the QUIC transport.
    Transmitting DNS messages over QUIC will provide essentially the same
    privacy protections as DoT [RFC7858] including Strict and
-   Opportunistic Usage Profiles [RFC8310].  Further discussion on this
-   is provided in Section 9.
 
 
 
 
-
-
-
-
-Huitema, et al.          Expires August 21, 2021                [Page 5]
+Huitema, et al.          Expires August 26, 2021                [Page 5]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
+
+   Opportunistic Usage Profiles [RFC8310].  Further discussion on this
+   is provided in Section 9.
 
 4.3.  Design for Minimum Latency
 
@@ -327,16 +330,16 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    maximum performance.  This means a different traffic profile than
    HTTP3 over QUIC.  This difference can be noted by firewalls and
    middleboxes.  There may be environments in which HTTP3 over QUIC will
-   be able to pass through, but DoQ will be blocked by these middle
-   boxes.
 
 
 
-
-Huitema, et al.          Expires August 21, 2021                [Page 6]
+Huitema, et al.          Expires August 26, 2021                [Page 6]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
+
+   be able to pass through, but DoQ will be blocked by these middle
+   boxes.
 
 4.5.  No Server Initiated Transactions
 
@@ -383,17 +386,17 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    By default, a DNS client desiring to use DoQ with a particular server
    MUST establish a QUIC connection to UDP port TBD on the server,
    unless it has mutual agreement with its server to use a port other
-   than port TBD for DoQ.  Such another port MUST NOT be port 53 or port
-   853.  This recommendation against use of port 53 for DoQ is to avoid
-   confusion between DoQ and the use of DNS over UDP [RFC1035].
 
 
 
-Huitema, et al.          Expires August 21, 2021                [Page 7]
+Huitema, et al.          Expires August 26, 2021                [Page 7]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
+   than port TBD for DoQ.  Such another port MUST NOT be port 53 or port
+   853.  This recommendation against use of port 53 for DoQ is to avoid
+   confusion between DoQ and the use of DNS over UDP [RFC1035].
    Similarly, using port 853 would cause confusion between DoQ and DNS
    over DTLS [RFC8094].
 
@@ -440,22 +443,19 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    terminating streams, aborting reading of streams, or immediately
    closing connections:
 
-   DOQ_NO_ERROR (0x00):  No error.  This is used when the connection or
-      stream needs to be closed, but there is no error to signal.
 
 
-
-Huitema, et al.          Expires August 21, 2021                [Page 8]
+Huitema, et al.          Expires August 26, 2021                [Page 8]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
+   DOQ_NO_ERROR (0x00):  No error.  This is used when the connection or
+      stream needs to be closed, but there is no error to signal.
+
    DOQ_INTERNAL_ERROR (0x01):  The DoQ implementation encountered an
       internal error and is incapable of pursuing the transaction or the
-      connection.
-
-   DOQ_TRANSPORT_PARAMETER_ERROR (0x02):  One or some of the transport
-      parameters proposed by the peer are not acceptable.
+      connection
 
 5.4.  Connection Management
 
@@ -501,7 +501,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
 
-Huitema, et al.          Expires August 21, 2021                [Page 9]
+Huitema, et al.          Expires August 26, 2021                [Page 9]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
@@ -531,8 +531,9 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    the "application/dns-message" for DNS over HTTP [RFC8484].  DoQ
    enforces the same restriction.
 
-   The maximum size of messages is controlled in QUIC by the transport
-   parameters:
+   The flow control mechanism of QUIC control how much data can be sent
+   by QUIC nodes at a given time.  The initial values of per stream flow
+   control parameters is defined by two transport parameters:
 
    o  initial_max_stream_data_bidi_local: when set by the client,
       specifies the amount of data that servers can send on a "response"
@@ -542,9 +543,8 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
       specifies the amount of data that clients can send on a "query"
       stream without waiting for a MAX_STREAM_DATA frame.
 
-   Clients and servers MUST set these two parameters to the value 65535.
-   If they receive a different value, they SHOULD close the QUIC
-   connection with an application error "Invalid Parameter".
+   For better performance, it is RECOMMENDED that clients and servers
+   set each of these two parameters to a value of 65535 or greater.
 
    The Extension Mechanisms for DNS (EDNS) [RFC6891] allow peers to
    specify the UDP message size.  This parameter is ignored by DoQ.  DoQ
@@ -557,7 +557,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
 
-Huitema, et al.          Expires August 21, 2021               [Page 10]
+Huitema, et al.          Expires August 26, 2021               [Page 10]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
@@ -613,7 +613,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
 
-Huitema, et al.          Expires August 21, 2021               [Page 11]
+Huitema, et al.          Expires August 26, 2021               [Page 11]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
@@ -669,7 +669,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
 
-Huitema, et al.          Expires August 21, 2021               [Page 12]
+Huitema, et al.          Expires August 26, 2021               [Page 12]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
@@ -725,7 +725,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 
 
-Huitema, et al.          Expires August 21, 2021               [Page 13]
+Huitema, et al.          Expires August 26, 2021               [Page 13]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
@@ -738,7 +738,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    based on a proposal described in [RFC7942].
 
    1.  AdGuard launched a DoQ recursive resolver service in December
-       2020.  The have released a suite of open source tools that
+       2020.  They have released a suite of open source tools that
        support DoQ:
 
        1.  AdGuard C++ DNS libraries [1] A DNS proxy library that
@@ -758,33 +758,36 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
            DoT, DoQ, DNSCrypt.
 
    2.  Quicdoq [5] Quicdoq is a simple open source implementation of DNS
-       over Quic.  It is written in C, based on Picoquic.
+       over Quic.  It is written in C, based on Picoquic [6].
 
-   3.  Flamethrower [6] is an open source DNS performance and functional
+   3.  Flamethrower [7] is an open source DNS performance and functional
        testing utility written in C++ that has an experimental
        implementation of DoQ.
+
+   4.  aioquic [8] is an implementation of QUIC in Python.  It includes
+       example client and server for DNS over QUIC.
 
 7.1.  Performance Measurements
 
    To our knowledge, no benchmarking studies comparing DoT, DoH and DoQ
    are published yet.  However anecdotal evidence from the AdGuard DoQ
-   recursive resolver deployment [7] indicates that it performs well
+   recursive resolver deployment [9] indicates that it performs well
    compared to the other encrypted protocols, particularly in mobile
-   environments.  Reasons for this include that DoQ
+   environments.  Reasons given for this include that DoQ
 
    o  Uses less bandwidth due to a more efficient handshake (and due to
       less per message overhead when compared to DoH).
 
-   o  Performs better in mobile environments due to the increased
-      resilience to packet loss
 
 
 
-
-Huitema, et al.          Expires August 21, 2021               [Page 14]
+Huitema, et al.          Expires August 26, 2021               [Page 14]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
+
+   o  Performs better in mobile environments due to the increased
+      resilience to packet loss
 
    o  Can maintain connections as users move between mobile networks via
       its connection management
@@ -831,16 +834,17 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    amplified for 0-RTT data, because the attacker might replay it at
    chosen times, several times.
 
-   The recommendation for TLS 1.3 [RFC8446] is that the capability to
-   use 0-RTT data should be turned off by default, and only enabled if
-   the user clearly understands the associated risks.
 
 
 
-Huitema, et al.          Expires August 21, 2021               [Page 15]
+Huitema, et al.          Expires August 26, 2021               [Page 15]
 
 Internet-Draft           DNS over Dedicated QUIC           February 2021
 
+
+   The recommendation for TLS 1.3 [RFC8446] is that the capability to
+   use 0-RTT data should be turned off by default, and only enabled if
+   the user clearly understands the associated risks.
 
    QUESTION: Should 0-RTT only be used with Opportunistic profiles (i.e.
    disabled by default for Strict only)?
@@ -883,6 +887,17 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
 10.  IANA Considerations
 
+
+
+
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 16]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
+
 10.1.  Registration of DoQ Identification String
 
    This document creates a new registration for the identification of
@@ -890,13 +905,6 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    IDs" registry [RFC7301].
 
    The "doq" string identifies DoQ:
-
-
-
-Huitema, et al.          Expires August 21, 2021               [Page 16]
-
-Internet-Draft           DNS over Dedicated QUIC           February 2021
-
 
    Protocol: DoQ
 
@@ -909,11 +917,11 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    IANA is required to add the following value to the "Service Name and
    Transport Protocol Port Number Registry" in the System Range.  The
    registry for that range requires IETF Review or IESG Approval
-   {{?RFC6335], and such a review was requested using the early
-   allocation process {{?RFC7120] for the well-known UDP port in this
-   document.  Since port 853 is reserved for 'DNS query-response
-   protocol run over TLS' consideration is requested for reserving port
-   8853 for 'DNS query-response
+   [RFC6335], and such a review was requested using the early allocation
+   process [RFC7120] for the well-known UDP port in this document.
+   Since port 853 is reserved for 'DNS query-response protocol run over
+   TLS' consideration is requested for reserving port 8853 for 'DNS
+   query-response
    protocol run over QUIC'.
 
       Service Name           dns-over-quic
@@ -924,7 +932,7 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
       Description            DNS query-response protocol run over QUIC
       Reference              This document
 
-10.2.1.  Port number 784 for experimentations
+10.2.1.  Port number 8853 for experimentations
 
    *RFC Editor's Note:* Please remove this section prior to publication
    of a final version of this document.
@@ -934,6 +942,17 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
    (Note that prior to version -02 of this draft, experiments were
    directed to use port 784.)
+
+
+
+
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 17]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
 
 11.  Acknowledgements
 
@@ -946,16 +965,10 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working
    group [DNS0RTT].
 
-
-
-
-Huitema, et al.          Expires August 21, 2021               [Page 17]
-
-Internet-Draft           DNS over Dedicated QUIC           February 2021
-
-
    Thanks to Tony Finch for an extensive review of the initial version
-   of this draft.
+   of this draft.  Reviews by Paul Hoffman and interoperability tests
+   conducted by Stephane Bortzmeyer helped improve the definition of the
+   protocol.
 
 12.  References
 
@@ -988,6 +1001,15 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
               DOI 10.17487/RFC6891, April 2013, <https://www.rfc-
               editor.org/info/rfc6891>.
 
+
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 18]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
+
    [RFC7301]  Friedl, S., Popov, A., Langley, A., and E. Stephan,
               "Transport Layer Security (TLS) Application-Layer Protocol
               Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
@@ -1002,13 +1024,6 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
               and P. Hoffman, "Specification for DNS over Transport
               Layer Security (TLS)", RFC 7858, DOI 10.17487/RFC7858, May
               2016, <https://www.rfc-editor.org/info/rfc7858>.
-
-
-
-Huitema, et al.          Expires August 21, 2021               [Page 18]
-
-Internet-Draft           DNS over Dedicated QUIC           February 2021
-
 
    [RFC7873]  Eastlake 3rd, D. and M. Andrews, "Domain Name System (DNS)
               Cookies", RFC 7873, DOI 10.17487/RFC7873, May 2016,
@@ -1043,6 +1058,14 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
               Wicinski, T., "DNS Privacy Considerations", draft-ietf-
               dprive-rfc7626-bis-08 (work in progress), October 2020.
 
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 19]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
+
    [I-D.ietf-dprive-xfr-over-tls]
               Toorop, W., Dickinson, S., Sahib, S., Aras, P., and A.
               Mankin, "DNS Zone Transfer-over-TLS", draft-ietf-dprive-
@@ -1058,14 +1081,6 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
               Congestion Control", draft-ietf-quic-recovery-34 (work in
               progress), January 2021.
 
-
-
-
-Huitema, et al.          Expires August 21, 2021               [Page 19]
-
-Internet-Draft           DNS over Dedicated QUIC           February 2021
-
-
    [RFC1885]  Conta, A. and S. Deering, "Internet Control Message
               Protocol (ICMPv6) for the Internet Protocol Version 6
               (IPv6)", RFC 1885, DOI 10.17487/RFC1885, December 1995,
@@ -1074,6 +1089,17 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    [RFC5936]  Lewis, E. and A. Hoenes, Ed., "DNS Zone Transfer Protocol
               (AXFR)", RFC 5936, DOI 10.17487/RFC5936, June 2010,
               <https://www.rfc-editor.org/info/rfc5936>.
+
+   [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
+              Cheshire, "Internet Assigned Numbers Authority (IANA)
+              Procedures for the Management of the Service Name and
+              Transport Protocol Port Number Registry", BCP 165,
+              RFC 6335, DOI 10.17487/RFC6335, August 2011,
+              <https://www.rfc-editor.org/info/rfc6335>.
+
+   [RFC7120]  Cotton, M., "Early IANA Allocation of Standards Track Code
+              Points", BCP 100, RFC 7120, DOI 10.17487/RFC7120, January
+              2014, <https://www.rfc-editor.org/info/rfc7120>.
 
    [RFC7626]  Bortzmeyer, S., "DNS Privacy Considerations", RFC 7626,
               DOI 10.17487/RFC7626, August 2015, <https://www.rfc-
@@ -1087,6 +1113,14 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
    [RFC7830]  Mayrhofer, A., "The EDNS(0) Padding Option", RFC 7830,
               DOI 10.17487/RFC7830, May 2016, <https://www.rfc-
               editor.org/info/rfc7830>.
+
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 20]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
 
    [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
               Code: The Implementation Status Section", BCP 205,
@@ -1111,17 +1145,6 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
               RFC 8490, DOI 10.17487/RFC8490, March 2019,
               <https://www.rfc-editor.org/info/rfc8490>.
 
-
-
-
-
-
-
-Huitema, et al.          Expires August 21, 2021               [Page 20]
-
-Internet-Draft           DNS over Dedicated QUIC           February 2021
-
-
 12.3.  URIs
 
    [1] https://github.com/AdguardTeam/DnsLibs
@@ -1134,9 +1157,94 @@ Internet-Draft           DNS over Dedicated QUIC           February 2021
 
    [5] https://github.com/private-octopus/quicdoq
 
-   [6] https://github.com/DNS-OARC/flamethrower/tree/dns-over-quic
+   [6] https://github.com/private-octopus/picoquic
 
-   [7] https://adguard.com/en/blog/dns-over-quic.html
+   [7] https://github.com/DNS-OARC/flamethrower/tree/dns-over-quic
+
+   [8] https://github.com/aiortc/aioquic
+
+   [9] https://adguard.com/en/blog/dns-over-quic.html
+
+Appendix A.  Supporting AXFR
+
+   This draft version makes no attempt to support AXFR or IXFR queries.
+   As defined in [RFC5936], the server responds to AXFR queries with a
+   series of DNS response messages where
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 21]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
+
+   "... the first message MUST begin with the SOA resource record of the
+   zone, and the last message MUST conclude with the same SOA resource
+   record."
+
+   and the QDCOUNT:
+
+   o  MUST be 1 in the first message;
+
+   o  MUST be 0 or 1 in all following messages;
+
+   o  MUST be 1 if RCODE indicates an error
+
+   When the DNS protocol is carried over TCP or TLS, these messages are
+   carried over a single byte stream and each of them is preceded by a
+   16 bit length field.  The encapsulation currently defined in this
+   draft does not include a length field and assumes exactly one
+   response message for each query.
+
+   Note that since IXFR can fall back to an AXFR-like response if the
+   server is not able to send an incremental change, this discussion
+   also applies to those AXFR-like responses returned to an IXFR request
+   in that scenario.
+
+   There are two plausible ways to carry the series of AXFR responses in
+   QUIC: keep the current format and use a separate QUIC stream for each
+   response; or, relax the restriction of having just one response per
+   QUIC stream.  This second option is much simpler to engineer.  It
+   will not require complex methods to correlate different streams, and
+   it will ensure that the responses in the series are delivered in the
+   intended order.  However, it requires parsing the response stream to
+   extract separate responses.  The practical requirement would be that
+   the content of the QUIC stream be exactly the same as the content of
+   a TCP connection that would manage exactly one query.  The main
+   difference with the current proposal would be to insert a length
+   field before each response.  So we would get:
+
+   o  For a query: open a bidirectional stream, send the query encoded
+      as { 16 bit length, DNS query }, mark this stream direction as
+      finished.
+
+   o  For most responses: send the single response message encoded as {
+      16 bit length, DNS response }, mark this stream direction as
+      finished.
+
+   o  For a response to an AXFR query: send a series of response
+      messages encoded as { 16 bit length, DNS response }, using the
+      QDCOUNT convention as specified in [RFC5936], mark this stream
+      direction as finished when the entire series is sent.
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 22]
+
+Internet-Draft           DNS over Dedicated QUIC           February 2021
+
+
+   This adds a length field that is not in the current draft, which
+   breaks compatibility with the previous versions.  Draft versions are
+   identified by draft version specific ALPN, which makes this change
+   manageable.  However, the authors would like to get feedback from
+   developers before making this change.
+
+   The change will also add new error conditions: if the stream FIN
+   happens before the bytes specified in the message length field are
+   sent; if the client expects a single response message and several are
+   sent; and, if the client expects AXFR responses but does not receive
+   the expected pattern of QDCOUNT flagged messages.
 
 Authors' Addresses
 
@@ -1173,4 +1281,8 @@ Authors' Addresses
 
 
 
-Huitema, et al.          Expires August 21, 2021               [Page 21]
+
+
+
+
+Huitema, et al.          Expires August 26, 2021               [Page 23]
