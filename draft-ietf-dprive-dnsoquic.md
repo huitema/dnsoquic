@@ -24,11 +24,6 @@ author:
         country: U.S.A
         email: huitema@huitema.net
       -
-        ins: A. Mankin
-        name: Allison Mankin
-        org: Salesforce
-        email: amankin@salesforce.com
-      -
         ins: S. Dickinson
         name: Sara Dickinson
         org: Sinodun IT
@@ -38,6 +33,12 @@ author:
         code: OX4 4GA
         country: U.K.
         email: sara@sinodun.com
+      -
+        ins: A. Mankin
+        name: Allison Mankin
+        org: Salesforce
+        email: allison.mankin@gmail.com
+
 
 informative:
   DNS0RTT:
@@ -136,7 +137,7 @@ functional changes should always first be discussed on the IETF DPRIVE WG
 
 # Design Considerations
 
-This section and its subsection present the design guidelines that were used
+This section and its subsections present the design guidelines that were used
 for DoQ. This section is informative in nature.
 
 ## Provide DNS Privacy
@@ -331,18 +332,25 @@ Other error scenarios can occur due to malformed, incomplete or unexpected
 messages during a transaction. These include (but are not limited to)
 
 * a client or server receives a message with a non-zero Message ID
-* an implementation receives a message containing the edns-tcp-keepalive 
-  EDNS(0) Option {{!RFC7828}} (see
-  {{resource-management-and-idle-timeout-values}})
 * a client or server receives a STREAM FIN before receiving all the bytes for a 
   message indicated in the 2-octet length field
 * a client receives a STREAM FIN before receiving all the expected responses
 * a server receives more than one query on a stream
 * a client receives a different number of responses on a stream than expected
   (e.g. multiple responses to a query for an A record)
+* an implementation receives a message containing the edns-tcp-keepalive 
+  EDNS(0) Option {{!RFC7828}} (see
+  {{resource-management-and-idle-timeout-values}})
+* an implementation receives a message containing the
+  EDNS(0) Padding Option {{!RFC7830}} (see
+  {{padding}})
 
 If a peer encounters such an error condition it is considered a fatal error. It
-SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism, and use the DoQ error code DOQ_PROTCOL_ERROR.
+SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
+and use the DoQ error code DOQ_PROTCOL_ERROR.
+
+It is noted that the restrictions on use of the above EDNS(0) options has
+implications for proxying message from TCP/DoT/DoH over DoQ.
 
 ## Connection Management
 
@@ -477,7 +485,7 @@ There are mechanisms specified for padding individual DNS messages in "The
 EDNS(0) Padding Option" {{?RFC7830}} and for padding within QUIC packets (see
 Section 8.6 of the QUIC transport specification {{!RFC9000}}).
 
-Implementations SHOULD NOT use DNS options for padding individual DNS messages,
+Implementations MUST NOT use DNS options for padding individual DNS messages,
 because QUIC transport MAY transmit multiple STREAM frames containing separate
 DNS messages in a single QUIC packet. Instead, implementations SHOULD use QUIC
 PADDING frames to align the packet length to a small set of fixed sizes,
