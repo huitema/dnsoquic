@@ -3,7 +3,7 @@
 # - xml2rfc (https://xml2rfc.tools.ietf.org/)
 
 DRAFT=draft-ietf-dprive-dnsoquic
-VERSION=02
+VERSION=03
 
 XML=$(DRAFT).xml
 HTML=$(DRAFT)-$(VERSION).html
@@ -13,9 +13,9 @@ TXT=$(DRAFT)-$(VERSION).txt
 
 all: $(HTML) $(TXT) 
 
-$(XML): $(DRAFT).md; kramdown-rfc2629 $< $@
+$(XML): $(DRAFT).md; kramdown-rfc2629 $< > $@
 
-$(HTML): $(XML) ; xml2rfc --html -o $@ $<
-$(TXT): $(XML) ; xml2rfc --text -o $@ $<
+$(HTML): $(XML) ; xml2rfc --html --v2 -o $@ $<
+$(TXT): $(XML) ; xml2rfc --text --v2 -o $@ $<
 
 clean: ; rm $(XML) $(HTML) $(TXT)
