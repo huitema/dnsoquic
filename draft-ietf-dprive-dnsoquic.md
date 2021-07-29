@@ -310,7 +310,7 @@ DOQ_INTERNAL_ERROR (0x01):
 : The DoQ implementation encountered an internal error and is incapable of
   pursuing the transaction or the connection.
 
-DOQ_PROTOCOL_ERROR (0x01):
+DOQ_PROTOCOL_ERROR (0x02):
 : The DoQ implementation encountered an protocol error and is forcibly aborting 
   the connection.
 
