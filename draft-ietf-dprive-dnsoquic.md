@@ -410,21 +410,6 @@ message length field in DNS over TCP {{!RFC1035}} and DNS over TLS
 {{!RFC7858}}, and by the definition of the "application/dns-message" for DNS
 over HTTP {{!RFC8484}}. DoQ enforces the same restriction.
 
-The flow control mechanisms of QUIC control how much data can be sent by QUIC
-nodes at a given time. The initial values of per stream flow control parameters
-is defined by two transport parameters:
-
-* initial_max_stream_data_bidi_local: when set by the client, specifies the
-  amount of data that servers can send on a "response" stream without waiting
-  for a MAX_STREAM_DATA frame.
-
-* initial_max_stream_data_bidi_remote: when set by the server, specifies the
-  amount of data that clients can send on a "query" stream without waiting for
-  a MAX_STREAM_DATA frame.
-
-For better performance, it is RECOMMENDED that clients and servers set each of
-these two parameters to a value of 65535 or greater.
-
 The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify the
 UDP message size. This parameter is ignored by DoQ. DoQ implementations always
 assume that the maximum message size is 65535 bytes.
@@ -569,11 +554,27 @@ connections. For example:
 
 Servers and Clients manage flow control as specified in QUIC.
 
-Servers MAY use the "maximum stream ID" option of the QUIC transport to limit
+Servers MAY use the "maximum stream ID" parameter of the QUIC transport to limit
 the number of streams opened by the client. This mechanism will effectively
 limit the number of DNS queries that a client can send on a single DoQ
-connection.
+connection. The initial value of this parameter is specified by the transport
+parameter `initial_max_streams_bidi`. For better performance, it is RECOMMENDED
+that servers chose a sufficiently large value for this parameter.
 
+The flow control mechanisms of QUIC control how much data can be sent by QUIC
+nodes at a given time. The initial values of per stream flow control parameters
+is defined by two transport parameters:
+
+* initial_max_stream_data_bidi_local: when set by the client, specifies the
+  amount of data that servers can send on a "response" stream without waiting
+  for a MAX_STREAM_DATA frame.
+
+* initial_max_stream_data_bidi_remote: when set by the server, specifies the
+  amount of data that clients can send on a "query" stream without waiting for
+  a MAX_STREAM_DATA frame.
+
+For better performance, it is RECOMMENDED that clients and servers set each of
+these two parameters to a value of 65535 or greater.
 
 # Implementation Status
 
