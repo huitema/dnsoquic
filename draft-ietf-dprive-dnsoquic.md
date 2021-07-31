@@ -394,12 +394,17 @@ A client MAY take advantage of the connection resume mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
 potential privacy issues associated with session resume before deciding to use
 this mechanism. These privacy issues are detailed in
-{{privacy-issues-with-session-resume}}.
+{{privacy-issues-with-session-resume}} and {{privacy-issues-with-0-rtt-data}},
+and the implementation considerations are discussed in
+{{using-0-rtt-and-resumption}}.
 
-When resuming a session, a client MAY take advantage of the 0-RTT mechanism
-supported by QUIC. The 0-RTT mechanism MUST NOT be used to send data that is
+The 0-RTT mechanism MUST NOT be used to send data that is
 not "replayable" transactions. For example, a client MAY transmit a Query as
-0-RTT, but MUST NOT transmit an Update.
+0-RTT, but MUST NOT transmit an Update. Servers that receive requests
+for replayable transactions MUST NOT process them before the connection
+handshake is confirmed, as defined in section 4.1.2 of {{!RFC9001}}; 
+servers MAY close connections in which replayable transactions are
+attempted with the error code DOQ_PROTOCOL_ERROR.
 
 ## Message Sizes
 
@@ -518,9 +523,43 @@ connections. Clients and servers should reuse and/or close connections
 depending on the level of available resources. Timeouts may be longer during
 periods of low activity and shorter during periods of high activity.
 
-Clients that are willing to use QUIC's 0-RTT mechanism can reestablish
-connections and send transactions on the new connection with minimal delay
-overhead. These clients MAY chose low values of the idle timer.
+### Using 0-RTT and resumption
+
+Using 0-RTT for DNS over QUIC has many compelling advantages. Clients
+can reestablish connections and send queries without incurring a connection
+delay. Clients and server can thus negotiate low values of the connection
+timers, without incurring latency penalties for new queries, reducing
+the number of simultaneous connections that servers need to manage. On
+the other hand, session resumption and 0-RTT data transmission create
+privacy risks detailed in detailed in
+{{privacy-issues-with-session-resume}} and {{privacy-issues-with-0-rtt-data}}.
+The following implementation recommendations are meant to reduce the privacy
+risks while enjoying the performance benefits of 0-RTT data, with the
+restriction specified in {{connection-resume-and-0-rtt}}.
+
+Clients SHOULD use resumption tickets only once, to reduce risks of tracking by third parties.
+Privacy conscious clients SHOULD NOT use session resumption if their IP address
+or location has changed, to reduce risk of tracking by the servers.
+
+Clients may receive address validation tokens from the server using the
+NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
+risks are mentioned in {{privacy-issues-with-new-tokens}}. Privacy conscious
+clients SHOULD only use the NEW TOKEN mechanism when they are also using session
+resumption, thus avoiding additional tracking risks.
+
+Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
+{{?RFC8446}}. Servers that can enforce single use of resumption tickets for 0-RTT
+per section 8.1 of {{?RFC8446}} SHOULD do so, as this is consistent with the above
+recommendation that clients use resumption tickets only once. All servers MUST use
+the Freshness Checks defined in section 8.2 of {{?RFC8446}} to assess the delay between
+creation of the Client Hello at the client and the arrival at the server, 
+and disable 0-RTT if that delay is larger than a threshold of at most 30 seconds.
+
+Servers SHOULD issue session resumption tickets as soon as possible after the handshake
+is confirmed, to maximize chances that the client can use resumption and 0-RTT if a
+session breaks. Session resumption tickets SHOULD have a sufficient long life time (e.g. 6 hours),
+so that clients are not tempted to either keep connection alive or frequently poll the server
+to renew session resumption tickets.
 
 ## Processing Queries in Parallel
 
@@ -663,29 +702,61 @@ attacker might replay it at chosen times, several times.
 
 The recommendation for TLS 1.3 {{?RFC8446}} is that the capability to use 0-RTT
 data should be turned off by default, and only enabled if the user clearly
-understands the associated risks.
+understands the associated risks. In our case, allowing 0-RTT data
+provides significant performance gains, and we are concerned that a
+recommendation to not use it would simply be ignored. Instead, we provide
+a set of practical recommendations in {{connection-resume-and-0-rtt}}
+and {{using-0-rtt-and-resumption}}.
 
-QUESTION: Should 0-RTT only be used with Opportunistic profiles (i.e.
-disabled by default for Strict only)?
+The prevention on allowing replayable transactions in 0-RTT data
+expressed in {{connection-resume-and-0-rtt}} blocks the most obvious
+risks of replay attacks, as it only allows for transactions that will
+not change the long term state of the server. 
+
+Attacks trying to assess the state of the cache are more powerful if
+the attacker can choose the time at which the 0-RTT data will be replayed.
+We believe that the freshness tests recommended in {{connection-resume-and-0-rtt}}
+significantly reduce the time range in which 0-RTT data can be
+replayed, and thus significantly reduce the potential of such
+attacks. The maximum delay parameter stated in {{connection-resume-and-0-rtt}}
+is 30 seconds. We believe this is consistent with commonly used values
+of the cached records TTL, and thus sufficiently small to impede
+most replay attacks.
 
 ## Privacy Issues With Session Resume
 
 The QUIC session resume mechanism reduces the cost of re-establishing sessions
 and enables 0-RTT data. There is a linkability issue associated with session
-resume, if the same resume token is used several times, but this risk is
-mitigated by the mechanisms incorporated in QUIC and in TLS 1.3. With these
-mechanisms, clients and servers can cooperate to avoid linkability by third
-parties. However, the server will always be able to link the resumed session to
-the initial session. This creates a virtual long duration session. The series
-of queries in that session can be used by the server to identify the client.
+resume, if the same resume token is used several times. Attackers on path
+between client and server could observe repeated usage of the token and
+use that to track the client over time or over multiple locations. 
 
-Enabling the server to link client sessions through session resume is probably
-not a large additional risk if the client's connectivity did not change between
-the sessions, since the two sessions can probably be correlated by comparing
-the IP addresses. On the other hand, if the addresses did change, the client
-SHOULD consider whether the linkability risk exceeds the performance benefits.
-This evaluation will obviously depend on the level of trust between client and
-server.
+The session resume mechanism allows servers to correlate the resumed sessions
+with the initial sessions, and thus to track the client. This creates a virtual
+long duration session. The series of queries in that session can be used by the
+server to identify the client. Servers can most probably do that already if
+the client address remains constant, but session resume tickets also enable
+tracking after changes of the client's address.
+
+The recommendations in {{connection-resume-and-0-rtt}} are designed to
+mitigate these risks. Using session resume tickets only once mitigates
+the risk of tracking by third parties. Refusing to resume session if addresses
+change mitigates the risk of tracking by the server.
+
+## Privacy Issues With New Tokens
+
+QUIC specifies address validation mechanisms in section 8 of {{!RFC9000}}.
+The NEW TOKEN mechanism allow QUIC servers to provide clients with
+address validation tokens, and avoid an extra RTT when address
+validation is required. The tokens are tied to an IP address. QUIC
+clients normally only use these tokens when setting a new connection
+from a previously used address. However, due to the prevalence of NAT,
+clients are not always aware that they are using a new address. There
+is a linkability risk if clients mistakenly use a NEW TOKEN after
+unknowingly moving to a new location.
+
+The recommendations in {{connection-resume-and-0-rtt}} mitigates
+this risk by tying the usage of the NEW TOKEN to that of session resumption.
 
 ## Traffic Analysis
 
@@ -759,8 +830,9 @@ The privacy issue with 0-RTT data and session resume were analyzed by Daniel
 Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working group {{DNS0RTT}}.
 
 Thanks to Tony Finch for an extensive review of the initial version of this
-draft. Reviews by Paul Hoffman and interoperability tests conducted by Stephane
-Bortzmeyer helped improve the definition of the protocol.
+draft, and to Robert Evans for the discussion of 0-RTT privacy issues.
+Reviews by Paul Hoffman and Martin Thomson and interoperability tests
+conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
 
