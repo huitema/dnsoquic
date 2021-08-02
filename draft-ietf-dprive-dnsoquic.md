@@ -552,31 +552,27 @@ connections. For example:
 
 ## Flow Control Mechanisms
 
-Servers and Clients manage flow control as specified in QUIC.
+Servers and Clients manage flow control using the mechanisms defined in
+section 4 of {{!RFC9000}}. These mechanisms allows clients and servers to
+how many streams can be created, how much data can be sent on a stream,
+and how much data can be sent on the union of all streams. For DNS over QUIC,
+controlling how many streams are created allow servers to control how many
+new requests the client can send on a given connection.
 
-Servers can use the "maximum stream ID" parameter of the QUIC transport to limit
-the number of streams opened by the client. This mechanism will effectively
-limit the number of DNS queries that a client can send on a single DoQ
-connection. The initial value of this parameter is specified by the transport
-parameter `initial_max_streams_bidi`. To allow at least one query per client,
-servers SHOULD use a non-zero value for this parameter. Using larger values
-will result in better performance.
+The global and per stream flow control allow servers to control how much data can be sent by
+clients. If that control is strict, clients will have to wait for new credits
+before they can transmit the full content of the request. The same mechanisms
+allow clients to control how much data can be sent by servers. If too strict,
+servers will have to wait for credits before sending the full content of the
+responses.
 
-The flow control mechanisms of QUIC control how much data can be sent by QUIC
-nodes at a given time. The initial values of per stream flow control parameters
-is defined by two transport parameters:
-
-* initial_max_stream_data_bidi_local: when set by the client, specifies the
-  amount of data that servers can send on a "response" stream without waiting
-  for a MAX_STREAM_DATA frame.
-
-* initial_max_stream_data_bidi_remote: when set by the server, specifies the
-  amount of data that clients can send on a "query" stream without waiting for
-  a MAX_STREAM_DATA frame.
-
-For better performance, it is RECOMMENDED that clients and servers set each of
-these two parameters to a value of 65537 or greater, allowing for at least one
-query or response of maximum length 65535 bytes.
+Initial values of parameters control how many requests and how much data can be
+sent by clients and servers at the beginning of the connection. These values
+are specified in transport parameters exchanged during the connection handshake.
+The parameter values received in the initial connection also control how many requests and
+how much data can be sent by clients using 0-RTT data in a resumed connection.
+Using too small values of these initial parameters would restrict the
+usefulness of allowing 0-RTT data.
 
 # Implementation Status
 
