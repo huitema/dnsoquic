@@ -557,14 +557,15 @@ section 4 of {{!RFC9000}}. These mechanisms allows clients and servers to
 how many streams can be created, how much data can be sent on a stream,
 and how much data can be sent on the union of all streams. For DNS over QUIC,
 controlling how many streams are created allow servers to control how many
-new requests the client can send on a given connection.
+new requests the client can send on a given connection. 
 
-The global and per stream flow control allow servers to control how much data can be sent by
-clients. If that control is strict, clients will have to wait for new credits
-before they can transmit the full content of the request. The same mechanisms
-allow clients to control how much data can be sent by servers. If too strict,
-servers will have to wait for credits before sending the full content of the
-responses.
+Flow control exists to protect endpoint resources.
+For servers, global and per-stream flow control limits control how much data can be sent by
+clients. The same mechanisms
+allow clients to control how much data can be sent by servers.
+Values that are too small will unnecessarily limit performance.
+Values that are too large might expose endpoints to overload or memory exhaustion.
+Implementations or deployments will need to adjust flow control limits to balance these concerns.
 
 Initial values of parameters control how many requests and how much data can be
 sent by clients and servers at the beginning of the connection. These values
