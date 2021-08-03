@@ -394,7 +394,7 @@ A client MAY take advantage of the connection resume mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
 potential privacy issues associated with session resume before deciding to use
 this mechanism. These privacy issues are detailed in
-{{privacy-issues-with-session-resume}} and {{privacy-issues-with-0-rtt-data}},
+{{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}},
 and the implementation considerations are discussed in
 {{using-0-rtt-and-resumption}}.
 
@@ -526,13 +526,14 @@ periods of low activity and shorter during periods of high activity.
 ### Using 0-RTT and resumption
 
 Using 0-RTT for DNS over QUIC has many compelling advantages. Clients
-can reestablish connections and send queries without incurring a connection
+can establish connections and send queries without incurring a connection
 delay. Clients and server can thus negotiate low values of the connection
 timers, without incurring latency penalties for new queries, reducing
-the number of simultaneous connections that servers need to manage. On
-the other hand, session resumption and 0-RTT data transmission create
+the number of simultaneous connections that servers need to manage.
+
+Session resumption and 0-RTT data transmission create
 privacy risks detailed in detailed in
-{{privacy-issues-with-session-resume}} and {{privacy-issues-with-0-rtt-data}}.
+{{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}}.
 The following implementation recommendations are meant to reduce the privacy
 risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{connection-resume-and-0-rtt}}.
@@ -685,7 +686,7 @@ it raises two concerns:
     linkability between successive client sessions.
 
 These issues are developed in {{privacy-issues-with-0-rtt-data}} and 
-{{privacy-issues-with-session-resume}}.
+{{privacy-issues-with-session-resumption}}.
 
 ## Privacy Issues With 0-RTT data
 
@@ -723,7 +724,7 @@ is 30 seconds. We believe this is consistent with commonly used values
 of the cached records TTL, and thus sufficiently small to impede
 most replay attacks.
 
-## Privacy Issues With Session Resume
+## Privacy Issues With Session Resumption
 
 The QUIC session resume mechanism reduces the cost of re-establishing sessions
 and enables 0-RTT data. There is a linkability issue associated with session
@@ -739,20 +740,19 @@ the client address remains constant, but session resume tickets also enable
 tracking after changes of the client's address.
 
 The recommendations in {{connection-resume-and-0-rtt}} are designed to
-mitigate these risks. Using session resume tickets only once mitigates
+mitigate these risks. Using session tickets only once mitigates
 the risk of tracking by third parties. Refusing to resume session if addresses
 change mitigates the risk of tracking by the server.
 
 ## Privacy Issues With New Tokens
 
 QUIC specifies address validation mechanisms in section 8 of {{!RFC9000}}.
-The NEW TOKEN mechanism allow QUIC servers to provide clients with
-address validation tokens, and avoid an extra RTT when address
-validation is required. The tokens are tied to an IP address. QUIC
+Use of an address validation token allows QUIC servers to avoid an extra RTT
+for new connections. Address validation tokens are typically tied to an IP address. QUIC
 clients normally only use these tokens when setting a new connection
 from a previously used address. However, due to the prevalence of NAT,
 clients are not always aware that they are using a new address. There
-is a linkability risk if clients mistakenly use a NEW TOKEN after
+is a linkability risk if clients mistakenly use address validation tokens after
 unknowingly moving to a new location.
 
 The recommendations in {{connection-resume-and-0-rtt}} mitigates
