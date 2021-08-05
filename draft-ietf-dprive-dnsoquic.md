@@ -739,7 +739,7 @@ the client address remains constant, but session resume tickets also enable
 tracking after changes of the client's address.
 
 The recommendations in {{connection-resume-and-0-rtt}} are designed to
-mitigate these risks. Using session resume tickets only once mitigates
+mitigate these risks. Using session tickets only once mitigates
 the risk of tracking by third parties. Refusing to resume session if addresses
 change mitigates the risk of tracking by the server.
 
@@ -834,6 +834,5 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
-
 
 
