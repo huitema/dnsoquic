@@ -534,7 +534,7 @@ the number of simultaneous connections that servers need to manage.
 Session resumption and 0-RTT data transmission create
 privacy risks detailed in detailed in
 {{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}}.
-The following implementation recommendations are meant to reduce the privacy
+The following recommendations are meant to reduce the privacy
 risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{connection-resume-and-0-rtt}}.
 
@@ -835,4 +835,3 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
-
