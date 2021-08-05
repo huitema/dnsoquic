@@ -746,9 +746,8 @@ change mitigates the risk of tracking by the server.
 ## Privacy Issues With New Tokens
 
 QUIC specifies address validation mechanisms in section 8 of {{!RFC9000}}.
-The NEW TOKEN mechanism allow QUIC servers to provide clients with
-address validation tokens, and avoid an extra RTT when address
-validation is required. The tokens are tied to an IP address. QUIC
+Use of an address validation token allows QUIC servers to avoid an extra RTT
+for new connections. Address validation tokens are typically tied to an IP address. QUIC
 clients normally only use these tokens when setting a new connection
 from a previously used address. However, due to the prevalence of NAT,
 clients are not always aware that they are using a new address. There
@@ -835,7 +834,6 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
-
 
 
 
