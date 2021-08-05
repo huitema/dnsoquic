@@ -542,7 +542,7 @@ Clients SHOULD use resumption tickets only once, to reduce risks of tracking by 
 Privacy conscious clients SHOULD NOT use session resumption if their IP address
 or location has changed, to reduce risk of tracking by the servers.
 
-Clients may receive address validation tokens from the server using the
+Clients could receive address validation tokens from the server using the
 NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-new-tokens}}. Privacy conscious
 clients SHOULD only use the NEW TOKEN mechanism when they are also using session
