@@ -526,7 +526,7 @@ periods of low activity and shorter during periods of high activity.
 ### Using 0-RTT and resumption
 
 Using 0-RTT for DNS over QUIC has many compelling advantages. Clients
-can reestablish connections and send queries without incurring a connection
+can establish connections and send queries without incurring a connection
 delay. Clients and server can thus negotiate low values of the connection
 timers, without incurring latency penalties for new queries, reducing
 the number of simultaneous connections that servers need to manage. On
@@ -834,5 +834,4 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
-
 
