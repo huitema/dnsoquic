@@ -752,7 +752,7 @@ validation is required. The tokens are tied to an IP address. QUIC
 clients normally only use these tokens when setting a new connection
 from a previously used address. However, due to the prevalence of NAT,
 clients are not always aware that they are using a new address. There
-is a linkability risk if clients mistakenly use a NEW TOKEN after
+is a linkability risk if clients mistakenly use address validation tokens after
 unknowingly moving to a new location.
 
 The recommendations in {{connection-resume-and-0-rtt}} mitigates
@@ -835,7 +835,6 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
-
 
 
 
