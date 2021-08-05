@@ -723,7 +723,7 @@ is 30 seconds. We believe this is consistent with commonly used values
 of the cached records TTL, and thus sufficiently small to impede
 most replay attacks.
 
-## Privacy Issues With Session Resume
+## Privacy Issues With Session Resumption
 
 The QUIC session resume mechanism reduces the cost of re-establishing sessions
 and enables 0-RTT data. There is a linkability issue associated with session
@@ -834,7 +834,6 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
-
 
 
 
