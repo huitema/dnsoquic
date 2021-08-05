@@ -539,7 +539,7 @@ risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{connection-resume-and-0-rtt}}.
 
 Clients SHOULD use resumption tickets only once, to reduce risks of tracking by third parties.
-Privacy conscious clients SHOULD NOT use session resumption if their IP address
+Clients SHOULD NOT use session resumption if their IP address
 or location has changed, to reduce risk of tracking by the servers.
 
 Clients could receive address validation tokens from the server using the
