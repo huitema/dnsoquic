@@ -558,7 +558,7 @@ and disable 0-RTT if that delay is larger than a threshold of at most 30 seconds
 
 Servers SHOULD issue session resumption tickets as soon as possible after the handshake
 is confirmed, to maximize chances that the client can use resumption and 0-RTT if a
-session breaks. Session resumption tickets SHOULD have a sufficient long life time (e.g. 6 hours),
+session breaks. Session resumption tickets SHOULD have a sufficient long life time (e.g., 6 hours),
 so that clients are not tempted to either keep connection alive or frequently poll the server
 to renew session resumption tickets.
 
