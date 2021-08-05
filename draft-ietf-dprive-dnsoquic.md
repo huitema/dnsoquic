@@ -544,8 +544,8 @@ or location has changed, to reduce risk of tracking by the servers.
 
 Clients could receive address validation tokens from the server using the
 NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
-risks are mentioned in {{privacy-issues-with-new-tokens}}. Privacy conscious
-clients SHOULD only use the NEW TOKEN mechanism when they are also using session
+risks are mentioned in {{privacy-issues-with-new-tokens}}.
+Clients SHOULD only use the NEW TOKEN mechanism when they are also using session
 resumption, thus avoiding additional tracking risks.
 
 Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
