@@ -721,9 +721,8 @@ The freshness tests ensure that 0-RTT data can only be
 successfully replayed if the delay from the creation of the
 Connection Request to its arrival at the server does not exceed "a certain amount"
 -- a parameter of the TLS implementation at the server.
-The exposure to cache state attacks by means of 0-RTT replay
-is reduced if this "certain amount" is small compared to
-commonly used values of the cached records TTL.
+The impact of cache state attacks by means of 0-RTT replay will be limited if this
+"certain amount" is smaller than commonly used values of the cached records TTL.
 
 ## Privacy Issues With Session Resumption
 
