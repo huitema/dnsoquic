@@ -527,9 +527,10 @@ periods of low activity and shorter during periods of high activity.
 
 Using 0-RTT for DNS over QUIC has many compelling advantages. Clients
 can establish connections and send queries without incurring a connection
-delay. Clients and server can thus negotiate low values of the connection
-timers, without incurring latency penalties for new queries, reducing
-the number of simultaneous connections that servers need to manage.
+delay. Servers can thus negotiate low values of the connection
+timers, which reduces the total number of connections that they need to
+manage. They can do that because the clients that use 0-RTT will not incur
+latency penalties if new connections are required for a query.
 
 Session resumption and 0-RTT data transmission create
 privacy risks detailed in detailed in
@@ -538,29 +539,19 @@ The following recommendations are meant to reduce the privacy
 risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{connection-resume-and-0-rtt}}.
 
-Clients SHOULD use resumption tickets only once, to reduce risks of tracking by third parties.
-Clients SHOULD NOT use session resumption if their IP address
-or location has changed, to reduce risk of tracking by the servers.
-
+Clients SHOULD use resumption tickets only once, as specified in Appendix C.4 
+to {{?RFC8446}}.
 Clients could receive address validation tokens from the server using the
 NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-new-tokens}}.
-Clients SHOULD only use the NEW TOKEN mechanism when they are also using session
+Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
 
-Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
-{{?RFC8446}}. Servers that can enforce single use of resumption tickets for 0-RTT
-per section 8.1 of {{?RFC8446}} SHOULD do so, as this is consistent with the above
-recommendation that clients use resumption tickets only once. All servers MUST use
-the Freshness Checks defined in section 8.2 of {{?RFC8446}} to assess the delay between
-creation of the Client Hello at the client and the arrival at the server, 
-and disable 0-RTT if that delay is larger than a threshold of at most 30 seconds.
-
-Servers SHOULD issue session resumption tickets as soon as possible after the handshake
-is confirmed, to maximize chances that the client can use resumption and 0-RTT if a
-session breaks. Session resumption tickets SHOULD have a sufficient long life time (e.g., 6 hours),
+Servers SHOULD issue session resumption tickets with a sufficiently long life time (e.g., 6 hours),
 so that clients are not tempted to either keep connection alive or frequently poll the server
 to renew session resumption tickets.
+Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
+{{?RFC8446}}. 
 
 ## Processing Queries in Parallel
 
@@ -716,13 +707,16 @@ not change the long term state of the server.
 
 Attacks trying to assess the state of the cache are more powerful if
 the attacker can choose the time at which the 0-RTT data will be replayed.
-We believe that the freshness tests recommended in {{connection-resume-and-0-rtt}}
-significantly reduce the time range in which 0-RTT data can be
-replayed, and thus significantly reduce the potential of such
-attacks. The maximum delay parameter stated in {{connection-resume-and-0-rtt}}
-is 30 seconds. We believe this is consistent with commonly used values
-of the cached records TTL, and thus sufficiently small to impede
-most replay attacks.
+The freshness tests recommended in
+section 8.3 of {{?RFC8446}}
+significantly reduce the time range of these replay attacks.
+The freshness tests ensure that 0-RTT data can only be
+successfully replayed if the delay from the creation of the
+Connection Request to its arrival at the server does not exceed "a certain amount"
+-- a parameter of the TLS implementation at the server.
+The impact of cache state attacks by means of 0-RTT replay
+will be limited if this "certain amount" is smaller than
+commonly used values of the cached records TTL.
 
 ## Privacy Issues With Session Resumption
 
