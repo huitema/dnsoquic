@@ -237,7 +237,6 @@ connections on the dedicated UDP port TBD (number to be defined in
 use a port other than TBD for DoQ. In order to use a port other than TBD, both
 clients and servers would need a configuration option in their software.
 
-
 By default, a DNS client desiring to use DoQ with a particular server MUST
 establish a QUIC connection to UDP port TBD on the server, unless it has mutual
 agreement with its server to use a port other than port TBD for DoQ. Such
@@ -398,13 +397,21 @@ this mechanism. These privacy issues are detailed in
 and the implementation considerations are discussed in
 {{using-0-rtt-and-resumption}}.
 
-The 0-RTT mechanism MUST NOT be used to send data that is
-not "replayable" transactions. For example, a client MAY transmit a Query as
-0-RTT, but MUST NOT transmit an Update. Servers that receive requests
-for replayable transactions MUST NOT process them before the connection
-handshake is confirmed, as defined in section 4.1.2 of {{!RFC9001}}; 
-servers MAY close connections in which replayable transactions are
-attempted with the error code DOQ_PROTOCOL_ERROR.
+The 0-RTT mechanism SHOULD NOT be used to send data that is
+not "replayable" transactions. Our analysis so far shows that
+such replayable transactions can only be QUERY requests,
+although we may need to also consider NOTIFY requests once
+the analysis of NOTIFY services is complete, see {{the-notify-service}}.
+
+Servers MUST NOT execute non replayable transactions received in 0-RTT
+data. Servers MUST adopt one of the following behaviors:
+
+* Queue the offending transaction and only execute it after the QUIC handshake
+has been confirmed, as defined in section 4.1.2 of {{!RFC9001}}.
+* Reply to the offending transaction with a response code REFUSED and
+an Extended DNS Error Code (EDE) "Too Early", see
+{{reservation-of-extended-dns-error-code-too-early}}.
+* Close the connection with the error code DOQ_PROTOCOL_ERROR.
 
 ## Message Sizes
 
@@ -714,8 +721,8 @@ The freshness tests ensure that 0-RTT data can only be
 successfully replayed if the delay from the creation of the
 Connection Request to its arrival at the server does not exceed "a certain amount"
 -- a parameter of the TLS implementation at the server.
-The impact of cache state attacks by means of 0-RTT replay
-will be limited if this "certain amount" is smaller than
+The exposure to cache state attacks by means of 0-RTT replay
+is reduced if this "certain amount" is small compared to
 commonly used values of the cached records TTL.
 
 ## Privacy Issues With Session Resumption
@@ -813,6 +820,16 @@ unassigned.
 (Note that version in -02 of this draft experiments were directed to use port
 8853.)
 
+## Reservation of Extended DNS Error Code Too Early
+
+IANA is requested to add the following value to
+the Extended DNS Error Codes registry {{!RFC8914}}:
+
+       INFO-CODE              TBD
+       Purpose                Too Early
+       Reference              This document  
+
+
 # Acknowledgements
 
 This document liberally borrows text from the HTTP-3 specification
@@ -829,3 +846,7 @@ Reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
+
+# The NOTIFY service
+
+To be written later.
