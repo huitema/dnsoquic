@@ -407,7 +407,7 @@ Servers MUST NOT execute non replayable transactions received in 0-RTT
 data. Servers MUST adopt one of the following behaviors:
 
 * Queue the offending transaction and only execute it after the QUIC handshake
-has been confirmed, as defined in section 4.1.2 of {{!RFC9001}}.
+has been completed, as defined in section 4.1.1 of {{!RFC9001}}.
 * Reply to the offending transaction with a response code REFUSED and
 an Extended DNS Error Code (EDE) "Too Early", see
 {{reservation-of-extended-dns-error-code-too-early}}.
