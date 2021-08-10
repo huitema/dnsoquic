@@ -714,15 +714,14 @@ not change the long term state of the server.
 
 Attacks trying to assess the state of the cache are more powerful if
 the attacker can choose the time at which the 0-RTT data will be replayed.
-The freshness tests recommended in
-section 8.3 of {{?RFC8446}}
-significantly reduce the time range of these replay attacks.
-The freshness tests ensure that 0-RTT data can only be
-successfully replayed if the delay from the creation of the
-Connection Request to its arrival at the server does not exceed "a certain amount"
--- a parameter of the TLS implementation at the server.
-The impact of cache state attacks by means of 0-RTT replay will be limited if this
-"certain amount" is smaller than commonly used values of the cached records TTL.
+Such attacks are blocked if the server enforces single-use tickets, or
+if the server implements a combination of Client Hello
+recording and freshness checks, as specified in
+section 8 of {{?RFC8446}}. These blocking mechanisms
+rely on shared state between all server instances in a server system. In
+the case of DNS over QUIC, the protection against replay attacks on the
+DNS cache is achieved if this state is shared between all servers
+that share the same DNS cache.
 
 ## Privacy Issues With Session Resumption
 
