@@ -2,7 +2,7 @@
 title: Specification of DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-03
+docName: draft-ietf-dprive-dnsoquic-04
     
 stand_alone: yes
 
@@ -794,8 +794,8 @@ implementations or deployments currently exist to our knowledge (even though
 several years have passed since the specification was published).
 
 This specification proposes to additionally reserve the use of port 853 for
-DoQ. Whilst {{!RFC8094}} did not specify the use of an ALPN for DoD, DoQ
-requires the use of the `doq` ALPN and is therefore de-muxable from DoD.
+DoQ. QUIC was designed to be able to co-exist with other protocols on the same
+port, including DTLS , see Section 17.2 in {{!RFC9000}}.
 
 IANA is requested to add the following value to the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
