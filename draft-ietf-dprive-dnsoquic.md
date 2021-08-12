@@ -237,7 +237,6 @@ connections on the dedicated UDP port TBD (number to be defined in
 use a port other than TBD for DoQ. In order to use a port other than TBD, both
 clients and servers would need a configuration option in their software.
 
-
 By default, a DNS client desiring to use DoQ with a particular server MUST
 establish a QUIC connection to UDP port TBD on the server, unless it has mutual
 agreement with its server to use a port other than port TBD for DoQ. Such
@@ -394,12 +393,25 @@ A client MAY take advantage of the connection resume mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
 potential privacy issues associated with session resume before deciding to use
 this mechanism. These privacy issues are detailed in
-{{privacy-issues-with-session-resume}}.
+{{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}},
+and the implementation considerations are discussed in
+{{using-0-rtt-and-resumption}}.
 
-When resuming a session, a client MAY take advantage of the 0-RTT mechanism
-supported by QUIC. The 0-RTT mechanism MUST NOT be used to send data that is
-not "replayable" transactions. For example, a client MAY transmit a Query as
-0-RTT, but MUST NOT transmit an Update.
+The 0-RTT mechanism SHOULD NOT be used to send data that is
+not "replayable" transactions. Our analysis so far shows that
+such replayable transactions can only be QUERY requests,
+although we may need to also consider NOTIFY requests once
+the analysis of NOTIFY services is complete, see {{the-notify-service}}.
+
+Servers MUST NOT execute non replayable transactions received in 0-RTT
+data. Servers MUST adopt one of the following behaviors:
+
+* Queue the offending transaction and only execute it after the QUIC handshake
+has been completed, as defined in section 4.1.1 of {{!RFC9001}}.
+* Reply to the offending transaction with a response code REFUSED and
+an Extended DNS Error Code (EDE) "Too Early", see
+{{reservation-of-extended-dns-error-code-too-early}}.
+* Close the connection with the error code DOQ_PROTOCOL_ERROR.
 
 ## Message Sizes
 
@@ -518,9 +530,35 @@ connections. Clients and servers should reuse and/or close connections
 depending on the level of available resources. Timeouts may be longer during
 periods of low activity and shorter during periods of high activity.
 
-Clients that are willing to use QUIC's 0-RTT mechanism can reestablish
-connections and send transactions on the new connection with minimal delay
-overhead. These clients MAY chose low values of the idle timer.
+### Using 0-RTT and resumption
+
+Using 0-RTT for DNS over QUIC has many compelling advantages. Clients
+can establish connections and send queries without incurring a connection
+delay. Servers can thus negotiate low values of the connection
+timers, which reduces the total number of connections that they need to
+manage. They can do that because the clients that use 0-RTT will not incur
+latency penalties if new connections are required for a query.
+
+Session resumption and 0-RTT data transmission create
+privacy risks detailed in detailed in
+{{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}}.
+The following recommendations are meant to reduce the privacy
+risks while enjoying the performance benefits of 0-RTT data, with the
+restriction specified in {{connection-resume-and-0-rtt}}.
+
+Clients SHOULD use resumption tickets only once, as specified in Appendix C.4 
+to {{?RFC8446}}.
+Clients could receive address validation tokens from the server using the
+NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
+risks are mentioned in {{privacy-issues-with-new-tokens}}.
+Clients SHOULD only use the address validation tokens when they are also using session
+resumption, thus avoiding additional tracking risks.
+
+Servers SHOULD issue session resumption tickets with a sufficiently long life time (e.g., 6 hours),
+so that clients are not tempted to either keep connection alive or frequently poll the server
+to renew session resumption tickets.
+Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
+{{?RFC8446}}. 
 
 ## Processing Queries in Parallel
 
@@ -646,7 +684,7 @@ it raises two concerns:
     linkability between successive client sessions.
 
 These issues are developed in {{privacy-issues-with-0-rtt-data}} and 
-{{privacy-issues-with-session-resume}}.
+{{privacy-issues-with-session-resumption}}.
 
 ## Privacy Issues With 0-RTT data
 
@@ -663,29 +701,61 @@ attacker might replay it at chosen times, several times.
 
 The recommendation for TLS 1.3 {{?RFC8446}} is that the capability to use 0-RTT
 data should be turned off by default, and only enabled if the user clearly
-understands the associated risks.
+understands the associated risks. In our case, allowing 0-RTT data
+provides significant performance gains, and we are concerned that a
+recommendation to not use it would simply be ignored. Instead, we provide
+a set of practical recommendations in {{connection-resume-and-0-rtt}}
+and {{using-0-rtt-and-resumption}}.
 
-QUESTION: Should 0-RTT only be used with Opportunistic profiles (i.e.
-disabled by default for Strict only)?
+The prevention on allowing replayable transactions in 0-RTT data
+expressed in {{connection-resume-and-0-rtt}} blocks the most obvious
+risks of replay attacks, as it only allows for transactions that will
+not change the long term state of the server. 
 
-## Privacy Issues With Session Resume
+Attacks trying to assess the state of the cache are more powerful if
+the attacker can choose the time at which the 0-RTT data will be replayed.
+Such attacks are blocked if the server enforces single-use tickets, or
+if the server implements a combination of Client Hello
+recording and freshness checks, as specified in
+section 8 of {{?RFC8446}}. These blocking mechanisms
+rely on shared state between all server instances in a server system. In
+the case of DNS over QUIC, the protection against replay attacks on the
+DNS cache is achieved if this state is shared between all servers
+that share the same DNS cache.
+
+## Privacy Issues With Session Resumption
 
 The QUIC session resume mechanism reduces the cost of re-establishing sessions
 and enables 0-RTT data. There is a linkability issue associated with session
-resume, if the same resume token is used several times, but this risk is
-mitigated by the mechanisms incorporated in QUIC and in TLS 1.3. With these
-mechanisms, clients and servers can cooperate to avoid linkability by third
-parties. However, the server will always be able to link the resumed session to
-the initial session. This creates a virtual long duration session. The series
-of queries in that session can be used by the server to identify the client.
+resume, if the same resume token is used several times. Attackers on path
+between client and server could observe repeated usage of the token and
+use that to track the client over time or over multiple locations. 
 
-Enabling the server to link client sessions through session resume is probably
-not a large additional risk if the client's connectivity did not change between
-the sessions, since the two sessions can probably be correlated by comparing
-the IP addresses. On the other hand, if the addresses did change, the client
-SHOULD consider whether the linkability risk exceeds the performance benefits.
-This evaluation will obviously depend on the level of trust between client and
-server.
+The session resume mechanism allows servers to correlate the resumed sessions
+with the initial sessions, and thus to track the client. This creates a virtual
+long duration session. The series of queries in that session can be used by the
+server to identify the client. Servers can most probably do that already if
+the client address remains constant, but session resume tickets also enable
+tracking after changes of the client's address.
+
+The recommendations in {{connection-resume-and-0-rtt}} are designed to
+mitigate these risks. Using session tickets only once mitigates
+the risk of tracking by third parties. Refusing to resume session if addresses
+change mitigates the risk of tracking by the server.
+
+## Privacy Issues With New Tokens
+
+QUIC specifies address validation mechanisms in section 8 of {{!RFC9000}}.
+Use of an address validation token allows QUIC servers to avoid an extra RTT
+for new connections. Address validation tokens are typically tied to an IP address. QUIC
+clients normally only use these tokens when setting a new connection
+from a previously used address. However, due to the prevalence of NAT,
+clients are not always aware that they are using a new address. There
+is a linkability risk if clients mistakenly use address validation tokens after
+unknowingly moving to a new location.
+
+The recommendations in {{connection-resume-and-0-rtt}} mitigates
+this risk by tying the usage of the NEW TOKEN to that of session resumption.
 
 ## Traffic Analysis
 
@@ -748,6 +818,16 @@ unassigned.
 (Note that version in -02 of this draft experiments were directed to use port
 8853.)
 
+## Reservation of Extended DNS Error Code Too Early
+
+IANA is requested to add the following value to
+the Extended DNS Error Codes registry {{!RFC8914}}:
+
+       INFO-CODE              TBD
+       Purpose                Too Early
+       Reference              This document  
+
+
 # Acknowledgements
 
 This document liberally borrows text from the HTTP-3 specification
@@ -759,13 +839,12 @@ The privacy issue with 0-RTT data and session resume were analyzed by Daniel
 Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working group {{DNS0RTT}}.
 
 Thanks to Tony Finch for an extensive review of the initial version of this
-draft. Reviews by Paul Hoffman and interoperability tests conducted by Stephane
-Bortzmeyer helped improve the definition of the protocol.
+draft, and to Robert Evans for the discussion of 0-RTT privacy issues.
+Reviews by Paul Hoffman and Martin Thomson and interoperability tests
+conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
 
+# The NOTIFY service
 
-
-
-
-
+To be written later.
