@@ -476,15 +476,38 @@ This defines how servers can send NEW TOKEN frames to clients after the client
 address is validated, in order to avoid the 1-RTT penalty during subsequent
 connections by the client from the same address.
 
-## Padding {#padding}
+## Padding
 
-There are mechanisms specified for padding individual DNS messages in "The
-EDNS(0) Padding Option" {{?RFC7830}} and for padding within QUIC packets (see
-Section 8.6 of the QUIC transport specification {{!RFC9000}}).
+Implementations SHOULD protect against the traffic analysis attacks described in
+{{traffic-analysis}} by the judicious injection of padding. In theory, this
+could be done either by padding individual DNS messages using the
+EDNS(0) Padding Option {{?RFC7830}} and by padding QUIC packets (see
+Section 8.6 of the QUIC transport specification {{!RFC9000}}). However,
+applying padding at the QUIC level will usually result in better performance:
 
-Implementations MUST NOT use DNS options for padding individual DNS messages,
-because QUIC transport MAY transmit multiple STREAM frames containing separate
-DNS messages in a single QUIC packet. Instead, implementations SHOULD use QUIC
+* In DNS over QUIC, packets may carry multiple frames such as acknowledgements,
+flow control directive, or data frames. The length of the packets varies with the
+sum of all these frames. Even if data frames are padded using the EDNS padding option,
+the combination of multiple frames will still produce a variety of packet sizes,
+which might provide adversaries with some amount of information.
+
+* Clients will often send multiple queries simultaneously, and servers may well
+have multiple responses ready simultaneously. Multiple short queries could be sent in
+a single QUIC packets, multiple responses could be sent on a single packet or on
+a small number of packets. Padding individual messages with the EDNS padding
+option will make this kind of packet packing more difficult, reducing the
+efficiency of the transport.
+
+* In an extreme case, packing individual messages to the maximum
+allowed size with the EDNS padding option would force clients or server to send
+exactly one QUIC packet per DNS message, which will for reveal the
+total number of queries sent by the client.
+
+The QUIC padding option can be applied after packing one or several messages in
+a packet, which is more efficient and also breaks any direct relation between number
+of DNS messages and number of QUIC packets. For these reason,
+implementations SHOULD NOT use DNS options for padding individual DNS messages.
+Instead, implementations SHOULD use QUIC
 PADDING frames to align the packet length to a small set of fixed sizes,
 aligned with the recommendations of the "Padding Policies for Extension
 Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
