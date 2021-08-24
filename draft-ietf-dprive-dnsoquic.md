@@ -413,6 +413,12 @@ an Extended DNS Error Code (EDE) "Too Early", see
 {{reservation-of-extended-dns-error-code-too-early}}.
 * Close the connection with the error code DOQ_PROTOCOL_ERROR.
 
+For the zone transfer scenario, it would be possible to replay an XFR QUERY
+that had been sent in 0-RTT data. However the authentication mechanisms described
+in RFC9103 ("Zone transfer over TLS") will ensure that the response is not sent by 
+the primary until the identity of the secondary has been verified i.e. the first
+behavior listed above.
+
 ## Message Sizes
 
 DoQ Queries and Responses are sent on QUIC streams, which in theory can carry
@@ -725,11 +731,7 @@ that share the same DNS cache.
 The attacks described above apply to the stub resolver to recursive
 resolver scenario, but similar attacks might be envisaged in the
 recursive resolver to authoritative resolver scenario, and the
-same mitigations apply. It is unclear whether the attacks also
-apply in the zone transfer scenario, but at the same time
-having the 0-RTT mitigations applied across all scenarios is
-probably prudent.
- 
+same mitigations apply.
 
 ## Privacy Issues With Session Resumption
 
@@ -751,10 +753,17 @@ mitigate these risks. Using session tickets only once mitigates
 the risk of tracking by third parties. Refusing to resume session if addresses
 change mitigates the risk of tracking by the server.
 
-It is unclear whether the tracking attacks also apply in the recursive resolver to
-authoritative server scenario or in the zone transfer scenarios. They might,
-especially if the clients chose to not always initiate connections from the
-same IP address. In that case, the mitigations described above are directly applicable.
+The privacy trade-offs here may be context specific. Stub resolvers will have a strong
+motivation to prefer privacy over latency since they often change location. However,
+recursive resolvers that use a small set of static IP addresses are more likely to prefer the reduced
+latency provided by session resumption and may consider this a valid reason to use
+resumption tickets even if the IP address changed between sessions.
+
+Encrypted zone transfer (RFC9103) explicitly does
+not attempt to hide the identity of the parties involved in the transfer, but at the
+same time such transfers are not particularly latency sensitive. This means that
+applications supporting zone transfers may decide to apply the same
+protections as stub to recursive applications.
 
 ## Privacy Issues With New Tokens
 
