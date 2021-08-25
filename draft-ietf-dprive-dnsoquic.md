@@ -865,6 +865,6 @@ SOA/XFR queries triggered by the receipt of one or more NOTIFYs.
 RFC9103 describes the privacy risks associated with both NOTIFY and SOA queries
 and does not include addressing those risks within the scope of encrypting zone
 transfers. Given this, the privacy benefit of using DoQ for NOTIFY is not clear -
-but for the same reason sending NOTIFY as 0-RTT data has no privacy risk above
-that of sending then using cleartext DNS.
+but for the same reason, sending NOTIFY as 0-RTT data has no privacy risk above
+that of sending it using cleartext DNS.
 
