@@ -343,9 +343,6 @@ messages during a transaction. These include (but are not limited to)
 * an implementation receives a message containing the edns-tcp-keepalive 
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management-and-idle-timeout-values}})
-* an implementation receives a message containing the
-  EDNS(0) Padding Option {{!RFC7830}} (see
-  {{padding}})
 
 If a peer encounters such an error condition it is considered a fatal error. It
 SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
@@ -485,18 +482,31 @@ This defines how servers can send NEW TOKEN frames to clients after the client
 address is validated, in order to avoid the 1-RTT penalty during subsequent
 connections by the client from the same address.
 
-## Padding {#padding}
+## Padding
 
-There are mechanisms specified for padding individual DNS messages in "The
-EDNS(0) Padding Option" {{?RFC7830}} and for padding within QUIC packets (see
+Implementations SHOULD protect against the traffic analysis attacks described in
+{{traffic-analysis}} by the judicious injection of padding. This
+could be done either by padding individual DNS messages using the
+EDNS(0) Padding Option {{?RFC7830}} and by padding QUIC packets (see
 Section 8.6 of the QUIC transport specification {{!RFC9000}}).
 
-Implementations MUST NOT use DNS options for padding individual DNS messages,
-because QUIC transport MAY transmit multiple STREAM frames containing separate
-DNS messages in a single QUIC packet. Instead, implementations SHOULD use QUIC
-PADDING frames to align the packet length to a small set of fixed sizes,
-aligned with the recommendations of the "Padding Policies for Extension
-Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
+In theory, padding at the QUIC level could result in better performance for the equivalent
+protection, because the amount of padding can take into account non-DNS frames
+such as acknowledgeemnts or flow control updates, and also because QUIC packets
+can carry multiple DNS messages. However, applications can only control the
+amount of padding in QUIC packets if the implementation of QUIC exposes adequate APIs. This leads
+to the following recommendation:
+
+* if the implementation of QUIC exposes APIs to set a padding policy,
+  DNS over QUIC SHOULD use that API to align the packet length to a small set of fixed sizes,
+  aligned with the recommendations of the "Padding Policies for Extension
+  Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
+
+* if padding at the QUIC level is not available or not used, 
+  DNS over QUIC MUST ensure that all DNS queries and responses are padded to
+  a small set of fixed sizes, using the EDNS padding extension as specified
+  in "Padding Policies for Extension
+  Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
 
 ## Connection Handling
 
