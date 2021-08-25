@@ -851,4 +851,25 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 # The NOTIFY service
 
-To be written later.
+This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data. 
+
+Section {{connection-resume-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
+used to send DNS requests that are not "replayable" transactions", and suggests
+this is limited to OPCODE QUERY. It might also be viable to propose that NOTIFY
+should be permitted in 0-RTT data because although it technically changes the
+state of the receiving server, the effect of replaying NOTIFYs has negligible
+impact in practice.
+
+NOTIFY messages prompt a secondary to either send an SOA query or an XFR
+request to the primary on the basis that a newer version of the zone is
+available. It has long been recognized that NOTIFYs can be forged and, in
+theory, used to cause a secondary to send repeated unnecessary requests to the
+primary. For this reason, most implementations have some form of throttling of the
+SOA/XFR queries triggered by the receipt of one or more NOTIFYs. 
+
+RFC9103 describes the privacy risks associated with both NOTIFY and SOA queries
+and does not include addressing those risks within the scope of encrypting zone
+transfers. Given this, the privacy benefit of using DoQ for NOTIFY is not clear -
+but for the same reason, sending NOTIFY as 0-RTT data has no privacy risk above
+that of sending it using cleartext DNS.
+
