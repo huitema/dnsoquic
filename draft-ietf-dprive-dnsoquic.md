@@ -203,12 +203,15 @@ by these middle boxes.
 
 ## No Server Initiated Transactions
 
-As stated in {{introduction}}, this document does not specify support for
-server initiated transactions. DSO is only applicable for DNS over TCP and DNS
-over TLS. DSO is not applicable to DNS over HTTP since HTTP has its own
-mechanism for managing sessions, and this is incompatible with the DSO; the
-same is true for DoQ.
+As stated in {{introduction}}, this document does not specify support for server
+initiated transactions within established DoQ connections.
+That is, only the initiator of the DoQ connection may send queries over the
+connection. 
 
+DSO supports server-initiated transactions within existing connections, however
+DSO is not applicable to DNS over HTTP since HTTP has its own mechanism for
+managing sessions, and this is incompatible with the DSO; the same is true for
+DoQ.
 
 # Specifications
 
@@ -387,17 +390,17 @@ all queries in progress over the connection MUST be considered failed,
 and a Server Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified
 to the initiator of the transaction.
 
-## Connection Resume and 0-RTT 
+## Session Resumption and 0-RTT 
 
-A client MAY take advantage of the connection resume mechanisms supported by
+A client MAY take advantage of the session resumption mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
-potential privacy issues associated with session resume before deciding to use
+potential privacy issues associated with session resumption before deciding to use
 this mechanism. These privacy issues are detailed in
 {{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}},
 and the implementation considerations are discussed in
-{{using-0-rtt-and-resumption}}.
+{{using-0-rtt-and-session-resumption}}.
 
-The 0-RTT mechanism SHOULD NOT be used to send data that is
+The 0-RTT mechanism SHOULD NOT be used to send DNS requests that are
 not "replayable" transactions. Our analysis so far shows that
 such replayable transactions can only be QUERY requests,
 although we may need to also consider NOTIFY requests once
@@ -437,7 +440,7 @@ TLS and DNS over DTLS" {{!RFC8310}}. There is no need to authenticate the
 client's identity in either scenario.
 
 For zone transfer, the requirements are the same as described in
-{{!I-D.ietf-dprive-xfr-over-tls}}.
+{{!RFC9103}}.
 
 For the recursive resolver to authoritative nameserver scenario, authentication
 requirements are unspecified at the time of writing and are the subject on
@@ -530,7 +533,7 @@ connections. Clients and servers should reuse and/or close connections
 depending on the level of available resources. Timeouts may be longer during
 periods of low activity and shorter during periods of high activity.
 
-### Using 0-RTT and resumption
+### Using 0-RTT and Session Resumption
 
 Using 0-RTT for DNS over QUIC has many compelling advantages. Clients
 can establish connections and send queries without incurring a connection
@@ -544,7 +547,7 @@ privacy risks detailed in detailed in
 {{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}}.
 The following recommendations are meant to reduce the privacy
 risks while enjoying the performance benefits of 0-RTT data, with the
-restriction specified in {{connection-resume-and-0-rtt}}.
+restriction specified in {{session-resumption-and-0-rtt}}.
 
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4 
 to {{?RFC8446}}.
@@ -570,7 +573,7 @@ for availability of responses for previously opened streams.
 
 ## Zone transfer
 
-{{!I-D.ietf-dprive-xfr-over-tls}} specifies zone transfer over TLS (XoT)
+{{!RFC9103}} specifies zone transfer over TLS (XoT)
 and includes updates to {{!RFC1995}} (IXFR), {{!RFC5936}} (AXFR) and
 {{!RFC7766}}. Considerations relating to the re-use of XoT connections
 described there apply analogously to zone transfers performed using DoQ
@@ -591,10 +594,10 @@ connections. For example:
 ## Flow Control Mechanisms
 
 Servers and Clients manage flow control using the mechanisms defined in
-section 4 of {{!RFC9000}}. These mechanisms allows clients and servers to
+section 4 of {{!RFC9000}}. These mechanisms allow clients and servers to specify
 how many streams can be created, how much data can be sent on a stream,
 and how much data can be sent on the union of all streams. For DNS over QUIC,
-controlling how many streams are created allow servers to control how many
+controlling how many streams are created allows servers to control how many
 new requests the client can send on a given connection. 
 
 Flow control exists to protect endpoint resources.
@@ -603,7 +606,9 @@ clients. The same mechanisms
 allow clients to control how much data can be sent by servers.
 Values that are too small will unnecessarily limit performance.
 Values that are too large might expose endpoints to overload or memory exhaustion.
-Implementations or deployments will need to adjust flow control limits to balance these concerns.
+Implementations or deployments will need to adjust flow control limits to
+balance these concerns. In particular, zone transfer implementations will need to control
+these limits carefully to ensure both large and concurrent zone transfers are well managed.
 
 Initial values of parameters control how many requests and how much data can be
 sent by clients and servers at the beginning of the connection. These values
@@ -679,7 +684,7 @@ it raises two concerns:
 1.  Adversaries could replay the 0-RTT data and infer its content
     from the behavior of the receiving server.
 
-2.  The 0-RTT mechanism relies on TLS resume, which can provide
+2.  The 0-RTT mechanism relies on TLS session resumption, which can provide
     linkability between successive client sessions.
 
 These issues are developed in {{privacy-issues-with-0-rtt-data}} and 
@@ -703,11 +708,11 @@ data should be turned off by default, and only enabled if the user clearly
 understands the associated risks. In our case, allowing 0-RTT data
 provides significant performance gains, and we are concerned that a
 recommendation to not use it would simply be ignored. Instead, we provide
-a set of practical recommendations in {{connection-resume-and-0-rtt}}
-and {{using-0-rtt-and-resumption}}.
+a set of practical recommendations in {{session-resumption-and-0-rtt}}
+and {{using-0-rtt-and-session-resumption}}.
 
 The prevention on allowing replayable transactions in 0-RTT data
-expressed in {{connection-resume-and-0-rtt}} blocks the most obvious
+expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
 risks of replay attacks, as it only allows for transactions that will
 not change the long term state of the server. 
 
@@ -724,22 +729,22 @@ that share the same DNS cache.
 
 ## Privacy Issues With Session Resumption
 
-The QUIC session resume mechanism reduces the cost of re-establishing sessions
+The QUIC session resumption mechanism reduces the cost of re-establishing sessions
 and enables 0-RTT data. There is a linkability issue associated with session
-resume, if the same resume token is used several times. Attackers on path
+resumption, if the same resumption token is used several times. Attackers on path
 between client and server could observe repeated usage of the token and
 use that to track the client over time or over multiple locations. 
 
-The session resume mechanism allows servers to correlate the resumed sessions
+The session resumption mechanism allows servers to correlate the resumed sessions
 with the initial sessions, and thus to track the client. This creates a virtual
 long duration session. The series of queries in that session can be used by the
 server to identify the client. Servers can most probably do that already if
-the client address remains constant, but session resume tickets also enable
+the client address remains constant, but session resumption tickets also enable
 tracking after changes of the client's address.
 
-The recommendations in {{connection-resume-and-0-rtt}} are designed to
+The recommendations in {{using-0-rtt-and-session-resumption}} are designed to
 mitigate these risks. Using session tickets only once mitigates
-the risk of tracking by third parties. Refusing to resume session if addresses
+the risk of tracking by third parties. Refusing to resume a session if addresses
 change mitigates the risk of tracking by the server.
 
 ## Privacy Issues With New Tokens
@@ -753,7 +758,7 @@ clients are not always aware that they are using a new address. There
 is a linkability risk if clients mistakenly use address validation tokens after
 unknowingly moving to a new location.
 
-The recommendations in {{connection-resume-and-0-rtt}} mitigates
+The recommendations in {{using-0-rtt-and-session-resumption}} mitigates
 this risk by tying the usage of the NEW TOKEN to that of session resumption.
 
 ## Traffic Analysis
@@ -834,7 +839,7 @@ This document liberally borrows text from the HTTP-3 specification
 {{?RFC7858}} authored by Zi Hu, Liang Zhu, John Heidemann, Allison Mankin,
 Duane Wessels, and Paul Hoffman.
 
-The privacy issue with 0-RTT data and session resume were analyzed by Daniel
+The privacy issue with 0-RTT data and session resumption were analyzed by Daniel
 Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working group {{DNS0RTT}}.
 
 Thanks to Tony Finch for an extensive review of the initial version of this
