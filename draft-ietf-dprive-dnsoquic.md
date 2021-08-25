@@ -105,7 +105,7 @@ The specific non-goals of this document are:
 1.  No attempt is made to evade potential blocking of DNS over QUIC
     traffic by middleboxes.
 
-3. No attempt to support server initiated transactions, which are used only in 
+2. No attempt to support server initiated transactions, which are used only in 
    DNS Stateful Operations (DSO) {{?RFC8490}}.
 
 Specifying the transmission of an application over QUIC requires specifying how
@@ -416,6 +416,12 @@ an Extended DNS Error Code (EDE) "Too Early", see
 {{reservation-of-extended-dns-error-code-too-early}}.
 * Close the connection with the error code DOQ_PROTOCOL_ERROR.
 
+For the zone transfer scenario, it would be possible to replay an XFR QUERY
+that had been sent in 0-RTT data. However the authentication mechanisms described
+in RFC9103 ("Zone transfer over TLS") will ensure that the response is not sent by 
+the primary until the identity of the secondary has been verified i.e. the first
+behavior listed above.
+
 ## Message Sizes
 
 DoQ Queries and Responses are sent on QUIC streams, which in theory can carry
@@ -695,7 +701,7 @@ These issues are developed in {{privacy-issues-with-0-rtt-data}} and
 The 0-RTT data can be replayed by adversaries. That data may trigger queries by
 a recursive resolver to authoritative resolvers. Adversaries may be able to
 pick a time at which the recursive resolver outgoing traffic is observable, and
-thus find out what name was queried for in the 0-RTT data.
+thus find out what name was queried for in the 0-RTT data. 
 
 This risk is in fact a subset of the general problem of observing the behavior
 of the recursive resolver discussed in "DNS Privacy Considerations"
@@ -727,6 +733,11 @@ the case of DNS over QUIC, the protection against replay attacks on the
 DNS cache is achieved if this state is shared between all servers
 that share the same DNS cache.
 
+The attacks described above apply to the stub resolver to recursive
+resolver scenario, but similar attacks might be envisaged in the
+recursive resolver to authoritative resolver scenario, and the
+same mitigations apply.
+
 ## Privacy Issues With Session Resumption
 
 The QUIC session resumption mechanism reduces the cost of re-establishing sessions
@@ -746,6 +757,18 @@ The recommendations in {{using-0-rtt-and-session-resumption}} are designed to
 mitigate these risks. Using session tickets only once mitigates
 the risk of tracking by third parties. Refusing to resume a session if addresses
 change mitigates the risk of tracking by the server.
+
+The privacy trade-offs here may be context specific. Stub resolvers will have a strong
+motivation to prefer privacy over latency since they often change location. However,
+recursive resolvers that use a small set of static IP addresses are more likely to prefer the reduced
+latency provided by session resumption and may consider this a valid reason to use
+resumption tickets even if the IP address changed between sessions.
+
+Encrypted zone transfer (RFC9103) explicitly does
+not attempt to hide the identity of the parties involved in the transfer, but at the
+same time such transfers are not particularly latency sensitive. This means that
+applications supporting zone transfers may decide to apply the same
+protections as stub to recursive applications.
 
 ## Privacy Issues With New Tokens
 
