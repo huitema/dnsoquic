@@ -308,17 +308,17 @@ DOQ_NO_ERROR (0x00):
 : No error.  This is used when the connection or stream needs to be closed, but
   there is no error to signal.
 
-DOQ_REQUEST_CANCELLED (0x01):
-: A DoQ client uses this to signal that it wants to cancel an 
-outstanding transaction.
-
-DOQ_INTERNAL_ERROR (0x02):
+DOQ_INTERNAL_ERROR (0x01):
 : The DoQ implementation encountered an internal error and is incapable of
   pursuing the transaction or the connection.
 
-DOQ_PROTOCOL_ERROR (0x03):
+DOQ_PROTOCOL_ERROR (0x02):
 : The DoQ implementation encountered an protocol error and is forcibly aborting 
   the connection.
+
+DOQ_REQUEST_CANCELLED (0x03):
+: A DoQ client uses this to signal that it wants to cancel an 
+outstanding transaction.
 
 ### Transaction Cancellation
 
