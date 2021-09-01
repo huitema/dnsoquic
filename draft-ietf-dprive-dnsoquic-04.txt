@@ -5,10 +5,10 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                            S. Dickinson
-Expires: January 14, 2022                                     Sinodun IT
+Expires: 5 March 2022                                         Sinodun IT
                                                                A. Mankin
                                                               Salesforce
-                                                           July 13, 2021
+                                                        1 September 2021
 
 
           Specification of DNS over Dedicated QUIC Connections
@@ -39,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 14, 2022.
+   This Internet-Draft will expire on 5 March 2022.
 
 Copyright Notice
 
@@ -47,22 +47,21 @@ Copyright Notice
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
-   Provisions Relating to IETF Documents
-   (https://trustee.ietf.org/license-info) in effect on the date of
-   publication of this document.  Please review these documents
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
 
 
 
-Huitema, et al.         Expires January 14, 2022                [Page 1]
+Huitema, et al.           Expires 5 March 2022                  [Page 1]
 
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
-   carefully, as they describe your rights and restrictions with respect
-   to this document.  Code Components extracted from this document must
-   include Simplified BSD License text as described in Section 4.e of
-   the Trust Legal Provisions and are provided without warranty as
-   described in the Simplified BSD License.
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Simplified BSD License text
+   as described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Simplified BSD License.
 
 Table of Contents
 
@@ -70,58 +69,63 @@ Table of Contents
    2.  Key Words . . . . . . . . . . . . . . . . . . . . . . . . . .   4
    3.  Document work via GitHub  . . . . . . . . . . . . . . . . . .   4
    4.  Design Considerations . . . . . . . . . . . . . . . . . . . .   4
-     4.1.  Provide DNS Privacy . . . . . . . . . . . . . . . . . . .   4
+     4.1.  Provide DNS Privacy . . . . . . . . . . . . . . . . . . .   5
      4.2.  Design for Minimum Latency  . . . . . . . . . . . . . . .   5
      4.3.  No Specific Middlebox Bypass Mechanism  . . . . . . . . .   6
      4.4.  No Server Initiated Transactions  . . . . . . . . . . . .   6
    5.  Specifications  . . . . . . . . . . . . . . . . . . . . . . .   6
      5.1.  Connection Establishment  . . . . . . . . . . . . . . . .   6
        5.1.1.  Draft Version Identification  . . . . . . . . . . . .   6
-       5.1.2.  Port Selection  . . . . . . . . . . . . . . . . . . .   6
+       5.1.2.  Port Selection  . . . . . . . . . . . . . . . . . . .   7
      5.2.  Stream Mapping and Usage  . . . . . . . . . . . . . . . .   7
        5.2.1.  DNS Message IDs . . . . . . . . . . . . . . . . . . .   8
      5.3.  DoQ Error Codes . . . . . . . . . . . . . . . . . . . . .   8
-       5.3.1.  Transaction Errors  . . . . . . . . . . . . . . . . .   8
-       5.3.2.  Protocol Errors . . . . . . . . . . . . . . . . . . .   8
-     5.4.  Connection Management . . . . . . . . . . . . . . . . . .   9
-     5.5.  Connection Resume and 0-RTT . . . . . . . . . . . . . . .  10
-     5.6.  Message Sizes . . . . . . . . . . . . . . . . . . . . . .  10
-   6.  Implementation Requirements . . . . . . . . . . . . . . . . .  11
-     6.1.  Authentication  . . . . . . . . . . . . . . . . . . . . .  11
-     6.2.  Fall Back to Other Protocols on Connection Failure  . . .  11
-     6.3.  Address Validation  . . . . . . . . . . . . . . . . . . .  11
-     6.4.  Padding . . . . . . . . . . . . . . . . . . . . . . . . .  12
-     6.5.  Connection Handling . . . . . . . . . . . . . . . . . . .  12
-       6.5.1.  Connection Reuse  . . . . . . . . . . . . . . . . . .  12
-       6.5.2.  Resource Management and Idle Timeout Values . . . . .  13
-     6.6.  Processing Queries in Parallel  . . . . . . . . . . . . .  13
-     6.7.  Zone transfer . . . . . . . . . . . . . . . . . . . . . .  14
-     6.8.  Flow Control Mechanisms . . . . . . . . . . . . . . . . .  14
-   7.  Implementation Status . . . . . . . . . . . . . . . . . . . .  14
-     7.1.  Performance Measurements  . . . . . . . . . . . . . . . .  15
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
-   9.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  16
-     9.1.  Privacy Issues With 0-RTT data  . . . . . . . . . . . . .  16
-     9.2.  Privacy Issues With Session Resume  . . . . . . . . . . .  16
-     9.3.  Traffic Analysis  . . . . . . . . . . . . . . . . . . . .  17
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
-     10.1.  Registration of DoQ Identification String  . . . . . . .  17
+       5.3.1.  Transaction Cancellation  . . . . . . . . . . . . . .   9
+       5.3.2.  Transaction Errors  . . . . . . . . . . . . . . . . .   9
+       5.3.3.  Protocol Errors . . . . . . . . . . . . . . . . . . .   9
+     5.4.  Connection Management . . . . . . . . . . . . . . . . . .  10
+     5.5.  Session Resumption and 0-RTT  . . . . . . . . . . . . . .  11
+     5.6.  Message Sizes . . . . . . . . . . . . . . . . . . . . . .  12
+   6.  Implementation Requirements . . . . . . . . . . . . . . . . .  12
+     6.1.  Authentication  . . . . . . . . . . . . . . . . . . . . .  12
+     6.2.  Fall Back to Other Protocols on Connection Failure  . . .  12
+     6.3.  Address Validation  . . . . . . . . . . . . . . . . . . .  13
+     6.4.  Padding . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     6.5.  Connection Handling . . . . . . . . . . . . . . . . . . .  14
+       6.5.1.  Connection Reuse  . . . . . . . . . . . . . . . . . .  14
+       6.5.2.  Resource Management and Idle Timeout Values . . . . .  14
+       6.5.3.  Using 0-RTT and Session Resumption  . . . . . . . . .  15
+     6.6.  Processing Queries in Parallel  . . . . . . . . . . . . .  15
+     6.7.  Zone transfer . . . . . . . . . . . . . . . . . . . . . .  16
+     6.8.  Flow Control Mechanisms . . . . . . . . . . . . . . . . .  16
+   7.  Implementation Status . . . . . . . . . . . . . . . . . . . .  17
+     7.1.  Performance Measurements  . . . . . . . . . . . . . . . .  18
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
+   9.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  18
+     9.1.  Privacy Issues With 0-RTT data  . . . . . . . . . . . . .  19
+     9.2.  Privacy Issues With Session Resumption  . . . . . . . . .  20
+     9.3.  Privacy Issues With New Tokens  . . . . . . . . . . . . .  20
+     9.4.  Traffic Analysis  . . . . . . . . . . . . . . . . . . . .  21
 
 
 
-Huitema, et al.         Expires January 14, 2022                [Page 2]
+Huitema, et al.           Expires 5 March 2022                  [Page 2]
 
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
-     10.2.  Reservation of Dedicated Port  . . . . . . . . . . . . .  17
-       10.2.1.  Port number 784 for experimentations . . . . . . . .  18
-   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  18
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  19
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  20
-     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  21
+     10.1.  Registration of DoQ Identification String  . . . . . . .  21
+     10.2.  Reservation of Dedicated Port  . . . . . . . . . . . . .  21
+       10.2.1.  Port number 784 for experimentations . . . . . . . .  22
+     10.3.  Reservation of Extended DNS Error Code Too Early . . . .  22
+     10.4.  DNS over QUIC Error Codes Registry . . . . . . . . . . .  22
+   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  24
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  24
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  26
+   Appendix A.  The NOTIFY service . . . . . . . . . . . . . . . . .  28
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
 
 1.  Introduction
 
@@ -153,22 +157,24 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    In order to achieve these goals, and to support ongoing work on
    encryption of DNS, the scope of this document includes
 
-   o  the "stub to recursive resolver" scenario
+   *  the "stub to recursive resolver" scenario
 
-   o  the "recursive resolver to authoritative nameserver" scenario and
+   *  the "recursive resolver to authoritative nameserver" scenario and
 
-   o  the "nameserver to nameserver" scenario (mainly used for zone
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                  [Page 3]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   *  the "nameserver to nameserver" scenario (mainly used for zone
       transfers (XFR) [RFC1995], [RFC5936]).
 
    In other words, this document is intended to specify QUIC as a
    general purpose transport for DNS.
-
-
-
-Huitema, et al.         Expires January 14, 2022                [Page 3]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
 
    The specific non-goals of this document are:
 
@@ -209,6 +215,17 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    This section and its subsections present the design guidelines that
    were used for DoQ.  This section is informative in nature.
 
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                  [Page 4]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
 4.1.  Provide DNS Privacy
 
    DoT [RFC7858] defines how to mitigate some of the issues described in
@@ -217,14 +234,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    over DTLS" [RFC8310] specify Strict and Opportunistic Usage Profiles
    for DoT including how stub resolvers can authenticate recursive
    resolvers.
-
-
-
-
-Huitema, et al.         Expires January 14, 2022                [Page 4]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
 
    QUIC connection setup includes the negotiation of security parameters
    using TLS, as specified in "Using TLS to Secure QUIC" [RFC9001],
@@ -265,22 +274,20 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    4.  Mapping of each DNS Query/Response transaction to a separate
        stream, to mitigate head-of-line blocking.  This enables servers
        to respond to queries "out of order".  It also enables clients to
+
+
+
+Huitema, et al.           Expires 5 March 2022                  [Page 5]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
        process responses as soon as they arrive, without having to wait
        for in order delivery of responses previously posted by the
        server.
 
    These considerations will be reflected in the mapping of DNS traffic
    to QUIC streams in Section 5.2.
-
-
-
-
-
-
-Huitema, et al.         Expires January 14, 2022                [Page 5]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
 
 4.3.  No Specific Middlebox Bypass Mechanism
 
@@ -293,8 +300,12 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
 4.4.  No Server Initiated Transactions
 
    As stated in Section 1, this document does not specify support for
-   server initiated transactions.  DSO is only applicable for DNS over
-   TCP and DNS over TLS.  DSO is not applicable to DNS over HTTP since
+   server initiated transactions within established DoQ connections.
+   That is, only the initiator of the DoQ connection may send queries
+   over the connection.
+
+   DSO supports server-initiated transactions within existing
+   connections, however DSO is not applicable to DNS over HTTP since
    HTTP has its own mechanism for managing sessions, and this is
    incompatible with the DSO; the same is true for DoQ.
 
@@ -319,6 +330,14 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    example, draft-ietf-dprive-dnsoquic-00 is identified using the string
    "doq-i00".
 
+
+
+
+Huitema, et al.           Expires 5 March 2022                  [Page 6]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
 5.1.2.  Port Selection
 
    By default, a DNS server that supports DoQ MUST listen for and accept
@@ -330,14 +349,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
 
    By default, a DNS client desiring to use DoQ with a particular server
    MUST establish a QUIC connection to UDP port TBD on the server,
-
-
-
-Huitema, et al.         Expires January 14, 2022                [Page 6]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    unless it has mutual agreement with its server to use a port other
    than port TBD for DoQ.  Such another port MUST NOT be port 53.  This
    recommendation against use of port 53 for DoQ is to avoid confusion
@@ -374,6 +385,15 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    indicate through the STREAM FIN mechanism that no further data will
    be sent on that stream.
 
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                  [Page 7]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
    The server MUST send the response(s) on the same stream and MUST
    indicate, after the last response, through the STREAM FIN mechanism
    that no further data will be sent on that stream.
@@ -386,14 +406,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    specification proposed a simpler mapping scheme which omitted the 2
    byte length field and supported only a single response on a given
    stream.  The more complex mapping above was adopted to specifically
-
-
-
-Huitema, et al.         Expires January 14, 2022                [Page 7]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    cater for XFR support, however it breaks compatibility with earlier
    versions.
 
@@ -419,10 +431,46 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
       internal error and is incapable of pursuing the transaction or the
       connection.
 
-   DOQ_PROTOCOL_ERROR (0x01):  The DoQ implementation encountered an
+   DOQ_PROTOCOL_ERROR (0x02):  The DoQ implementation encountered an
       protocol error and is forcibly aborting the connection.
 
-5.3.1.  Transaction Errors
+   DOQ_REQUEST_CANCELLED (0x03):  A DoQ client uses this to signal that
+      it wants to cancel an outstanding transaction.
+
+
+
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                  [Page 8]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+5.3.1.  Transaction Cancellation
+
+   In QUIC, sending STOP_SENDING requests that a peer cease transmission
+   on a stream.  If a DoQ client wishes to cancel an outstanding
+   request, it MUST issue a QUIC Stop Sending with error code
+   DOQ_REQUEST_CANCELLED.  This may be sent at any time but will be
+   ignored if the server has already sent the response.  The
+   corresponding DNS transaction MUST be abandoned.
+
+   A server that receives STOP_SENDING MUST issue a RESET_STREAM with
+   error code DOQ_REQUEST_CANCELLED, unless it has already sent a
+   complete response in which case it MAY ignore the STOP_SENDING
+   request.  Servers MAY limit the number of DOQ_REQUEST_CANCELLED
+   errors received on a connection before choosing to close the
+   connection.
+
+   Note that this mechanism provides a way for secondaries to cancel a
+   single zone transfer occurring on a given stream without having to
+   close the QUIC connection.
+
+5.3.2.  Transaction Errors
 
    Servers normally complete transactions by sending a DNS response (or
    responses) on the transaction's stream, including cases where the DNS
@@ -431,41 +479,48 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    back a response with the Response Code set to SERVFAIL.
 
    If a server is incapable of sending a DNS response due to an internal
-   error, it may issue a QUIC Stream Reset with error code
-   DOQ_INTERNAL_ERROR.  The corresponding transaction MUST be abandoned.
+   error, it SHOULD issue a QUIC Stream Reset with error code
+   DOQ_INTERNAL_ERROR.  The corresponding DNS transaction MUST be
+   abandoned.  Clients MAY limit the number of unsolicited QUIC Stream
+   Resets received on a connection before choosing to close the
+   connection.
 
-5.3.2.  Protocol Errors
+   Note that this mechanism provides a way for primaries to abort a
+   single zone transfer occurring on a given stream without having to
+   close the QUIC connection.
+
+5.3.3.  Protocol Errors
 
    Other error scenarios can occur due to malformed, incomplete or
    unexpected messages during a transaction.  These include (but are not
    limited to)
 
-   o  a client or server receives a message with a non-zero Message ID
+   *  a client or server receives a message with a non-zero Message ID
 
 
 
 
-Huitema, et al.         Expires January 14, 2022                [Page 8]
+
+Huitema, et al.           Expires 5 March 2022                  [Page 9]
 
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
-   o  a client or server receives a STREAM FIN before receiving all the
+   *  a client or server receives a STREAM FIN before receiving all the
       bytes for a message indicated in the 2-octet length field
 
-   o  a client receives a STREAM FIN before receiving all the expected
+   *  a client receives a STREAM FIN before receiving all the expected
       responses
 
-   o  a server receives more than one query on a stream
+   *  a server receives more than one query on a stream
 
-   o  a client receives a different number of responses on a stream than
+   *  a client receives a different number of responses on a stream than
       expected (e.g. multiple responses to a query for an A record)
 
-   o  an implementation receives a message containing the edns-tcp-
-      keepalive EDNS(0) Option [RFC7828] (see Section 6.5.2)
+   *  a client receives a STOP_SENDING request
 
-   o  an implementation receives a message containing the EDNS(0)
-      Padding Option [RFC7830] (see Section 6.4)
+   *  an implementation receives a message containing the edns-tcp-
+      keepalive EDNS(0) Option [RFC7828] (see Section 6.5.2)
 
    If a peer encounters such an error condition it is considered a fatal
    error.  It SHOULD forcibly abort the connection using QUIC's
@@ -480,11 +535,11 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    Section 10 of the QUIC transport specification [RFC9000] specifies
    that connections can be closed in three ways:
 
-   o  idle timeout
+   *  idle timeout
 
-   o  immediate close
+   *  immediate close
 
-   o  stateless reset
+   *  stateless reset
 
    Clients and servers implementing DoQ SHOULD negotiate use of the idle
    timeout.  Closing on idle timeout is done without any packet
@@ -494,18 +549,23 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    endpoints.  Practical considerations on setting the idle timeout are
    discussed in Section 6.5.2.
 
+
+
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 10]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
    Clients SHOULD monitor the idle time incurred on their connection to
    the server, defined by the time spent since the last packet from the
    server has been received.  When a client prepares to send a new DNS
    query to the server, it will check whether the idle time is
-
-
-
-Huitema, et al.         Expires January 14, 2022                [Page 9]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    sufficient lower than the idle timer.  If it is, the client will send
    the DNS query over the existing connection.  If not, the client will
    establish a new connection and send the query over that connection.
@@ -523,19 +583,47 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    and a Server Failure (SERVFAIL, [RFC1035]) SHOULD be notified to the
    initiator of the transaction.
 
-5.5.  Connection Resume and 0-RTT
+5.5.  Session Resumption and 0-RTT
 
-   A client MAY take advantage of the connection resume mechanisms
+   A client MAY take advantage of the session resumption mechanisms
    supported by QUIC transport [RFC9000] and QUIC TLS [RFC9001].
    Clients SHOULD consider potential privacy issues associated with
-   session resume before deciding to use this mechanism.  These privacy
-   issues are detailed in Section 9.2.
+   session resumption before deciding to use this mechanism.  These
+   privacy issues are detailed in Section 9.2 and Section 9.1, and the
+   implementation considerations are discussed in Section 6.5.3.
 
-   When resuming a session, a client MAY take advantage of the 0-RTT
-   mechanism supported by QUIC.  The 0-RTT mechanism MUST NOT be used to
-   send data that is not "replayable" transactions.  For example, a
-   client MAY transmit a Query as 0-RTT, but MUST NOT transmit an
-   Update.
+   The 0-RTT mechanism SHOULD NOT be used to send DNS requests that are
+   not "replayable" transactions.  Our analysis so far shows that such
+   replayable transactions can only be QUERY requests, although we may
+   need to also consider NOTIFY requests once the analysis of NOTIFY
+   services is complete, see Appendix A.
+
+   Servers MUST NOT execute non replayable transactions received in
+   0-RTT data.  Servers MUST adopt one of the following behaviors:
+
+   *  Queue the offending transaction and only execute it after the QUIC
+      handshake has been completed, as defined in section 4.1.1 of
+      [RFC9001].
+
+   *  Reply to the offending transaction with a response code REFUSED
+      and an Extended DNS Error Code (EDE) "Too Early", see
+      Section 10.3.
+
+   *  Close the connection with the error code DOQ_PROTOCOL_ERROR.
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 11]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   For the zone transfer scenario, it would be possible to replay an XFR
+   QUERY that had been sent in 0-RTT data.  However the authentication
+   mechanisms described in RFC9103 ("Zone transfer over TLS") will
+   ensure that the response is not sent by the primary until the
+   identity of the secondary has been verified i.e. the first behavior
+   listed above.
 
 5.6.  Message Sizes
 
@@ -546,28 +634,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    TCP [RFC1035] and DNS over TLS [RFC7858], and by the definition of
    the "application/dns-message" for DNS over HTTP [RFC8484].  DoQ
    enforces the same restriction.
-
-   The flow control mechanisms of QUIC control how much data can be sent
-   by QUIC nodes at a given time.  The initial values of per stream flow
-   control parameters is defined by two transport parameters:
-
-   o  initial_max_stream_data_bidi_local: when set by the client,
-      specifies the amount of data that servers can send on a "response"
-      stream without waiting for a MAX_STREAM_DATA frame.
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 10]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
-   o  initial_max_stream_data_bidi_remote: when set by the server,
-      specifies the amount of data that clients can send on a "query"
-      stream without waiting for a MAX_STREAM_DATA frame.
-
-   For better performance, it is RECOMMENDED that clients and servers
-   set each of these two parameters to a value of 65535 or greater.
 
    The Extension Mechanisms for DNS (EDNS) [RFC6891] allow peers to
    specify the UDP message size.  This parameter is ignored by DoQ.  DoQ
@@ -584,7 +650,7 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    need to authenticate the client's identity in either scenario.
 
    For zone transfer, the requirements are the same as described in
-   [I-D.ietf-dprive-xfr-over-tls].
+   [RFC9103].
 
    For the recursive resolver to authoritative nameserver scenario,
    authentication requirements are unspecified at the time of writing
@@ -600,6 +666,14 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    DNS clients SHOULD remember server IP addresses that don't support
    DoQ, including timeouts, connection refusals, and QUIC handshake
    failures, and not request DoQ from them for a reasonable period (such
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 12]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
    as one hour per server).  DNS clients following an out-of-band key-
    pinned privacy profile ([RFC7858]) MAY be more aggressive about
    retrying DoQ connection failures.
@@ -609,15 +683,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    Section 8 of the QUIC transport specification [RFC9000] defines
    Address Validation procedures to avoid servers being used in address
    amplification attacks.  DoQ implementations MUST conform to this
-
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 11]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    specification, which limits the worst case amplification to a factor
    3.
 
@@ -638,18 +703,38 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
 
 6.4.  Padding
 
-   There are mechanisms specified for padding individual DNS messages in
-   "The EDNS(0) Padding Option" [RFC7830] and for padding within QUIC
-   packets (see Section 8.6 of the QUIC transport specification
-   [RFC9000]).
+   Implementations SHOULD protect against the traffic analysis attacks
+   described in Section 9.4 by the judicious injection of padding.  This
+   could be done either by padding individual DNS messages using the
+   EDNS(0) Padding Option [RFC7830] and by padding QUIC packets (see
+   Section 8.6 of the QUIC transport specification [RFC9000]).
 
-   Implementations MUST NOT use DNS options for padding individual DNS
-   messages, because QUIC transport MAY transmit multiple STREAM frames
-   containing separate DNS messages in a single QUIC packet.  Instead,
-   implementations SHOULD use QUIC PADDING frames to align the packet
-   length to a small set of fixed sizes, aligned with the
-   recommendations of the "Padding Policies for Extension Mechanisms for
-   DNS (EDNS(0))" [RFC8467].
+   In theory, padding at the QUIC level could result in better
+   performance for the equivalent protection, because the amount of
+   padding can take into account non-DNS frames such as acknowledgeemnts
+   or flow control updates, and also because QUIC packets can carry
+   multiple DNS messages.  However, applications can only control the
+   amount of padding in QUIC packets if the implementation of QUIC
+   exposes adequate APIs.  This leads to the following recommendation:
+
+   *  if the implementation of QUIC exposes APIs to set a padding
+      policy, DNS over QUIC SHOULD use that API to align the packet
+      length to a small set of fixed sizes, aligned with the
+      recommendations of the "Padding Policies for Extension Mechanisms
+      for DNS (EDNS(0))" [RFC8467].
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 13]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   *  if padding at the QUIC level is not available or not used, DNS
+      over QUIC MUST ensure that all DNS queries and responses are
+      padded to a small set of fixed sizes, using the EDNS padding
+      extension as specified in "Padding Policies for Extension
+      Mechanisms for DNS (EDNS(0))" [RFC8467].
 
 6.5.  Connection Handling
 
@@ -665,15 +750,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    connections, each with a single query, clients SHOULD reuse a single
    QUIC connection to the recursive resolver.
 
-
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 12]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    In order to achieve performance on par with UDP, DNS clients SHOULD
    send their queries concurrently over the QUIC streams on a QUIC
    connection.  That is, when a DNS client sends multiple queries to a
@@ -687,9 +763,9 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    SHOULD follow best practices similar to those specified for DNS over
    TCP [RFC7766], in particular with regard to:
 
-   o  Concurrent Connections (Section 6.2.2)
+   *  Concurrent Connections (Section 6.2.2)
 
-   o  Security Considerations (Section 10)
+   *  Security Considerations (Section 10)
 
    Failure to do so may lead to resource exhaustion and denial of
    service.
@@ -701,16 +777,50 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    on a DoQ connection (because it is specific to the use of TCP/TLS as
    a transport).
 
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 14]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
    This document does not make specific recommendations for timeout
    values on idle connections.  Clients and servers should reuse and/or
    close connections depending on the level of available resources.
    Timeouts may be longer during periods of low activity and shorter
    during periods of high activity.
 
-   Clients that are willing to use QUIC's 0-RTT mechanism can
-   reestablish connections and send transactions on the new connection
-   with minimal delay overhead.  These clients MAY chose low values of
-   the idle timer.
+6.5.3.  Using 0-RTT and Session Resumption
+
+   Using 0-RTT for DNS over QUIC has many compelling advantages.
+   Clients can establish connections and send queries without incurring
+   a connection delay.  Servers can thus negotiate low values of the
+   connection timers, which reduces the total number of connections that
+   they need to manage.  They can do that because the clients that use
+   0-RTT will not incur latency penalties if new connections are
+   required for a query.
+
+   Session resumption and 0-RTT data transmission create privacy risks
+   detailed in detailed in Section 9.2 and Section 9.1.  The following
+   recommendations are meant to reduce the privacy risks while enjoying
+   the performance benefits of 0-RTT data, with the restriction
+   specified in Section 5.5.
+
+   Clients SHOULD use resumption tickets only once, as specified in
+   Appendix C.4 to [RFC8446].  Clients could receive address validation
+   tokens from the server using the NEW TOKEN mechanism; see section 8
+   of [RFC9000].  The associated tracking risks are mentioned in
+   Section 9.3.  Clients SHOULD only use the address validation tokens
+   when they are also using session resumption, thus avoiding additional
+   tracking risks.
+
+   Servers SHOULD issue session resumption tickets with a sufficiently
+   long life time (e.g., 6 hours), so that clients are not tempted to
+   either keep connection alive or frequently poll the server to renew
+   session resumption tickets.  Servers SHOULD implement the anti-replay
+   mechanisms specified in section 8 of [RFC8446].
 
 6.6.  Processing Queries in Parallel
 
@@ -725,44 +835,77 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
 
 
 
-Huitema, et al.         Expires January 14, 2022               [Page 13]
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 15]
 
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 6.7.  Zone transfer
 
-   [I-D.ietf-dprive-xfr-over-tls] specifies zone transfer over TLS (XoT)
-   and includes updates to [RFC1995] (IXFR), [RFC5936] (AXFR) and
-   [RFC7766].  Considerations relating to the re-use of XoT connections
-   described there apply analogously to zone transfers performed using
-   DoQ connections.  For example:
+   [RFC9103] specifies zone transfer over TLS (XoT) and includes updates
+   to [RFC1995] (IXFR), [RFC5936] (AXFR) and [RFC7766].  Considerations
+   relating to the re-use of XoT connections described there apply
+   analogously to zone transfers performed using DoQ connections.  For
+   example:
 
-   o  DoQ servers MUST be able to handle multiple concurrent IXFR
+   *  DoQ servers MUST be able to handle multiple concurrent IXFR
       requests on a single QUIC connection
 
-   o  DoQ servers MUST be able to handle multiple concurrent AXFR
+   *  DoQ servers MUST be able to handle multiple concurrent AXFR
       requests on a single QUIC connection
 
-   o  DoQ implementations SHOULD
+   *  DoQ implementations SHOULD
 
-      *  use the same QUIC connection for both AXFR and IXFR requests to
+      -  use the same QUIC connection for both AXFR and IXFR requests to
          the same primary
 
-      *  pipeline such requests (if they pipeline XFR requests in
+      -  pipeline such requests (if they pipeline XFR requests in
          general) and MAY intermingle them
 
-      *  send the response(s) for each request as soon as they are
-         available i.e.  responses MAY be sent intermingled
+      -  send the response(s) for each request as soon as they are
+         available i.e. responses MAY be sent intermingled
 
 6.8.  Flow Control Mechanisms
 
-   Servers and Clients manage flow control as specified in QUIC.
+   Servers and Clients manage flow control using the mechanisms defined
+   in section 4 of [RFC9000].  These mechanisms allow clients and
+   servers to specify how many streams can be created, how much data can
+   be sent on a stream, and how much data can be sent on the union of
+   all streams.  For DNS over QUIC, controlling how many streams are
+   created allows servers to control how many new requests the client
+   can send on a given connection.
 
-   Servers MAY use the "maximum stream ID" option of the QUIC transport
-   to limit the number of streams opened by the client.  This mechanism
-   will effectively limit the number of DNS queries that a client can
-   send on a single DoQ connection.
+   Flow control exists to protect endpoint resources.  For servers,
+   global and per-stream flow control limits control how much data can
+   be sent by clients.  The same mechanisms allow clients to control how
+   much data can be sent by servers.  Values that are too small will
+   unnecessarily limit performance.  Values that are too large might
+   expose endpoints to overload or memory exhaustion.  Implementations
+   or deployments will need to adjust flow control limits to balance
+   these concerns.  In particular, zone transfer implementations will
+   need to control these limits carefully to ensure both large and
+   concurrent zone transfers are well managed.
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 16]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   Initial values of parameters control how many requests and how much
+   data can be sent by clients and servers at the beginning of the
+   connection.  These values are specified in transport parameters
+   exchanged during the connection handshake.  The parameter values
+   received in the initial connection also control how many requests and
+   how much data can be sent by clients using 0-RTT data in a resumed
+   connection.  Using too small values of these initial parameters would
+   restrict the usefulness of allowing 0-RTT data.
 
 7.  Implementation Status
 
@@ -775,72 +918,68 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
        2020.  They have released a suite of open source tools that
        support DoQ:
 
-       1.  AdGuard C++ DNS libraries [1] A DNS proxy library that
-           supports all existing DNS protocols including DNS-over-TLS,
-           DNS-over-HTTPS, DNSCrypt and DNS-over-QUIC (experimental).
+       1.  AdGuard C++ DNS libraries (https://github.com/AdguardTeam/
+           DnsLibs) A DNS proxy library that supports all existing DNS
+           protocols including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt
+           and DNS-over-QUIC (experimental).
 
+       2.  DNS Proxy (https://github.com/AdguardTeam/dnsproxy) A simple
+           DNS proxy server that supports all existing DNS protocols
+           including DNS-over-TLS, DNS-over-HTTPS, DNSCrypt, and DNS-
+           over-QUIC.  Moreover, it can work as a DNS-over-HTTPS, DNS-
+           over-TLS or DNS-over-QUIC server.
 
+       3.  CoreDNS fork for AdGuard DNS (https://github.com/AdguardTeam/
+           coredns) Includes DNS-over-QUIC server-side support.
 
-Huitema, et al.         Expires January 14, 2022               [Page 14]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+       4.  dnslookup (https://github.com/ameshkov/dnslookup) Simple
+           command line utility to make DNS lookups.  Supports all known
+           DNS protocols: plain DNS, DoH, DoT, DoQ, DNSCrypt.
 
+   2.  Quicdoq (https://github.com/private-octopus/quicdoq) Quicdoq is a
+       simple open source implementation of DoQ.  It is written in C,
+       based on Picoquic (https://github.com/private-octopus/picoquic).
 
-       2.  DNS Proxy [2] A simple DNS proxy server that supports all
-           existing DNS protocols including DNS-over-TLS, DNS-over-
-           HTTPS, DNSCrypt, and DNS-over-QUIC.  Moreover, it can work as
-           a DNS-over-HTTPS, DNS-over-TLS or DNS-over-QUIC server.
-
-       3.  CoreDNS fork for AdGuard DNS [3] Includes DNS-over-QUIC
-           server-side support.
-
-       4.  dnslookup [4] Simple command line utility to make DNS
-           lookups.  Supports all known DNS protocols: plain DNS, DoH,
-           DoT, DoQ, DNSCrypt.
-
-   2.  Quicdoq [5] Quicdoq is a simple open source implementation of
-       DoQ.  It is written in C, based on Picoquic [6].
-
-   3.  Flamethrower [7] is an open source DNS performance and functional
+   3.  Flamethrower (https://github.com/DNS-OARC/flamethrower/tree/dns-
+       over-quic) is an open source DNS performance and functional
        testing utility written in C++ that has an experimental
        implementation of DoQ.
 
-   4.  aioquic [8] is an implementation of QUIC in Python.  It includes
-       example client and server for DoQ.
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 17]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   4.  aioquic (https://github.com/aiortc/aioquic) is an implementation
+       of QUIC in Python.  It includes example client and server for
+       DoQ.
 
 7.1.  Performance Measurements
 
    To our knowledge, no benchmarking studies comparing DoT, DoH and DoQ
    are published yet.  However anecdotal evidence from the AdGuard DoQ
-   recursive resolver deployment [9] indicates that it performs well
-   compared to the other encrypted protocols, particularly in mobile
-   environments.  Reasons given for this include that DoQ
+   recursive resolver deployment (https://adguard.com/en/blog/dns-over-
+   quic.html) indicates that it performs well compared to the other
+   encrypted protocols, particularly in mobile environments.  Reasons
+   given for this include that DoQ
 
-   o  Uses less bandwidth due to a more efficient handshake (and due to
+   *  Uses less bandwidth due to a more efficient handshake (and due to
       less per message overhead when compared to DoH).
 
-   o  Performs better in mobile environments due to the increased
+   *  Performs better in mobile environments due to the increased
       resilience to packet loss
 
-   o  Can maintain connections as users move between mobile networks via
+   *  Can maintain connections as users move between mobile networks via
       its connection management
 
 8.  Security Considerations
 
    The security considerations of DoQ should be comparable to those of
    DoT [RFC7858].
-
-
-
-
-
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 15]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
 
 9.  Privacy Considerations
 
@@ -856,10 +995,20 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    1.  Adversaries could replay the 0-RTT data and infer its content
        from the behavior of the receiving server.
 
-   2.  The 0-RTT mechanism relies on TLS resume, which can provide
-       linkability between successive client sessions.
+   2.  The 0-RTT mechanism relies on TLS session resumption, which can
+       provide linkability between successive client sessions.
 
    These issues are developed in Section 9.1 and Section 9.2.
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 18]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
 
 9.1.  Privacy Issues With 0-RTT data
 
@@ -878,42 +1027,105 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
 
    The recommendation for TLS 1.3 [RFC8446] is that the capability to
    use 0-RTT data should be turned off by default, and only enabled if
-   the user clearly understands the associated risks.
+   the user clearly understands the associated risks.  In our case,
+   allowing 0-RTT data provides significant performance gains, and we
+   are concerned that a recommendation to not use it would simply be
+   ignored.  Instead, we provide a set of practical recommendations in
+   Section 5.5 and Section 6.5.3.
 
-   QUESTION: Should 0-RTT only be used with Opportunistic profiles (i.e.
-   disabled by default for Strict only)?
+   The prevention on allowing replayable transactions in 0-RTT data
+   expressed in Section 5.5 blocks the most obvious risks of replay
+   attacks, as it only allows for transactions that will not change the
+   long term state of the server.
 
-9.2.  Privacy Issues With Session Resume
+   Attacks trying to assess the state of the cache are more powerful if
+   the attacker can choose the time at which the 0-RTT data will be
+   replayed.  Such attacks are blocked if the server enforces single-use
+   tickets, or if the server implements a combination of Client Hello
+   recording and freshness checks, as specified in section 8 of
+   [RFC8446].  These blocking mechanisms rely on shared state between
+   all server instances in a server system.  In the case of DNS over
+   QUIC, the protection against replay attacks on the DNS cache is
+   achieved if this state is shared between all servers that share the
+   same DNS cache.
 
-   The QUIC session resume mechanism reduces the cost of re-establishing
-   sessions and enables 0-RTT data.  There is a linkability issue
-   associated with session resume, if the same resume token is used
-   several times, but this risk is mitigated by the mechanisms
-   incorporated in QUIC and in TLS 1.3.  With these mechanisms, clients
+   The attacks described above apply to the stub resolver to recursive
+   resolver scenario, but similar attacks might be envisaged in the
+   recursive resolver to authoritative resolver scenario, and the same
+   mitigations apply.
 
 
 
-Huitema, et al.         Expires January 14, 2022               [Page 16]
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 19]
 
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
-   and servers can cooperate to avoid linkability by third parties.
-   However, the server will always be able to link the resumed session
-   to the initial session.  This creates a virtual long duration
-   session.  The series of queries in that session can be used by the
-   server to identify the client.
+9.2.  Privacy Issues With Session Resumption
 
-   Enabling the server to link client sessions through session resume is
-   probably not a large additional risk if the client's connectivity did
-   not change between the sessions, since the two sessions can probably
-   be correlated by comparing the IP addresses.  On the other hand, if
-   the addresses did change, the client SHOULD consider whether the
-   linkability risk exceeds the performance benefits.  This evaluation
-   will obviously depend on the level of trust between client and
-   server.
+   The QUIC session resumption mechanism reduces the cost of re-
+   establishing sessions and enables 0-RTT data.  There is a linkability
+   issue associated with session resumption, if the same resumption
+   token is used several times.  Attackers on path between client and
+   server could observe repeated usage of the token and use that to
+   track the client over time or over multiple locations.
 
-9.3.  Traffic Analysis
+   The session resumption mechanism allows servers to correlate the
+   resumed sessions with the initial sessions, and thus to track the
+   client.  This creates a virtual long duration session.  The series of
+   queries in that session can be used by the server to identify the
+   client.  Servers can most probably do that already if the client
+   address remains constant, but session resumption tickets also enable
+   tracking after changes of the client's address.
+
+   The recommendations in Section 6.5.3 are designed to mitigate these
+   risks.  Using session tickets only once mitigates the risk of
+   tracking by third parties.  Refusing to resume a session if addresses
+   change mitigates the risk of tracking by the server.
+
+   The privacy trade-offs here may be context specific.  Stub resolvers
+   will have a strong motivation to prefer privacy over latency since
+   they often change location.  However, recursive resolvers that use a
+   small set of static IP addresses are more likely to prefer the
+   reduced latency provided by session resumption and may consider this
+   a valid reason to use resumption tickets even if the IP address
+   changed between sessions.
+
+   Encrypted zone transfer (RFC9103) explicitly does not attempt to hide
+   the identity of the parties involved in the transfer, but at the same
+   time such transfers are not particularly latency sensitive.  This
+   means that applications supporting zone transfers may decide to apply
+   the same protections as stub to recursive applications.
+
+9.3.  Privacy Issues With New Tokens
+
+   QUIC specifies address validation mechanisms in section 8 of
+   [RFC9000].  Use of an address validation token allows QUIC servers to
+   avoid an extra RTT for new connections.  Address validation tokens
+   are typically tied to an IP address.  QUIC clients normally only use
+   these tokens when setting a new connection from a previously used
+   address.  However, due to the prevalence of NAT, clients are not
+   always aware that they are using a new address.  There is a
+   linkability risk if clients mistakenly use address validation tokens
+   after unknowingly moving to a new location.
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 20]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   The recommendations in Section 6.5.3 mitigates this risk by tying the
+   usage of the NEW TOKEN to that of session resumption.
+
+9.4.  Traffic Analysis
 
    Even though QUIC packets are encrypted, adversaries can gain
    information from observing packet lengths, in both queries and
@@ -946,14 +1158,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    Port 853 is currently reserved for 'DNS query-response protocol run
    over TLS/DTLS' [RFC7858].  However, the specification for DNS over
    DTLS (DoD) [RFC8094] is experimental, limited to stub to resolver,
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 17]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    and no implementations or deployments currently exist to our
    knowledge (even though several years have passed since the
    specification was published).
@@ -962,6 +1166,17 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    853 for DoQ.  QUIC was designed to be able to co-exist with other
    protocols on the same port, including DTLS , see Section 17.2 in
    [RFC9000].
+
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 21]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
 
    IANA is requested to add the following value to the "Service Name and
    Transport Protocol Port Number Registry" in the System Range.  The
@@ -985,6 +1200,114 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    (Note that version in -02 of this draft experiments were directed to
    use port 8853.)
 
+10.3.  Reservation of Extended DNS Error Code Too Early
+
+   IANA is requested to add the following value to the Extended DNS
+   Error Codes registry [RFC8914]:
+
+      INFO-CODE              TBD
+      Purpose                Too Early
+      Reference              This document
+
+10.4.  DNS over QUIC Error Codes Registry
+
+   IANA [SHALL add/has added] a registry for "DNS over QUIC Error Codes"
+   on the "Domain Name System (DNS) Parameters" web page.
+
+   The "DNS over QUIC Error Codes" registry governs a 62-bit space.
+   This space is split into three regions that are governed by different
+   policies.  Permanent registrations in this registry are assigned
+   using the Specification Required policy ([RFC8126]), except for
+   values between 0x00 and 0x3f (in hexadecimal; inclusive), which are
+   assigned using Standards Action or IESG Approval as defined in
+   Section 4.9 and 4.10 of [RFC8126].
+
+   Provisional registrations of codepoints are intended to allow for
+   private use and experimentation with extensions to DNS over QUIC.
+   Provisional registrations only require the inclusion of the codepoint
+   value and contact information.  However, provisional registrations
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 22]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   could be reclaimed and reassigned for another purpose.  Provisional
+   registrations require Expert Review, as defined in Section 4.5 of
+   [RFC8126].  The designated expert or experts are advised that only
+   registrations for an excessive proportion of remaining codepoint
+   space or the very first unassigned value (see Section 22.1.2) can be
+   rejected.  Provisional registrations will include a Date field that
+   indicates when the registration was last updated.  A request to
+   update the date on any provisional registration can be made without
+   review from the designated expert(s).
+
+   Registrations in this registry MUST include the following fields:
+
+   Value:  The assigned codepoint.
+
+   Error:  A short mnemonic for the parameter.
+
+   Description:  A brief description of the error code semantics, which
+      MAY be a summary if a specification reference is provided.
+
+   Status:  "Permanent" or "Provisional".
+
+   Specification:  A reference to a publicly available specification for
+      the value (optional for provisional registrations).
+
+   Date:  The date of last update to the registration.
+
+   Contact:  Contact details for the registrant.
+
+   Notes:  Supplementary notes about the registration.
+
+   The initial contents of this registry are shown in Section 11.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 23]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   +=======+=======================+===================+===============+
+   | Value | Error                 | Description       | Specification |
+   +=======+=======================+===================+===============+
+   | 0x0   | DOQ_NO_ERROR          | No error          | Section 5.3   |
+   +-------+-----------------------+-------------------+---------------+
+   | 0x1   | DOQ_INTERNAL_ERROR    | Implementation    | Section 5.3   |
+   |       |                       | error             |               |
+   +-------+-----------------------+-------------------+---------------+
+   | 0x2   | DOQ_PROTOCOL_ERROR    | Generic protocol  | Section 5.3   |
+   |       |                       | violation         |               |
+   +-------+-----------------------+-------------------+---------------+
+   | 0x3   | DOQ_REQUEST_CANCELLED | Request           | Section 5.3   |
+   |       |                       | cancelled by      |               |
+   |       |                       | client            |               |
+   +-------+-----------------------+-------------------+---------------+
+
+                                  Table 1
+
 11.  Acknowledgements
 
    This document liberally borrows text from the HTTP-3 specification
@@ -992,40 +1315,36 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    specification [RFC7858] authored by Zi Hu, Liang Zhu, John Heidemann,
    Allison Mankin, Duane Wessels, and Paul Hoffman.
 
-   The privacy issue with 0-RTT data and session resume were analyzed by
-   Daniel Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working
-   group [DNS0RTT].
+   The privacy issue with 0-RTT data and session resumption were
+   analyzed by Daniel Kahn Gillmor (DKG) in a message to the IETF
+   "DPRIVE" working group [DNS0RTT].
 
    Thanks to Tony Finch for an extensive review of the initial version
-   of this draft.  Reviews by Paul Hoffman and interoperability tests
-   conducted by Stephane Bortzmeyer helped improve the definition of the
-   protocol.
-
-
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 18]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
+   of this draft, and to Robert Evans for the discussion of 0-RTT
+   privacy issues.  Reviews by Paul Hoffman and Martin Thomson and
+   interoperability tests conducted by Stephane Bortzmeyer helped
+   improve the definition of the protocol.
 
 12.  References
 
 12.1.  Normative References
 
    [I-D.ietf-dnsop-rfc8499bis]
-              Hoffman, P. and K. Fujiwara, "DNS Terminology", draft-
-              ietf-dnsop-rfc8499bis-02 (work in progress), June 2021.
-
-   [I-D.ietf-dprive-xfr-over-tls]
-              Toorop, W., Dickinson, S., Sahib, S., Aras, P., and A.
-              Mankin, "DNS Zone Transfer-over-TLS", draft-ietf-dprive-
-              xfr-over-tls-12 (work in progress), May 2021.
+              Hoffman, P. and K. Fujiwara, "DNS Terminology", Work in
+              Progress, Internet-Draft, draft-ietf-dnsop-rfc8499bis-02,
+              24 June 2021, <https://www.ietf.org/archive/id/draft-ietf-
+              dnsop-rfc8499bis-02.txt>.
 
    [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
               STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
               <https://www.rfc-editor.org/info/rfc1034>.
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 24]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
 
    [RFC1035]  Mockapetris, P., "Domain names - implementation and
               specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
@@ -1059,17 +1378,6 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
               DOI 10.17487/RFC7828, April 2016,
               <https://www.rfc-editor.org/info/rfc7828>.
 
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 19]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
-   [RFC7830]  Mayrhofer, A., "The EDNS(0) Padding Option", RFC 7830,
-              DOI 10.17487/RFC7830, May 2016,
-              <https://www.rfc-editor.org/info/rfc7830>.
-
    [RFC7858]  Hu, Z., Zhu, L., Heidemann, J., Mankin, A., Wessels, D.,
               and P. Hoffman, "Specification for DNS over Transport
               Layer Security (TLS)", RFC 7858, DOI 10.17487/RFC7858, May
@@ -1084,6 +1392,21 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
               DOI 10.17487/RFC8094, February 2017,
               <https://www.rfc-editor.org/info/rfc8094>.
 
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 25]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/info/rfc8126>.
+
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
@@ -1097,6 +1420,11 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
               (DoH)", RFC 8484, DOI 10.17487/RFC8484, October 2018,
               <https://www.rfc-editor.org/info/rfc8484>.
 
+   [RFC8914]  Kumari, W., Hunt, E., Arends, R., Hardaker, W., and D.
+              Lawrence, "Extended DNS Errors", RFC 8914,
+              DOI 10.17487/RFC8914, October 2020,
+              <https://www.rfc-editor.org/info/rfc8914>.
+
    [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", RFC 9000,
               DOI 10.17487/RFC9000, May 2021,
@@ -1106,35 +1434,43 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
               QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
               <https://www.rfc-editor.org/info/rfc9001>.
 
+   [RFC9103]  Toorop, W., Dickinson, S., Sahib, S., Aras, P., and A.
+              Mankin, "DNS Zone Transfer over TLS", RFC 9103,
+              DOI 10.17487/RFC9103, August 2021,
+              <https://www.rfc-editor.org/info/rfc9103>.
+
 12.2.  Informative References
 
    [DNS0RTT]  Kahn Gillmor, D., "DNS + 0-RTT", Message to DNS-Privacy WG
-              mailing list, April 2016, <https://www.ietf.org/mail-
+              mailing list, 6 April 2016, <https://www.ietf.org/mail-
               archive/web/dns-privacy/current/msg01276.html>.
 
-
-
-
-
-
-Huitema, et al.         Expires January 14, 2022               [Page 20]
-
-Internet-Draft           DNS over Dedicated QUIC               July 2021
-
-
    [I-D.ietf-dprive-rfc7626-bis]
-              Wicinski, T., "DNS Privacy Considerations", draft-ietf-
-              dprive-rfc7626-bis-09 (work in progress), March 2021.
+              Wicinski, T., "DNS Privacy Considerations", Work in
+              Progress, Internet-Draft, draft-ietf-dprive-rfc7626-bis-
+              09, 9 March 2021, <https://www.ietf.org/archive/id/draft-
+              ietf-dprive-rfc7626-bis-09.txt>.
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 26]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
 
    [I-D.ietf-quic-http]
               Bishop, M., "Hypertext Transfer Protocol Version 3
-              (HTTP/3)", draft-ietf-quic-http-34 (work in progress),
-              February 2021.
+              (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
+              quic-http-34, 2 February 2021,
+              <https://www.ietf.org/archive/id/draft-ietf-quic-http-
+              34.txt>.
 
    [I-D.ietf-quic-recovery]
               Iyengar, J. and I. Swett, "QUIC Loss Detection and
-              Congestion Control", draft-ietf-quic-recovery-34 (work in
-              progress), January 2021.
+              Congestion Control", Work in Progress, Internet-Draft,
+              draft-ietf-quic-recovery-34, 14 January 2021,
+              <https://www.ietf.org/archive/id/draft-ietf-quic-recovery-
+              34.txt>.
 
    [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
               Cheshire, "Internet Assigned Numbers Authority (IANA)
@@ -1146,6 +1482,10 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
    [RFC7626]  Bortzmeyer, S., "DNS Privacy Considerations", RFC 7626,
               DOI 10.17487/RFC7626, August 2015,
               <https://www.rfc-editor.org/info/rfc7626>.
+
+   [RFC7830]  Mayrhofer, A., "The EDNS(0) Padding Option", RFC 7830,
+              DOI 10.17487/RFC7830, May 2016,
+              <https://www.rfc-editor.org/info/rfc7830>.
 
    [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
               Code: The Implementation Status Section", BCP 205,
@@ -1165,40 +1505,48 @@ Internet-Draft           DNS over Dedicated QUIC               July 2021
               RFC 8490, DOI 10.17487/RFC8490, March 2019,
               <https://www.rfc-editor.org/info/rfc8490>.
 
-12.3.  URIs
-
-   [1] https://github.com/AdguardTeam/DnsLibs
-
-   [2] https://github.com/AdguardTeam/dnsproxy
 
 
 
-Huitema, et al.         Expires January 14, 2022               [Page 21]
+
+Huitema, et al.           Expires 5 March 2022                 [Page 27]
 
-Internet-Draft           DNS over Dedicated QUIC               July 2021
+Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
-   [3] https://github.com/AdguardTeam/coredns
+Appendix A.  The NOTIFY service
 
-   [4] https://github.com/ameshkov/dnslookup
+   This appendix discusses the issue of allowing NOTIFY to be sent in
+   0-RTT data.
 
-   [5] https://github.com/private-octopus/quicdoq
+   Section Section 5.5 says "The 0-RTT mechanism SHOULD NOT be used to
+   send DNS requests that are not "replayable" transactions", and
+   suggests this is limited to OPCODE QUERY.  It might also be viable to
+   propose that NOTIFY should be permitted in 0-RTT data because
+   although it technically changes the state of the receiving server,
+   the effect of replaying NOTIFYs has negligible impact in practice.
 
-   [6] https://github.com/private-octopus/picoquic
+   NOTIFY messages prompt a secondary to either send an SOA query or an
+   XFR request to the primary on the basis that a newer version of the
+   zone is available.  It has long been recognized that NOTIFYs can be
+   forged and, in theory, used to cause a secondary to send repeated
+   unnecessary requests to the primary.  For this reason, most
+   implementations have some form of throttling of the SOA/XFR queries
+   triggered by the receipt of one or more NOTIFYs.
 
-   [7] https://github.com/DNS-OARC/flamethrower/tree/dns-over-quic
-
-   [8] https://github.com/aiortc/aioquic
-
-   [9] https://adguard.com/en/blog/dns-over-quic.html
+   RFC9103 describes the privacy risks associated with both NOTIFY and
+   SOA queries and does not include addressing those risks within the
+   scope of encrypting zone transfers.  Given this, the privacy benefit
+   of using DoQ for NOTIFY is not clear - but for the same reason,
+   sending NOTIFY as 0-RTT data has no privacy risk above that of
+   sending it using cleartext DNS.
 
 Authors' Addresses
 
    Christian Huitema
    Private Octopus Inc.
    427 Golfcourse Rd
-   Friday Harbor  WA 98250
-   U.S.A
+   Friday Harbor
 
    Email: huitema@huitema.net
 
@@ -1206,14 +1554,21 @@ Authors' Addresses
    Sara Dickinson
    Sinodun IT
    Oxford Science Park
-   Oxford  OX4 4GA
-   U.K.
+   Oxford
 
    Email: sara@sinodun.com
 
 
    Allison Mankin
    Salesforce
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 28]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
 
    Email: allison.mankin@gmail.com
 
@@ -1229,4 +1584,41 @@ Authors' Addresses
 
 
 
-Huitema, et al.         Expires January 14, 2022               [Page 22]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Huitema, et al.           Expires 5 March 2022                 [Page 29]
