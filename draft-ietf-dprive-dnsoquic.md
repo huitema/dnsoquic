@@ -886,7 +886,7 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data. 
 
-Section {{connection-resume-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
+Section {{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
 used to send DNS requests that are not "replayable" transactions", and suggests
 this is limited to OPCODE QUERY. It might also be viable to propose that NOTIFY
 should be permitted in 0-RTT data because although it technically changes the
