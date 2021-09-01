@@ -349,7 +349,7 @@ SERVFAIL.
 If a server is incapable of sending a DNS response due to an internal error, it
 SHOULD issue a QUIC Stream Reset with error code DOQ_INTERNAL_ERROR. The
 corresponding DNS transaction MUST be abandoned. Clients MAY limit the number of
-DOQ_INTERNAL_ERROR errors received on a connection before choosing to close the
+unsolicited QUIC Stream Resets received on a connection before choosing to close the
 connection.
 
 Note that this mechanism provides a way for primaries to abort a single zone
