@@ -864,6 +864,67 @@ the Extended DNS Error Codes registry {{!RFC8914}}:
        Purpose                Too Early
        Reference              This document  
 
+## DNS over QUIC Error Codes Registry {#iana-error-codes}
+
+IANA \[SHALL add/has added] a registry for "DNS over QUIC Error Codes" on the
+"Domain Name System (DNS) Parameters" web page.
+
+The "DNS over QUIC Error Codes" registry governs a 62-bit space.  This space is
+split into three regions that are governed by different policies.  Permanent
+registrations in this registry are assigned using the Specification Required
+policy ({{!RFC8126}}), except for values between 0x00 and 0x3f (in hexadecimal;
+inclusive), which are assigned using Standards Action or IESG Approval as
+defined in Section 4.9 and 4.10 of {{!RFC8126}}.
+
+Provisional registrations of codepoints are intended to allow for private use
+and experimentation with extensions to DNS over QUIC. Provisional registrations
+only require the inclusion of the codepoint value and contact information. However,
+provisional registrations could be reclaimed and reassigned for another purpose.
+Provisional registrations require Expert Review, as defined in Section 4.5 of {{!RFC8126}}.
+The designated expert or experts are advised that only registrations for an excessive
+proportion of remaining codepoint space or the very first unassigned value (see Section 22.1.2)
+can be rejected. Provisional registrations will include a Date field that indicates
+when the registration was last updated. A request to update the date on any provisional
+registration can be made without review from the designated expert(s).
+
+Registrations in this registry MUST include the following fields:
+
+Value:
+: The assigned codepoint.
+
+Error:
+: A short mnemonic for the parameter.
+
+Description:
+: A brief description of the error code semantics, which MAY be a summary if a
+  specification reference is provided.
+
+Status:
+: "Permanent" or "Provisional".
+
+Specification:
+: A reference to a publicly available specification for the value (optional for provisional registrations).
+
+Date:
+: The date of last update to the registration.
+
+Contact:
+: Contact details for the registrant.
+
+Notes:
+: Supplementary notes about the registration.
+
+The initial contents of this registry are shown in {{iana-error-table}}.
+
+| Value | Error                     | Description                   | Specification   |
+|:------|:--------------------------|:------------------------------|:----------------|
+| 0x0   | DOQ_NO_ERROR | No error | {{doq-error-codes}} |
+| 0x1  | DOQ_INTERNAL_ERROR | Implementation error | {{doq-error-codes}} |
+| 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation | {{doq-error-codes}} |
+| 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client | {{doq-error-codes}} |
+
+{: #iana-error-table title="Initial DNS over QUIC Error Codes Entries"}
+
 
 # Acknowledgements
 
