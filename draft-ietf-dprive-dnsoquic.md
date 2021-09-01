@@ -316,6 +316,28 @@ DOQ_PROTOCOL_ERROR (0x02):
 : The DoQ implementation encountered an protocol error and is forcibly aborting 
   the connection.
 
+DOQ_REQUEST_CANCELLED (0x03):
+: A DoQ client uses this to signal that it wants to cancel an 
+outstanding transaction.
+
+### Transaction Cancellation
+
+In QUIC, sending STOP_SENDING requests that a peer cease transmission on a
+stream. If a DoQ client wishes to cancel an outstanding request, it MUST issue
+a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
+any time but will be ignored if the server has already sent the response. The
+corresponding DNS transaction MUST be abandoned.
+
+A server that receives STOP_SENDING MUST issue a RESET_STREAM with error code
+DOQ_REQUEST_CANCELLED, unless it has already sent a complete response in which
+case it MAY ignore the STOP_SENDING request. Servers MAY limit the number of
+DOQ_REQUEST_CANCELLED errors received on a connection before choosing to close
+the connection.
+
+Note that this mechanism provides a way for secondaries to cancel a single zone
+transfer occurring on a given stream without having to close the QUIC
+connection.
+
 ### Transaction Errors
 
 Servers normally complete transactions by sending a DNS response (or responses)
@@ -325,8 +347,14 @@ notified to the client by sending back a response with the Response Code set to
 SERVFAIL.
 
 If a server is incapable of sending a DNS response due to an internal error, it
-may issue a QUIC Stream Reset with error code DOQ_INTERNAL_ERROR. The
-corresponding transaction MUST be abandoned.
+SHOULD issue a QUIC Stream Reset with error code DOQ_INTERNAL_ERROR. The
+corresponding DNS transaction MUST be abandoned. Clients MAY limit the number of
+unsolicited QUIC Stream Resets received on a connection before choosing to close the
+connection.
+
+Note that this mechanism provides a way for primaries to abort a single zone
+transfer occurring on a given stream without having to close the QUIC
+connection.
 
 ### Protocol Errors 
 
@@ -340,6 +368,7 @@ messages during a transaction. These include (but are not limited to)
 * a server receives more than one query on a stream
 * a client receives a different number of responses on a stream than expected
   (e.g. multiple responses to a query for an A record)
+* a client receives a STOP_SENDING request
 * an implementation receives a message containing the edns-tcp-keepalive 
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management-and-idle-timeout-values}})
@@ -947,7 +976,7 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data. 
 
-Section {{connection-resume-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
+Section {{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
 used to send DNS requests that are not "replayable" transactions", and suggests
 this is limited to OPCODE QUERY. It might also be viable to propose that NOTIFY
 should be permitted in 0-RTT data because although it technically changes the
