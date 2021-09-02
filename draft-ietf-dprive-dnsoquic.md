@@ -516,7 +516,7 @@ connections by the client from the same address.
 Implementations SHOULD protect against the traffic analysis attacks described in
 {{traffic-analysis}} by the judicious injection of padding. This
 could be done either by padding individual DNS messages using the
-EDNS(0) Padding Option {{?RFC7830}} and by padding QUIC packets (see
+EDNS(0) Padding Option {{!RFC7830}} and by padding QUIC packets (see
 Section 8.6 of the QUIC transport specification {{!RFC9000}}).
 
 In theory, padding at the QUIC level could result in better performance for the equivalent
