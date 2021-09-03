@@ -5,10 +5,10 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                            S. Dickinson
-Expires: 5 March 2022                                         Sinodun IT
+Expires: 6 March 2022                                         Sinodun IT
                                                                A. Mankin
                                                               Salesforce
-                                                        1 September 2021
+                                                        2 September 2021
 
 
           Specification of DNS over Dedicated QUIC Connections
@@ -39,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 March 2022.
+   This Internet-Draft will expire on 6 March 2022.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Huitema, et al.           Expires 5 March 2022                  [Page 1]
+Huitema, et al.           Expires 6 March 2022                  [Page 1]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Huitema, et al.           Expires 5 March 2022                  [Page 2]
+Huitema, et al.           Expires 6 March 2022                  [Page 2]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -124,7 +124,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  24
      12.2.  Informative References . . . . . . . . . . . . . . . . .  26
-   Appendix A.  The NOTIFY service . . . . . . . . . . . . . . . . .  28
+   Appendix A.  The NOTIFY service . . . . . . . . . . . . . . . . .  27
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
 
 1.  Introduction
@@ -165,7 +165,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                  [Page 3]
+Huitema, et al.           Expires 6 March 2022                  [Page 3]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -221,7 +221,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                  [Page 4]
+Huitema, et al.           Expires 6 March 2022                  [Page 4]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -251,8 +251,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    1.  Support for 0-RTT data during session resumption.
 
    2.  Support for advanced error recovery procedures as specified in
-       "QUIC Loss Detection and Congestion Control"
-       [I-D.ietf-quic-recovery].
+       "QUIC Loss Detection and Congestion Control" [RFC9002].
 
    3.  Mitigation of head-of-line blocking by allowing parallel delivery
        of data on multiple streams.
@@ -271,17 +270,21 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    3.  Fast resumption of QUIC connections to manage the disconnect-on-
        idle feature of QUIC without incurring retransmission time-outs.
 
-   4.  Mapping of each DNS Query/Response transaction to a separate
-       stream, to mitigate head-of-line blocking.  This enables servers
-       to respond to queries "out of order".  It also enables clients to
 
 
 
-Huitema, et al.           Expires 5 March 2022                  [Page 5]
+
+
+
+
+Huitema, et al.           Expires 6 March 2022                  [Page 5]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
+   4.  Mapping of each DNS Query/Response transaction to a separate
+       stream, to mitigate head-of-line blocking.  This enables servers
+       to respond to queries "out of order".  It also enables clients to
        process responses as soon as they arrive, without having to wait
        for in order delivery of responses previously posted by the
        server.
@@ -325,18 +328,20 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    as "doq".  Until such an RFC exists, implementations MUST NOT
    identify themselves using this string.
 
+
+
+
+
+
+Huitema, et al.           Expires 6 March 2022                  [Page 6]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
+
    Implementations of draft versions of the protocol MUST add the string
    "-" and the corresponding draft number to the identifier.  For
    example, draft-ietf-dprive-dnsoquic-00 is identified using the string
    "doq-i00".
-
-
-
-
-Huitema, et al.           Expires 5 March 2022                  [Page 6]
-
-Internet-Draft           DNS over Dedicated QUIC          September 2021
-
 
 5.1.2.  Port Selection
 
@@ -381,18 +386,17 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    bidirectional stream for each subsequent query on a QUIC connection,
    in conformance with the QUIC transport specification [RFC9000].
 
-   The client MUST send the DNS query over the selected stream, and MUST
-   indicate through the STREAM FIN mechanism that no further data will
-   be sent on that stream.
 
 
 
-
-
-Huitema, et al.           Expires 5 March 2022                  [Page 7]
+Huitema, et al.           Expires 6 March 2022                  [Page 7]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
+
+   The client MUST send the DNS query over the selected stream, and MUST
+   indicate through the STREAM FIN mechanism that no further data will
+   be sent on that stream.
 
    The server MUST send the response(s) on the same stream and MUST
    indicate, after the last response, through the STREAM FIN mechanism
@@ -437,15 +441,11 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    DOQ_REQUEST_CANCELLED (0x03):  A DoQ client uses this to signal that
       it wants to cancel an outstanding transaction.
 
+   See Section 10.4 for details on registering new error codes.
 
 
 
-
-
-
-
-
-Huitema, et al.           Expires 5 March 2022                  [Page 8]
+Huitema, et al.           Expires 6 March 2022                  [Page 8]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -501,7 +501,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                  [Page 9]
+Huitema, et al.           Expires 6 March 2022                  [Page 9]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -557,7 +557,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 10]
+Huitema, et al.           Expires 6 March 2022                 [Page 10]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -613,7 +613,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 11]
+Huitema, et al.           Expires 6 March 2022                 [Page 11]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -669,7 +669,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 12]
+Huitema, et al.           Expires 6 March 2022                 [Page 12]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -725,7 +725,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 13]
+Huitema, et al.           Expires 6 March 2022                 [Page 13]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -781,7 +781,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 14]
+Huitema, et al.           Expires 6 March 2022                 [Page 14]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -837,7 +837,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 15]
+Huitema, et al.           Expires 6 March 2022                 [Page 15]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -893,7 +893,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 16]
+Huitema, et al.           Expires 6 March 2022                 [Page 16]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -949,7 +949,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 17]
+Huitema, et al.           Expires 6 March 2022                 [Page 17]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1005,7 +1005,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 18]
+Huitema, et al.           Expires 6 March 2022                 [Page 18]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1061,7 +1061,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 19]
+Huitema, et al.           Expires 6 March 2022                 [Page 19]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1117,7 +1117,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 20]
+Huitema, et al.           Expires 6 March 2022                 [Page 20]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1173,7 +1173,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 21]
+Huitema, et al.           Expires 6 March 2022                 [Page 21]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1229,7 +1229,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 22]
+Huitema, et al.           Expires 6 March 2022                 [Page 22]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1240,7 +1240,8 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    Provisional reservations share the range of values larger than 0x3f
    with some permanent registrations.  This is by design, to enable
    conversion of provisional registrations into permanent registrations
-   without requiring changes in deployed systems.
+   without requiring changes in deployed systems.  (This design is
+   aligned with the principles set in section 22 of [RFC9000].)
 
    Registrations in this registry MUST include the following fields:
 
@@ -1273,7 +1274,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    A request to update the date on any provisional registration can be
    made without review from the designated expert(s).
 
-   The initial contents of this registry are shown in Section 11.
+   The initial contents of this registry are shown in Table 1.
 
 
 
@@ -1284,8 +1285,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-
-Huitema, et al.           Expires 5 March 2022                 [Page 23]
+Huitema, et al.           Expires 6 March 2022                 [Page 23]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1306,7 +1306,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
    |       |                       | client            |               |
    +-------+-----------------------+-------------------+---------------+
 
-                                  Table 1
+             Table 1: Initial DNS over QUIC Error Codes Entries
 
 11.  Acknowledgements
 
@@ -1341,7 +1341,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 24]
+Huitema, et al.           Expires 6 March 2022                 [Page 24]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1397,7 +1397,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 25]
+Huitema, et al.           Expires 6 March 2022                 [Page 25]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1453,7 +1453,7 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-Huitema, et al.           Expires 5 March 2022                 [Page 26]
+Huitema, et al.           Expires 6 March 2022                 [Page 26]
 
 Internet-Draft           DNS over Dedicated QUIC          September 2021
 
@@ -1463,13 +1463,6 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
               quic-http-34, 2 February 2021,
               <https://www.ietf.org/archive/id/draft-ietf-quic-http-
-              34.txt>.
-
-   [I-D.ietf-quic-recovery]
-              Iyengar, J. and I. Swett, "QUIC Loss Detection and
-              Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery-34, 14 January 2021,
-              <https://www.ietf.org/archive/id/draft-ietf-quic-recovery-
               34.txt>.
 
    [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
@@ -1505,19 +1498,21 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
               RFC 8490, DOI 10.17487/RFC8490, March 2019,
               <https://www.rfc-editor.org/info/rfc8490>.
 
-
-
-
-
-Huitema, et al.           Expires 5 March 2022                 [Page 27]
-
-Internet-Draft           DNS over Dedicated QUIC          September 2021
-
+   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+              May 2021, <https://www.rfc-editor.org/info/rfc9002>.
 
 Appendix A.  The NOTIFY service
 
    This appendix discusses the issue of allowing NOTIFY to be sent in
    0-RTT data.
+
+
+
+Huitema, et al.           Expires 6 March 2022                 [Page 27]
+
+Internet-Draft           DNS over Dedicated QUIC          September 2021
+
 
    Section Section 5.5 says "The 0-RTT mechanism SHOULD NOT be used to
    send DNS requests that are not "replayable" transactions", and
@@ -1562,14 +1557,6 @@ Authors' Addresses
    Allison Mankin
    Salesforce
 
-
-
-
-Huitema, et al.           Expires 5 March 2022                 [Page 28]
-
-Internet-Draft           DNS over Dedicated QUIC          September 2021
-
-
    Email: allison.mankin@gmail.com
 
 
@@ -1578,47 +1565,4 @@ Internet-Draft           DNS over Dedicated QUIC          September 2021
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Huitema, et al.           Expires 5 March 2022                 [Page 29]
+Huitema, et al.           Expires 6 March 2022                 [Page 28]
