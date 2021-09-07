@@ -143,7 +143,7 @@ for DoQ. This section is informative in nature.
 ## Provide DNS Privacy
 
 DoT {{?RFC7858}} defines how to mitigate some of the issues described in "DNS
-Privacy Considerations" {{?RFC7626}} by specifying how to transmit DNS messages
+Privacy Considerations" {{?RFC9076}} by specifying how to transmit DNS messages
 over TLS. The "Usage Profiles for DNS over TLS and DNS over DTLS" {{!RFC8310}}
 specify Strict and Opportunistic Usage Profiles for DoT including how stub
 resolvers can authenticate recursive resolvers.
@@ -531,13 +531,13 @@ to the following recommendation:
 * if the implementation of QUIC exposes APIs to set a padding policy,
   DNS over QUIC SHOULD use that API to align the packet length to a small set of fixed sizes,
   aligned with the recommendations of the "Padding Policies for Extension
-  Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
+  Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
 
 * if padding at the QUIC level is not available or not used, 
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
   a small set of fixed sizes, using the EDNS padding extension as specified
   in "Padding Policies for Extension
-  Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
+  Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
 
 ## Connection Handling
 
@@ -720,7 +720,7 @@ The security considerations of DoQ should be comparable to those of DoT
 # Privacy Considerations
 
 The general considerations of encrypted transports provided in "DNS Privacy
-Considerations" {{?I-D.ietf-dprive-rfc7626-bis}} apply to DoQ. The specific
+Considerations" {{?RFC7626}} apply to DoQ. The specific
 considerations provided there do not differ between DoT and DoQ, and are not
 discussed further here.
 
@@ -746,7 +746,7 @@ thus find out what name was queried for in the 0-RTT data.
 
 This risk is in fact a subset of the general problem of observing the behavior
 of the recursive resolver discussed in "DNS Privacy Considerations"
-{{?RFC7626}}. The attack is partially mitigated by reducing the observability
+{{?RFC9076}}. The attack is partially mitigated by reducing the observability
 of this traffic. However, the risk is amplified for 0-RTT data, because the
 attacker might replay it at chosen times, several times.
 
