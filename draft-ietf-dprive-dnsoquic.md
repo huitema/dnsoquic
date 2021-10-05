@@ -247,6 +247,10 @@ another port MUST NOT be port 53. This recommendation against use of port 53
 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
 {{!RFC1035}}.
 
+In the stub to recursive scenario, the use of port 443 as a mutually agreed 
+alternative port can be operationally beneficial, since port 443 is less likely
+to be blocked than other ports.
+
 ## Stream Mapping and Usage
 
 The mapping of DNS traffic over QUIC streams takes advantage of the QUIC stream
@@ -470,8 +474,11 @@ assume that the maximum message size is 65535 bytes.
 
 For the stub to recursive resolver scenario, the authentication requirements
 are the same as described in DoT {{?RFC7858}} and "Usage Profiles for DNS over
-TLS and DNS over DTLS" {{!RFC8310}}. There is no need to authenticate the
-client's identity in either scenario.
+TLS and DNS over DTLS" {{!RFC8310}}. {{?RFC8932}} states that DNS privacy
+services SHOULD provide credentials that clients can use to authenticate the
+server. Given this, and to align with the authentication model for DoH, DoQ stubs 
+SHOULD use a Strict authentication profile. There is no need
+to authenticate the client's identity.
 
 For zone transfer, the requirements are the same as described in
 {{!RFC9103}}.
