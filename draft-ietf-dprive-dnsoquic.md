@@ -2,7 +2,7 @@
 title: Specification of DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-04
+docName: draft-ietf-dprive-dnsoquic-05
     
 stand_alone: yes
 
@@ -21,7 +21,7 @@ author:
         street: 427 Golfcourse Rd
         city: Friday Harbor
         code: WA 98250
-        country: U.S.A
+        country: USA
         email: huitema@huitema.net
       -
         ins: S. Dickinson
@@ -31,7 +31,7 @@ author:
         street: Oxford Science Park
         city: Oxford
         code: OX4 4GA
-        country: U.K.
+        country: UK
         email: sara@sinodun.com
       -
         ins: A. Mankin
@@ -720,9 +720,11 @@ The security considerations of DoQ should be comparable to those of DoT
 # Privacy Considerations
 
 The general considerations of encrypted transports provided in "DNS Privacy
-Considerations" {{?RFC7626}} apply to DoQ. The specific
+Considerations" {{?RFC9076}} apply to DoQ. The specific
 considerations provided there do not differ between DoT and DoQ, and are not
-discussed further here.
+discussed further here. Similarly, "Recommendations for DNS Privacy Service 
+Operators" {{?RFC8932}} (which covers operational, policy, and security 
+considerations for DNS privacy services) is also applicable to DoQ services.
 
 QUIC incorporates the mechanisms of TLS 1.3 {{?RFC8446}} and this enables QUIC
 transmission of "0-RTT" data. This can provide interesting latency gains, but
