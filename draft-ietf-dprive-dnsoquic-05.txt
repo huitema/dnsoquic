@@ -361,7 +361,10 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
    In the stub to recursive scenario, the use of port 443 as a mutually
    agreed alternative port can be operationally beneficial, since port
-   443 is less likely to be blocked than other ports.
+   443 is less likely to be blocked than other ports.  Several
+   mechanisms for stubs to discover recursives offering encrypted
+   transports, including the use of custom ports, are the subject of
+   work in the ADD working group.
 
 5.2.  Stream Mapping and Usage
 
@@ -382,9 +385,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    of each QUIC stream is exactly the same as the content of a TCP
    connection that would manage exactly one query.
 
-   All DNS messages (queries and responses) sent over DoQ connections
-   MUST be encoded as a 2-octet length field followed by the message
-   content as specified in [RFC1035].
 
 
 
@@ -393,6 +393,10 @@ Huitema, et al.           Expires 11 April 2022                 [Page 7]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
+
+   All DNS messages (queries and responses) sent over DoQ connections
+   MUST be encoded as a 2-octet length field followed by the message
+   content as specified in [RFC1035].
 
    The client MUST select the next available client-initiated
    bidirectional stream for each subsequent query on a QUIC connection,
@@ -439,16 +443,15 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
       internal error and is incapable of pursuing the transaction or the
       connection.
 
-   DOQ_PROTOCOL_ERROR (0x02):  The DoQ implementation encountered an
-      protocol error and is forcibly aborting the connection.
-
-
 
 
 Huitema, et al.           Expires 11 April 2022                 [Page 8]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
+
+   DOQ_PROTOCOL_ERROR (0x02):  The DoQ implementation encountered an
+      protocol error and is forcibly aborting the connection.
 
    DOQ_REQUEST_CANCELLED (0x03):  A DoQ client uses this to signal that
       it wants to cancel an outstanding transaction.
@@ -493,9 +496,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    Note that this mechanism provides a way for primaries to abort a
    single zone transfer occurring on a given stream without having to
    close the QUIC connection.
-
-
-
 
 
 
