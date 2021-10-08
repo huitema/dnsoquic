@@ -1,5 +1,5 @@
 ---
-title: Specification of DNS over Dedicated QUIC Connections
+title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
 docName: draft-ietf-dprive-dnsoquic-05
