@@ -477,8 +477,8 @@ are the same as described in DoT {{?RFC7858}} and "Usage Profiles for DNS over
 TLS and DNS over DTLS" {{!RFC8310}}. {{?RFC8932}} states that DNS privacy
 services SHOULD provide credentials that clients can use to authenticate the
 server. Given this, and to align with the authentication model for DoH, DoQ stubs 
-SHOULD use a Strict authentication profile. There is no need
-to authenticate the client's identity.
+SHOULD use a Strict authentication profile. Client authentication for the encrypted 
+stub to recursive scenario is not described in any DNS RFC.
 
 For zone transfer, the requirements are the same as described in
 {{!RFC9103}}.
