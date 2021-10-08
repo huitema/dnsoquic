@@ -247,9 +247,11 @@ another port MUST NOT be port 53. This recommendation against use of port 53
 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
 {{!RFC1035}}.
 
-In the stub to recursive scenario, the use of port 443 as a mutually agreed 
+In the stub to recursive scenario, the use of port 443 as a mutually agreed
 alternative port can be operationally beneficial, since port 443 is less likely
-to be blocked than other ports.
+to be blocked than other ports. Several mechanisms for stubs to discover
+recursives offering encrypted transports, including the use of custom ports, are
+the subject of work in the ADD working group.
 
 ## Stream Mapping and Usage
 
