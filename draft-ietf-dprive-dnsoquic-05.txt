@@ -5,10 +5,10 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                            S. Dickinson
-Expires: 8 April 2022                                         Sinodun IT
+Expires: 11 April 2022                                        Sinodun IT
                                                                A. Mankin
                                                               Salesforce
-                                                          5 October 2021
+                                                          8 October 2021
 
 
           Specification of DNS over Dedicated QUIC Connections
@@ -39,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 April 2022.
+   This Internet-Draft will expire on 11 April 2022.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Huitema, et al.           Expires 8 April 2022                  [Page 1]
+Huitema, et al.           Expires 11 April 2022                 [Page 1]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -82,20 +82,20 @@ Table of Contents
      5.3.  DoQ Error Codes . . . . . . . . . . . . . . . . . . . . .   8
        5.3.1.  Transaction Cancellation  . . . . . . . . . . . . . .   9
        5.3.2.  Transaction Errors  . . . . . . . . . . . . . . . . .   9
-       5.3.3.  Protocol Errors . . . . . . . . . . . . . . . . . . .   9
+       5.3.3.  Protocol Errors . . . . . . . . . . . . . . . . . . .  10
      5.4.  Connection Management . . . . . . . . . . . . . . . . . .  10
      5.5.  Session Resumption and 0-RTT  . . . . . . . . . . . . . .  11
      5.6.  Message Sizes . . . . . . . . . . . . . . . . . . . . . .  12
    6.  Implementation Requirements . . . . . . . . . . . . . . . . .  12
      6.1.  Authentication  . . . . . . . . . . . . . . . . . . . . .  12
-     6.2.  Fall Back to Other Protocols on Connection Failure  . . .  12
+     6.2.  Fall Back to Other Protocols on Connection Failure  . . .  13
      6.3.  Address Validation  . . . . . . . . . . . . . . . . . . .  13
      6.4.  Padding . . . . . . . . . . . . . . . . . . . . . . . . .  13
      6.5.  Connection Handling . . . . . . . . . . . . . . . . . . .  14
        6.5.1.  Connection Reuse  . . . . . . . . . . . . . . . . . .  14
        6.5.2.  Resource Management and Idle Timeout Values . . . . .  14
        6.5.3.  Using 0-RTT and Session Resumption  . . . . . . . . .  15
-     6.6.  Processing Queries in Parallel  . . . . . . . . . . . . .  15
+     6.6.  Processing Queries in Parallel  . . . . . . . . . . . . .  16
      6.7.  Zone transfer . . . . . . . . . . . . . . . . . . . . . .  16
      6.8.  Flow Control Mechanisms . . . . . . . . . . . . . . . . .  16
    7.  Implementation Status . . . . . . . . . . . . . . . . . . . .  17
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Huitema, et al.           Expires 8 April 2022                  [Page 2]
+Huitema, et al.           Expires 11 April 2022                 [Page 2]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -165,7 +165,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                  [Page 3]
+Huitema, et al.           Expires 11 April 2022                 [Page 3]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -221,7 +221,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                  [Page 4]
+Huitema, et al.           Expires 11 April 2022                 [Page 4]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -277,7 +277,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                  [Page 5]
+Huitema, et al.           Expires 11 April 2022                 [Page 5]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -333,7 +333,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                  [Page 6]
+Huitema, et al.           Expires 11 April 2022                 [Page 6]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -359,6 +359,10 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    recommendation against use of port 53 for DoQ is to avoid confusion
    between DoQ and the use of DNS over UDP [RFC1035].
 
+   In the stub to recursive scenario, the use of port 443 as a mutually
+   agreed alternative port can be operationally beneficial, since port
+   443 is less likely to be blocked than other ports.
+
 5.2.  Stream Mapping and Usage
 
    The mapping of DNS traffic over QUIC streams takes advantage of the
@@ -382,17 +386,17 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    MUST be encoded as a 2-octet length field followed by the message
    content as specified in [RFC1035].
 
-   The client MUST select the next available client-initiated
-   bidirectional stream for each subsequent query on a QUIC connection,
-   in conformance with the QUIC transport specification [RFC9000].
 
 
 
-
-Huitema, et al.           Expires 8 April 2022                  [Page 7]
+Huitema, et al.           Expires 11 April 2022                 [Page 7]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
+
+   The client MUST select the next available client-initiated
+   bidirectional stream for each subsequent query on a QUIC connection,
+   in conformance with the QUIC transport specification [RFC9000].
 
    The client MUST send the DNS query over the selected stream, and MUST
    indicate through the STREAM FIN mechanism that no further data will
@@ -438,17 +442,18 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    DOQ_PROTOCOL_ERROR (0x02):  The DoQ implementation encountered an
       protocol error and is forcibly aborting the connection.
 
+
+
+
+Huitema, et al.           Expires 11 April 2022                 [Page 8]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    DOQ_REQUEST_CANCELLED (0x03):  A DoQ client uses this to signal that
       it wants to cancel an outstanding transaction.
 
    See Section 10.4 for details on registering new error codes.
-
-
-
-Huitema, et al.           Expires 8 April 2022                  [Page 8]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
 5.3.1.  Transaction Cancellation
 
@@ -489,6 +494,18 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    single zone transfer occurring on a given stream without having to
    close the QUIC connection.
 
+
+
+
+
+
+
+
+Huitema, et al.           Expires 11 April 2022                 [Page 9]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
 5.3.3.  Protocol Errors
 
    Other error scenarios can occur due to malformed, incomplete or
@@ -496,15 +513,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    limited to)
 
    *  a client or server receives a message with a non-zero Message ID
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                  [Page 9]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    *  a client or server receives a STREAM FIN before receiving all the
       bytes for a message indicated in the 2-octet length field
@@ -541,6 +549,19 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
    *  stateless reset
 
+
+
+
+
+
+
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 10]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    Clients and servers implementing DoQ SHOULD negotiate use of the idle
    timeout.  Closing on idle timeout is done without any packet
    exchange, which minimizes protocol overhead.  Per section 10.1 of the
@@ -548,19 +569,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    is computed as the minimum of the values advertised by the two
    endpoints.  Practical considerations on setting the idle timeout are
    discussed in Section 6.5.2.
-
-
-
-
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 10]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    Clients SHOULD monitor the idle time incurred on their connection to
    the server, defined by the time spent since the last packet from the
@@ -601,6 +609,15 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    Servers MUST NOT execute non replayable transactions received in
    0-RTT data.  Servers MUST adopt one of the following behaviors:
 
+
+
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 11]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    *  Queue the offending transaction and only execute it after the QUIC
       handshake has been completed, as defined in section 4.1.1 of
       [RFC9001].
@@ -610,13 +627,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
       Section 10.3.
 
    *  Close the connection with the error code DOQ_PROTOCOL_ERROR.
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 11]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    For the zone transfer scenario, it would be possible to replay an XFR
    QUERY that had been sent in 0-RTT data.  However the authentication
@@ -646,11 +656,23 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
    For the stub to recursive resolver scenario, the authentication
    requirements are the same as described in DoT [RFC7858] and "Usage
-   Profiles for DNS over TLS and DNS over DTLS" [RFC8310].  There is no
-   need to authenticate the client's identity in either scenario.
+   Profiles for DNS over TLS and DNS over DTLS" [RFC8310].  [RFC8932]
+   states that DNS privacy services SHOULD provide credentials that
+   clients can use to authenticate the server.  Given this, and to align
+   with the authentication model for DoH, DoQ stubs SHOULD use a Strict
+   authentication profile.  Client authentication for the encrypted stub
+   to recursive scenario is not described in any DNS RFC.
 
    For zone transfer, the requirements are the same as described in
    [RFC9103].
+
+
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 12]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
 
    For the recursive resolver to authoritative nameserver scenario,
    authentication requirements are unspecified at the time of writing
@@ -666,14 +688,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    DNS clients SHOULD remember server IP addresses that don't support
    DoQ, including timeouts, connection refusals, and QUIC handshake
    failures, and not request DoQ from them for a reasonable period (such
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 12]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
-
    as one hour per server).  DNS clients following an out-of-band key-
    pinned privacy profile ([RFC7858]) MAY be more aggressive about
    retrying DoQ connection failures.
@@ -709,6 +723,13 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    EDNS(0) Padding Option [RFC7830] and by padding QUIC packets (see
    Section 8.6 of the QUIC transport specification [RFC9000]).
 
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 13]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    In theory, padding at the QUIC level could result in better
    performance for the equivalent protection, because the amount of
    padding can take into account non-DNS frames such as acknowledgeemnts
@@ -722,13 +743,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
       length to a small set of fixed sizes, aligned with the
       recommendations of the "Padding Policies for Extension Mechanisms
       for DNS (EDNS(0))" [RFC8467].
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 13]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    *  if padding at the QUIC level is not available or not used, DNS
       over QUIC MUST ensure that all DNS queries and responses are
@@ -765,6 +779,13 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
    *  Concurrent Connections (Section 6.2.2)
 
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 14]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    *  Security Considerations (Section 10)
 
    Failure to do so may lead to resource exhaustion and denial of
@@ -776,15 +797,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    the edns-tcp-keepalive EDNS(0) Option [RFC7828] in any messages sent
    on a DoQ connection (because it is specific to the use of TCP/TLS as
    a transport).
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 14]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    This document does not make specific recommendations for timeout
    values on idle connections.  Clients and servers should reuse and/or
@@ -822,6 +834,14 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    session resumption tickets.  Servers SHOULD implement the anti-replay
    mechanisms specified in section 8 of [RFC8446].
 
+
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 15]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
 6.6.  Processing Queries in Parallel
 
    As specified in Section 7 of "DNS Transport over TCP - Implementation
@@ -830,17 +850,6 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    DoQ, they do that by sending responses on their specific stream as
    soon as possible, without waiting for availability of responses for
    previously opened streams.
-
-
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 15]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
 6.7.  Zone transfer
 
@@ -881,22 +890,20 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    global and per-stream flow control limits control how much data can
    be sent by clients.  The same mechanisms allow clients to control how
    much data can be sent by servers.  Values that are too small will
+
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 16]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    unnecessarily limit performance.  Values that are too large might
    expose endpoints to overload or memory exhaustion.  Implementations
    or deployments will need to adjust flow control limits to balance
    these concerns.  In particular, zone transfer implementations will
    need to control these limits carefully to ensure both large and
    concurrent zone transfers are well managed.
-
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 16]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    Initial values of parameters control how many requests and how much
    data can be sent by clients and servers at the beginning of the
@@ -940,19 +947,17 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
        simple open source implementation of DoQ.  It is written in C,
        based on Picoquic (https://github.com/private-octopus/picoquic).
 
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 17]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    3.  Flamethrower (https://github.com/DNS-OARC/flamethrower/tree/dns-
        over-quic) is an open source DNS performance and functional
        testing utility written in C++ that has an experimental
        implementation of DoQ.
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 17]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
    4.  aioquic (https://github.com/aiortc/aioquic) is an implementation
        of QUIC in Python.  It includes example client and server for
@@ -998,17 +1003,17 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    1.  Adversaries could replay the 0-RTT data and infer its content
        from the behavior of the receiving server.
 
+
+
+Huitema, et al.           Expires 11 April 2022                [Page 18]
+
+Internet-Draft           DNS over Dedicated QUIC            October 2021
+
+
    2.  The 0-RTT mechanism relies on TLS session resumption, which can
        provide linkability between successive client sessions.
 
    These issues are developed in Section 9.1 and Section 9.2.
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 18]
-
-Internet-Draft           DNS over Dedicated QUIC            October 2021
-
 
 9.1.  Privacy Issues With 0-RTT data
 
@@ -1056,12 +1061,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-
-
-
-
-
-Huitema, et al.           Expires 8 April 2022                 [Page 19]
+Huitema, et al.           Expires 11 April 2022                [Page 19]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1117,7 +1117,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 20]
+Huitema, et al.           Expires 11 April 2022                [Page 20]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1173,7 +1173,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 21]
+Huitema, et al.           Expires 11 April 2022                [Page 21]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1229,7 +1229,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 22]
+Huitema, et al.           Expires 11 April 2022                [Page 22]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1285,7 +1285,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 23]
+Huitema, et al.           Expires 11 April 2022                [Page 23]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1341,7 +1341,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 24]
+Huitema, et al.           Expires 11 April 2022                [Page 24]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1397,7 +1397,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 25]
+Huitema, et al.           Expires 11 April 2022                [Page 25]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1453,7 +1453,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 26]
+Huitema, et al.           Expires 11 April 2022                [Page 26]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1509,7 +1509,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 27]
+Huitema, et al.           Expires 11 April 2022                [Page 27]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1565,7 +1565,7 @@ Authors' Addresses
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 28]
+Huitema, et al.           Expires 11 April 2022                [Page 28]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1621,4 +1621,4 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 8 April 2022                 [Page 29]
+Huitema, et al.           Expires 11 April 2022                [Page 29]
