@@ -5,10 +5,10 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                            S. Dickinson
-Expires: 11 April 2022                                        Sinodun IT
+Expires: 14 April 2022                                        Sinodun IT
                                                                A. Mankin
                                                               Salesforce
-                                                          8 October 2021
+                                                         11 October 2021
 
 
                   DNS over Dedicated QUIC Connections
@@ -39,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 April 2022.
+   This Internet-Draft will expire on 14 April 2022.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 1]
+Huitema, et al.           Expires 14 April 2022                 [Page 1]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 2]
+Huitema, et al.           Expires 14 April 2022                 [Page 2]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -165,7 +165,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 3]
+Huitema, et al.           Expires 14 April 2022                 [Page 3]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -221,7 +221,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 4]
+Huitema, et al.           Expires 14 April 2022                 [Page 4]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -277,7 +277,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 5]
+Huitema, et al.           Expires 14 April 2022                 [Page 5]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -333,7 +333,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 6]
+Huitema, et al.           Expires 14 April 2022                 [Page 6]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -389,7 +389,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 7]
+Huitema, et al.           Expires 14 April 2022                 [Page 7]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -445,7 +445,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 8]
+Huitema, et al.           Expires 14 April 2022                 [Page 8]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -501,7 +501,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                 [Page 9]
+Huitema, et al.           Expires 14 April 2022                 [Page 9]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -557,7 +557,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 10]
+Huitema, et al.           Expires 14 April 2022                [Page 10]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -613,7 +613,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 11]
+Huitema, et al.           Expires 14 April 2022                [Page 11]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -669,7 +669,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 12]
+Huitema, et al.           Expires 14 April 2022                [Page 12]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -725,7 +725,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 13]
+Huitema, et al.           Expires 14 April 2022                [Page 13]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -781,7 +781,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 14]
+Huitema, et al.           Expires 14 April 2022                [Page 14]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -837,7 +837,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 15]
+Huitema, et al.           Expires 14 April 2022                [Page 15]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -893,7 +893,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 16]
+Huitema, et al.           Expires 14 April 2022                [Page 16]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -949,7 +949,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 17]
+Huitema, et al.           Expires 14 April 2022                [Page 17]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1005,7 +1005,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 18]
+Huitema, et al.           Expires 14 April 2022                [Page 18]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1048,11 +1048,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
    replayed.  Such attacks are blocked if the server enforces single-use
    tickets, or if the server implements a combination of Client Hello
    recording and freshness checks, as specified in section 8 of
-   [RFC8446].  These blocking mechanisms rely on shared state between
-   all server instances in a server system.  In the case of DNS over
-   QUIC, the protection against replay attacks on the DNS cache is
-   achieved if this state is shared between all servers that share the
-   same DNS cache.
+   [RFC8446].
 
    The attacks described above apply to the stub resolver to recursive
    resolver scenario, but similar attacks might be envisaged in the
@@ -1061,7 +1057,11 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 19]
+
+
+
+
+Huitema, et al.           Expires 14 April 2022                [Page 19]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1117,7 +1117,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 20]
+Huitema, et al.           Expires 14 April 2022                [Page 20]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1173,7 +1173,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 21]
+Huitema, et al.           Expires 14 April 2022                [Page 21]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1229,7 +1229,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 22]
+Huitema, et al.           Expires 14 April 2022                [Page 22]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1285,7 +1285,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 23]
+Huitema, et al.           Expires 14 April 2022                [Page 23]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1341,7 +1341,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 24]
+Huitema, et al.           Expires 14 April 2022                [Page 24]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1397,7 +1397,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 25]
+Huitema, et al.           Expires 14 April 2022                [Page 25]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1453,7 +1453,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 26]
+Huitema, et al.           Expires 14 April 2022                [Page 26]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1509,7 +1509,7 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 27]
+Huitema, et al.           Expires 14 April 2022                [Page 27]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1565,7 +1565,7 @@ Authors' Addresses
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 28]
+Huitema, et al.           Expires 14 April 2022                [Page 28]
 
 Internet-Draft           DNS over Dedicated QUIC            October 2021
 
@@ -1621,4 +1621,4 @@ Internet-Draft           DNS over Dedicated QUIC            October 2021
 
 
 
-Huitema, et al.           Expires 11 April 2022                [Page 29]
+Huitema, et al.           Expires 14 April 2022                [Page 29]
