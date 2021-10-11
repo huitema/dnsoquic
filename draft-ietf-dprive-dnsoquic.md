@@ -779,11 +779,7 @@ the attacker can choose the time at which the 0-RTT data will be replayed.
 Such attacks are blocked if the server enforces single-use tickets, or
 if the server implements a combination of Client Hello
 recording and freshness checks, as specified in
-section 8 of {{?RFC8446}}. These blocking mechanisms
-rely on shared state between all server instances in a server system. In
-the case of DNS over QUIC, the protection against replay attacks on the
-DNS cache is achieved if this state is shared between all servers
-that share the same DNS cache.
+section 8 of {{?RFC8446}}. 
 
 The attacks described above apply to the stub resolver to recursive
 resolver scenario, but similar attacks might be envisaged in the
