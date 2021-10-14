@@ -57,7 +57,7 @@ informative:
 This document describes the use of QUIC to provide transport privacy for DNS.
 The encryption provided by QUIC has similar properties to that provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
-TCP and provides more efficient error corrections than UDP. DNS over QUIC
+TCP and provides more efficient packet loss recovery than UDP. DNS over QUIC
 (DoQ) has privacy properties similar to DNS over TLS (DoT) specified in RFC7858,
 and latency characteristics similar to classic DNS over UDP.
 
@@ -163,7 +163,7 @@ components:
 
  1.  Support for 0-RTT data during session resumption.
 
- 2.  Support for advanced error recovery procedures as specified in
+ 2.  Support for advanced packet loss recovery procedures as specified in
      "QUIC Loss Detection and Congestion Control" {{?RFC9002}}.
 
  3.  Mitigation of head-of-line blocking by allowing parallel
