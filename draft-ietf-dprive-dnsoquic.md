@@ -2,7 +2,7 @@
 title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-05
+docName: draft-ietf-dprive-dnsoquic-06
 
 stand_alone: yes
 
@@ -609,7 +609,7 @@ Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
 to {{?RFC8446}}.
 Clients could receive address validation tokens from the server using the
 NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
-risks are mentioned in {{privacy-issues-with-new-tokens}}.
+risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
 Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
 
@@ -854,11 +854,16 @@ This document creates a new registration for the identification of DoQ in the
 "Application Layer Protocol Negotiation (ALPN) Protocol IDs" registry
 {{!RFC7301}}.
 
-    The "doq" string identifies DoQ:
+The "doq" string identifies DoQ:
 
-        Protocol:                 DoQ
-        Identification Sequence:  0x64 0x6F 0x71 ("doq")
-        Specification:            This document
+Protocol:
+: DoQ
+
+Identification Sequence:
+: 0x64 0x6F 0x71 ("doq")
+
+Specification:
+: This document
 
 ## Reservation of Dedicated Port
 
@@ -876,13 +881,26 @@ IANA is requested to add the following value to the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
-       Service Name           dns-over-quic
-       Port Number            853
-       Transport Protocol(s)  UDP
-       Assignee               IESG
-       Contact                IETF Chair
-       Description            DNS query-response protocol run over QUIC
-       Reference              This document
+Service Name:
+: dns-over-quic
+
+Port Number:
+: 853
+
+Transport Protocol(s):
+: UDP
+
+Assignee:
+: IESG
+
+Contact:
+: IETF Chair
+
+Description:
+: DNS query-response protocol run over QUIC
+
+Reference:
+: This document
 
 ### Port number 784 for experimentations
 
@@ -898,9 +916,14 @@ unassigned.
 IANA is requested to add the following value to
 the Extended DNS Error Codes registry {{!RFC8914}}:
 
-       INFO-CODE              TBD
-       Purpose                Too Early
-       Reference              This document
+INFO-CODE:
+: TBD
+
+Purpose:
+: Too Early
+
+Reference:
+: This document
 
 ## DNS over QUIC Error Codes Registry {#iana-error-codes}
 
