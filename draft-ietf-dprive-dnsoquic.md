@@ -309,21 +309,24 @@ connection/stream to unique Message ID).
 The following error codes are defined for use when abruptly terminating streams,
 aborting reading of streams, or immediately closing connections:
 
-DOQ_NO_ERROR (0x00):
+DOQ_NO_ERROR (0x0):
 : No error.  This is used when the connection or stream needs to be closed, but
   there is no error to signal.
 
-DOQ_INTERNAL_ERROR (0x01):
+DOQ_INTERNAL_ERROR (0x1):
 : The DoQ implementation encountered an internal error and is incapable of
   pursuing the transaction or the connection.
 
-DOQ_PROTOCOL_ERROR (0x02):
+DOQ_PROTOCOL_ERROR (0x2):
 : The DoQ implementation encountered an protocol error and is forcibly aborting
   the connection.
 
-DOQ_REQUEST_CANCELLED (0x03):
+DOQ_REQUEST_CANCELLED (0x3):
 : A DoQ client uses this to signal that it wants to cancel an
-outstanding transaction.
+  outstanding transaction.
+
+DOQ_EXCESSIVE_LOAD (0x4):
+: A DoQ client uses this to signal when closing a connectiondue to excessive load.
 
 DOQ_ERROR_RESERVED (0xd098ea5e):
 : Alternative error code used for tests. 
@@ -338,11 +341,9 @@ a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
 any time but will be ignored if the server has already sent the response. The
 corresponding DNS transaction MUST be abandoned.
 
-A server that receives STOP_SENDING MUST issue a RESET_STREAM request.
-The error code of the reset stream request SHOULD be sent to 
-DOQ_REQUEST_CANCELLED. Servers MAY limit the number of
-reset stream requests received on a connection before choosing to close
-the connection.
+Servers that receive STOP_SENDING act in accordance with section 3.5 of {{!RFC9000}}.
+Servers MAY impose implementation limits on the total number or rate of request cancellations.
+If limits are encountered, servers SHOULD close the connection with error code DOQ_EXCESSIVE_LOAD.
 
 Note that this mechanism provides a way for secondaries to cancel a single zone
 transfer occurring on a given stream without having to close the QUIC
@@ -402,9 +403,9 @@ Because new error codes can be defined without negotiation, use of an error
 code in an unexpected context or receipt of an unknown error code MUST be
 treated as equivalent to DOQ_NO_ERROR.
 
-Implementations that wish to test the support for the error code extension
-mechanism MAY use DOQ_ERROR_RESERVED, or any error code registered according
-to {{iana-error-codes}}.
+Implementations MAY wish to test the support for the error code extension
+mechanism by using error codes not listed in this document, or they MAY use
+DOQ_ERROR_RESERVED.
 
 ## Connection Management
 
@@ -990,6 +991,7 @@ The initial contents of this registry are shown in {{iana-error-table}}.
 | 0x1  | DOQ_INTERNAL_ERROR | Implementation error | {{doq-error-codes}} |
 | 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation | {{doq-error-codes}} |
 | 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client | {{doq-error-codes}} |
+| 0x4  | DOQ_EXCESSIVE_LOAD | Server closing a connection for excessive load | {{doq-error-codes}} |
 | 0xd098ea5e | DOQ_ERROR_RESERVED | Alternative error code used for tests | {{doq-error-codes}} |
 {: #iana-error-table title="Initial DNS over QUIC Error Codes Entries"}
 
