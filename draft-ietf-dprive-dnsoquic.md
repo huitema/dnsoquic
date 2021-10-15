@@ -489,18 +489,19 @@ For the recursive resolver to authoritative nameserver scenario, authentication
 requirements are unspecified at the time of writing and are the subject on
 ongoing work in the DPRIVE WG.
 
-## Fall Back to Other Protocols on Connection Failure
+## Fallback to Other Protocols on Connection Failure
 
 If the establishment of the DoQ connection fails, clients MAY attempt to
 fall back to DoT and then potentially clear text, as specified in DoT
 {{?RFC7858}} and "Usage Profiles for DNS over TLS and DNS over DTLS"
 {{!RFC8310}}, depending on their privacy profile.
 
-DNS clients SHOULD remember server IP addresses that don't support DoQ,
-including timeouts, connection refusals, and QUIC handshake failures, and not
-request DoQ from them for a reasonable period (such as one hour per server).
-DNS clients following an out-of-band key-pinned privacy profile ({{?RFC7858}})
-MAY be more aggressive about retrying DoQ connection failures.
+DNS clients SHOULD remember server IP addresses that don't support DoQ.
+Timeouts, connection refusals, and QUIC handshake failures are valid indicators
+that a server does not support DoQ.  Clients SHOULD NOT attempt DoQ queries to a
+server that does not support DoQ for a reasonable period (such as one hour per
+server).  DNS clients following an out-of-band key-pinned privacy profile
+({{?RFC7858}}) MAY be more aggressive about retrying DoQ connection failures.
 
 ## Address Validation
 
