@@ -383,7 +383,7 @@ messages during a transaction. These include (but are not limited to)
 
 If a peer encounters such an error condition it is considered a fatal error. It
 SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
-and use the DoQ error code DOQ_PROTCOL_ERROR.
+and use the DoQ error code DOQ_PROTOCOL_ERROR.
 
 It is noted that the restrictions on use of the above EDNS(0) options has
 implications for proxying message from TCP/DoT/DoH over DoQ.
