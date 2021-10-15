@@ -301,9 +301,11 @@ compatibility with earlier versions.
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
 zero.
 
-It is noted that this has implications for proxying DoQ message to other
-transports in that a mapping of some form must be performed (e.g., from DoQ
-connection/stream to unique Message ID).
+This has implications for proxying DoQ message to other
+transports. When forwarding a DNS message, a DNS Message ID MUST be generated
+according to the rules of the protocol that is in use.  For example, the DNS
+Message ID to zero for DoQ, whereas it is set to a randomly chosen value for DNS
+over UDP.
 
 ## DoQ Error Codes
 
