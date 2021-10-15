@@ -86,10 +86,6 @@ DoQ mapping are:
 3.  Provide a transport that is not constrained by path MTU limitations on the 
     size of DNS responses it can send.
 
-4.  Explore the characteristics of using QUIC as a DNS
-    transport, versus other solutions like DNS over UDP {{!RFC1035}},
-    DNS over TLS (DoT) {{?RFC7858}}, or DNS over HTTPS (DoH) {{?RFC8484}}.
-
 In order to achieve these goals, and to support ongoing work on encryption of
 DNS, the scope of this document includes 
 
