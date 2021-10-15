@@ -68,10 +68,13 @@ and latency characteristics similar to classic DNS over UDP.
 Domain Name System (DNS) concepts are specified in "Domain names - concepts and
 facilities" {{!RFC1034}}. The transmission of DNS queries and responses over
 UDP and TCP is specified in "Domain names - implementation and specification"
-{{!RFC1035}}. This document presents a mapping of the DNS protocol over the
+{{!RFC1035}}.
+
+ This document presents a mapping of the DNS protocol over the
 QUIC transport {{!RFC9000}} {{!RFC9001}}. DNS over QUIC is referred here as DoQ,
-in line with "DNS Terminology" {{!I-D.ietf-dnsop-rfc8499bis}}. The goals of the
-DoQ mapping are:
+in line with "DNS Terminology" {{!I-D.ietf-dnsop-rfc8499bis}}.
+
+The goals of the DoQ mapping are:
 
 
 1.  Provide the same DNS privacy protection as DNS over TLS (DoT)
