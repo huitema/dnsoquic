@@ -518,7 +518,7 @@ the DNS Cookies mechanism {{!RFC7873}}.
 DoQ implementations that configure Address Validation using Retry Packets
 SHOULD implement the Address Validation for Future Connections procedure
 defined in section 8.1.3 of the QUIC transport specification {{!RFC9000}}).
-This defines how servers can send NEW TOKEN frames to clients after the client
+This defines how servers can send NEW_TOKEN frames to clients after the client
 address is validated, in order to avoid the 1-RTT penalty during subsequent
 connections by the client from the same address.
 
@@ -608,7 +608,7 @@ restriction specified in {{session-resumption-and-0-rtt}}.
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4 
 to {{?RFC8446}}.
 Clients could receive address validation tokens from the server using the
-NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
+NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-new-tokens}}.
 Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
@@ -818,7 +818,7 @@ same time such transfers are not particularly latency sensitive. This means that
 applications supporting zone transfers may decide to apply the same
 protections as stub to recursive applications.
 
-## Privacy Issues With New Tokens
+## Privacy Issues With Address Validation Tokens
 
 QUIC specifies address validation mechanisms in section 8 of {{!RFC9000}}.
 Use of an address validation token allows QUIC servers to avoid an extra RTT
@@ -830,7 +830,7 @@ is a linkability risk if clients mistakenly use address validation tokens after
 unknowingly moving to a new location.
 
 The recommendations in {{using-0-rtt-and-session-resumption}} mitigates
-this risk by tying the usage of the NEW TOKEN to that of session resumption.
+this risk by tying the usage of the NEW_TOKEN to that of session resumption.
 
 ## Traffic Analysis
 
