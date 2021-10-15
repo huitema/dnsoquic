@@ -231,15 +231,18 @@ draft-ietf-dprive-dnsoquic-00 is identified using the string "doq-i00".
 
 By default, a DNS server that supports DoQ MUST listen for and accept QUIC
 connections on the dedicated UDP port TBD (number to be defined in
-{{iana-considerations}}), unless it has mutual agreement with its clients to
-use a port other than TBD for DoQ. In order to use a port other than TBD, both
-clients and servers would need a configuration option in their software.
+{{iana-considerations}}), unless there is a mutual agreement to
+use another port.
 
 By default, a DNS client desiring to use DoQ with a particular server MUST
-establish a QUIC connection to UDP port TBD on the server, unless it has mutual
-agreement with its server to use a port other than port TBD for DoQ. Such
-another port MUST NOT be port 53. This recommendation against use of port 53
-for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
+establish a QUIC connection to UDP port TBD on the server, unless there is a
+mutual agreement to use another port.
+
+In order to use a port other than TBD, both clients and servers would need a
+configuration option in their software.
+
+DoQ connections MUST NOT use UDP port 53. This recommendation against use of
+port 53 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
 {{!RFC1035}}.
 
 In the stub to recursive scenario, the use of port 443 as a mutually agreed
@@ -313,6 +316,7 @@ DOQ_INTERNAL_ERROR (0x1):
 : The DoQ implementation encountered an internal error and is incapable of
   pursuing the transaction or the connection.
 
+<<<<<<< HEAD
 DOQ_PROTOCOL_ERROR (0x2):
 : The DoQ implementation encountered an protocol error and is forcibly aborting
   the connection.
@@ -326,6 +330,15 @@ DOQ_EXCESSIVE_LOAD (0x4):
 
 DOQ_ERROR_RESERVED (0xd098ea5e):
 : Alternative error code used for tests. 
+=======
+DOQ_PROTOCOL_ERROR (0x02):
+: The DoQ implementation encountered an protocol error and is forcibly aborting
+  the connection.
+
+DOQ_REQUEST_CANCELLED (0x03):
+: A DoQ client uses this to signal that it wants to cancel an
+outstanding transaction.
+>>>>>>> Remove some of the repetition around port usage
 
 See {{iana-error-codes}} for details on registering new error codes.
 
@@ -626,9 +639,13 @@ risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{session-resumption-and-0-rtt}}.
 
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
+<<<<<<< HEAD
 to {{?RFC8446}}. By default, clients SHOULD NOT use session resumption if the
 client's connectivity has changed.
 
+=======
+to {{?RFC8446}}.
+>>>>>>> Remove some of the repetition around port usage
 Clients could receive address validation tokens from the server using the
 NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
@@ -640,6 +657,7 @@ so that clients are not tempted to either keep connection alive or frequently po
 to renew session resumption tickets.
 Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
 {{?RFC8446}}.
+<<<<<<< HEAD
 
 ### Controlling Connection Migration For Privacy
 
@@ -649,6 +667,8 @@ as the client's connectivity changes.
 As detailed in {{privacy-issues-with-long-duration-sessions}}, these features
 trade off privacy for latency. By default, clients SHOULD be configured
 to prioritise privacy and start new sessions if their connectivity changes.
+=======
+>>>>>>> Remove some of the repetition around port usage
 
 ## Processing Queries in Parallel
 
@@ -806,6 +826,16 @@ The prevention on allowing replayable transactions in 0-RTT data
 expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
 risks of replay attacks, as it only allows for transactions that will
 not change the long term state of the server.
+<<<<<<< HEAD
+=======
+
+Attacks trying to assess the state of the cache are more powerful if
+the attacker can choose the time at which the 0-RTT data will be replayed.
+Such attacks are blocked if the server enforces single-use tickets, or
+if the server implements a combination of Client Hello
+recording and freshness checks, as specified in
+section 8 of {{?RFC8446}}.
+>>>>>>> Remove some of the repetition around port usage
 
 The attacks described above apply to the stub resolver to recursive
 resolver scenario, but similar attacks might be envisaged in the
@@ -900,6 +930,7 @@ This document creates a new registration for the identification of DoQ in the
 
 The "doq" string identifies DoQ:
 
+<<<<<<< HEAD
 Protocol:
 : DoQ
 
@@ -908,6 +939,11 @@ Identification Sequence:
 
 Specification:
 : This document
+=======
+        Protocol:                 DoQ
+        Identification Sequence:  0x64 0x6F 0x71 ("doq")
+        Specification:            This document
+>>>>>>> Remove some of the repetition around port usage
 
 ## Reservation of Dedicated Port
 
@@ -925,6 +961,7 @@ IANA is requested to add the following value to the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
+<<<<<<< HEAD
 Service Name:
 : dns-over-quic
 
@@ -945,6 +982,15 @@ Description:
 
 Reference:
 : This document
+=======
+       Service Name           dns-over-quic
+       Port Number            853
+       Transport Protocol(s)  UDP
+       Assignee               IESG
+       Contact                IETF Chair
+       Description            DNS query-response protocol run over QUIC
+       Reference              This document
+>>>>>>> Remove some of the repetition around port usage
 
 ### Port number 784 for experimentations
 
@@ -960,6 +1006,7 @@ unassigned.
 IANA is requested to add the following value to
 the Extended DNS Error Codes registry {{!RFC8914}}:
 
+<<<<<<< HEAD
 INFO-CODE:
 : TBD
 
@@ -968,6 +1015,11 @@ Purpose:
 
 Reference:
 : This document
+=======
+       INFO-CODE              TBD
+       Purpose                Too Early
+       Reference              This document
+>>>>>>> Remove some of the repetition around port usage
 
 ## DNS over QUIC Error Codes Registry {#iana-error-codes}
 
