@@ -3,7 +3,7 @@ title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
 docName: draft-ietf-dprive-dnsoquic-05
-    
+
 stand_alone: yes
 
 ipr: trust200902
@@ -75,7 +75,7 @@ DoQ mapping are:
 
 
 1.  Provide the same DNS privacy protection as DNS over TLS (DoT)
-    {{?RFC7858}}. This includes an option for the client to 
+    {{?RFC7858}}. This includes an option for the client to
     authenticate the server by means of an authentication domain
     name as specified in "Usage Profiles for DNS over TLS and DNS
     over DTLS" {{!RFC8310}}.
@@ -83,7 +83,7 @@ DoQ mapping are:
 2.  Provide an improved level of source address validation for DNS
     servers compared to classic DNS over UDP.
 
-3.  Provide a transport that is not constrained by path MTU limitations on the 
+3.  Provide a transport that is not constrained by path MTU limitations on the
     size of DNS responses it can send.
 
 4.  Explore the characteristics of using QUIC as a DNS
@@ -91,11 +91,11 @@ DoQ mapping are:
     DNS over TLS (DoT) {{?RFC7858}}, or DNS over HTTPS (DoH) {{?RFC8484}}.
 
 In order to achieve these goals, and to support ongoing work on encryption of
-DNS, the scope of this document includes 
+DNS, the scope of this document includes
 
 * the "stub to recursive resolver" scenario
-* the "recursive resolver to authoritative nameserver" scenario and 
-* the "nameserver to nameserver" scenario (mainly used for zone transfers (XFR) {{!RFC1995}}, {{RFC5936}}). 
+* the "recursive resolver to authoritative nameserver" scenario and
+* the "nameserver to nameserver" scenario (mainly used for zone transfers (XFR) {{!RFC1995}}, {{RFC5936}}).
 
 In other words, this document is intended to specify QUIC as a general purpose
 transport for DNS.
@@ -105,7 +105,7 @@ The specific non-goals of this document are:
 1.  No attempt is made to evade potential blocking of DNS over QUIC
     traffic by middleboxes.
 
-2. No attempt to support server initiated transactions, which are used only in 
+2. No attempt to support server initiated transactions, which are used only in
    DNS Stateful Operations (DSO) {{?RFC8490}}.
 
 Specifying the transmission of an application over QUIC requires specifying how
@@ -173,7 +173,7 @@ This mapping of DNS to QUIC will take advantage of these features in
 three ways:
 
  1.  Optional support for sending 0-RTT data during session resumption
-     (the security and privacy implications of this are discussed 
+     (the security and privacy implications of this are discussed
      in later sections).
 
  2.  Long-lived QUIC connections over which multiple DNS transactions
@@ -206,7 +206,7 @@ by these middle boxes.
 As stated in {{introduction}}, this document does not specify support for server
 initiated transactions within established DoQ connections.
 That is, only the initiator of the DoQ connection may send queries over the
-connection. 
+connection.
 
 DSO supports server-initiated transactions within existing connections, however
 DSO is not applicable to DNS over HTTP since HTTP has its own mechanism for
@@ -290,12 +290,6 @@ Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
 4, and so on.
 
-For completeness it is noted that versions prior to -02 of this specification
-proposed a simpler mapping scheme which omitted the 2 byte length field and
-supported only a single response on a given stream. The more complex mapping
-above was adopted to specifically cater for XFR support, however it breaks
-compatibility with earlier versions.
-
 ### DNS Message IDs
 
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
@@ -319,11 +313,11 @@ DOQ_INTERNAL_ERROR (0x01):
   pursuing the transaction or the connection.
 
 DOQ_PROTOCOL_ERROR (0x02):
-: The DoQ implementation encountered an protocol error and is forcibly aborting 
+: The DoQ implementation encountered an protocol error and is forcibly aborting
   the connection.
 
 DOQ_REQUEST_CANCELLED (0x03):
-: A DoQ client uses this to signal that it wants to cancel an 
+: A DoQ client uses this to signal that it wants to cancel an
 outstanding transaction.
 
 See {{iana-error-codes}} for details on registering new error codes.
@@ -364,20 +358,20 @@ Note that this mechanism provides a way for primaries to abort a single zone
 transfer occurring on a given stream without having to close the QUIC
 connection.
 
-### Protocol Errors 
+### Protocol Errors
 
 Other error scenarios can occur due to malformed, incomplete or unexpected
 messages during a transaction. These include (but are not limited to)
 
 * a client or server receives a message with a non-zero Message ID
-* a client or server receives a STREAM FIN before receiving all the bytes for a 
+* a client or server receives a STREAM FIN before receiving all the bytes for a
   message indicated in the 2-octet length field
 * a client receives a STREAM FIN before receiving all the expected responses
 * a server receives more than one query on a stream
 * a client receives a different number of responses on a stream than expected
   (e.g. multiple responses to a query for an A record)
 * a client receives a STOP_SENDING request
-* an implementation receives a message containing the edns-tcp-keepalive 
+* an implementation receives a message containing the edns-tcp-keepalive
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management-and-idle-timeout-values}})
 
@@ -424,7 +418,7 @@ all queries in progress over the connection MUST be considered failed,
 and a Server Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified
 to the initiator of the transaction.
 
-## Session Resumption and 0-RTT 
+## Session Resumption and 0-RTT
 
 A client MAY take advantage of the session resumption mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
@@ -452,7 +446,7 @@ an Extended DNS Error Code (EDE) "Too Early", see
 
 For the zone transfer scenario, it would be possible to replay an XFR QUERY
 that had been sent in 0-RTT data. However the authentication mechanisms described
-in RFC9103 ("Zone transfer over TLS") will ensure that the response is not sent by 
+in RFC9103 ("Zone transfer over TLS") will ensure that the response is not sent by
 the primary until the identity of the secondary has been verified i.e. the first
 behavior listed above.
 
@@ -478,8 +472,8 @@ For the stub to recursive resolver scenario, the authentication requirements
 are the same as described in DoT {{?RFC7858}} and "Usage Profiles for DNS over
 TLS and DNS over DTLS" {{!RFC8310}}. {{?RFC8932}} states that DNS privacy
 services SHOULD provide credentials that clients can use to authenticate the
-server. Given this, and to align with the authentication model for DoH, DoQ stubs 
-SHOULD use a Strict authentication profile. Client authentication for the encrypted 
+server. Given this, and to align with the authentication model for DoH, DoQ stubs
+SHOULD use a Strict authentication profile. Client authentication for the encrypted
 stub to recursive scenario is not described in any DNS RFC.
 
 For zone transfer, the requirements are the same as described in
@@ -542,7 +536,7 @@ to the following recommendation:
   aligned with the recommendations of the "Padding Policies for Extension
   Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
 
-* if padding at the QUIC level is not available or not used, 
+* if padding at the QUIC level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
   a small set of fixed sizes, using the EDNS padding extension as specified
   in "Padding Policies for Extension
@@ -605,7 +599,7 @@ The following recommendations are meant to reduce the privacy
 risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{session-resumption-and-0-rtt}}.
 
-Clients SHOULD use resumption tickets only once, as specified in Appendix C.4 
+Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
 to {{?RFC8446}}.
 Clients could receive address validation tokens from the server using the
 NEW TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
@@ -617,7 +611,7 @@ Servers SHOULD issue session resumption tickets with a sufficiently long life ti
 so that clients are not tempted to either keep connection alive or frequently poll the server
 to renew session resumption tickets.
 Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
-{{?RFC8446}}. 
+{{?RFC8446}}.
 
 ## Processing Queries in Parallel
 
@@ -639,7 +633,7 @@ connections. For example:
   single QUIC connection
 * DoQ servers MUST be able to handle multiple concurrent AXFR requests on a
   single QUIC connection
-* DoQ implementations SHOULD 
+* DoQ implementations SHOULD
      * use the same QUIC connection for both AXFR and IXFR requests to the same
        primary
      * pipeline such requests (if they pipeline XFR requests in general) and
@@ -654,7 +648,7 @@ section 4 of {{!RFC9000}}. These mechanisms allow clients and servers to specify
 how many streams can be created, how much data can be sent on a stream,
 and how much data can be sent on the union of all streams. For DNS over QUIC,
 controlling how many streams are created allows servers to control how many
-new requests the client can send on a given connection. 
+new requests the client can send on a given connection.
 
 Flow control exists to protect endpoint resources.
 For servers, global and per-stream flow control limits control how much data can be sent by
@@ -731,8 +725,8 @@ The security considerations of DoQ should be comparable to those of DoT
 The general considerations of encrypted transports provided in "DNS Privacy
 Considerations" {{?RFC9076}} apply to DoQ. The specific
 considerations provided there do not differ between DoT and DoQ, and are not
-discussed further here. Similarly, "Recommendations for DNS Privacy Service 
-Operators" {{?RFC8932}} (which covers operational, policy, and security 
+discussed further here. Similarly, "Recommendations for DNS Privacy Service
+Operators" {{?RFC8932}} (which covers operational, policy, and security
 considerations for DNS privacy services) is also applicable to DoQ services.
 
 QUIC incorporates the mechanisms of TLS 1.3 {{?RFC8446}} and this enables QUIC
@@ -745,7 +739,7 @@ it raises two concerns:
 2.  The 0-RTT mechanism relies on TLS session resumption, which can provide
     linkability between successive client sessions.
 
-These issues are developed in {{privacy-issues-with-0-rtt-data}} and 
+These issues are developed in {{privacy-issues-with-0-rtt-data}} and
 {{privacy-issues-with-session-resumption}}.
 
 ## Privacy Issues With 0-RTT data
@@ -753,7 +747,7 @@ These issues are developed in {{privacy-issues-with-0-rtt-data}} and
 The 0-RTT data can be replayed by adversaries. That data may trigger queries by
 a recursive resolver to authoritative resolvers. Adversaries may be able to
 pick a time at which the recursive resolver outgoing traffic is observable, and
-thus find out what name was queried for in the 0-RTT data. 
+thus find out what name was queried for in the 0-RTT data.
 
 This risk is in fact a subset of the general problem of observing the behavior
 of the recursive resolver discussed in "DNS Privacy Considerations"
@@ -772,14 +766,14 @@ and {{using-0-rtt-and-session-resumption}}.
 The prevention on allowing replayable transactions in 0-RTT data
 expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
 risks of replay attacks, as it only allows for transactions that will
-not change the long term state of the server. 
+not change the long term state of the server.
 
 Attacks trying to assess the state of the cache are more powerful if
 the attacker can choose the time at which the 0-RTT data will be replayed.
 Such attacks are blocked if the server enforces single-use tickets, or
 if the server implements a combination of Client Hello
 recording and freshness checks, as specified in
-section 8 of {{?RFC8446}}. 
+section 8 of {{?RFC8446}}.
 
 The attacks described above apply to the stub resolver to recursive
 resolver scenario, but similar attacks might be envisaged in the
@@ -792,7 +786,7 @@ The QUIC session resumption mechanism reduces the cost of re-establishing sessio
 and enables 0-RTT data. There is a linkability issue associated with session
 resumption, if the same resumption token is used several times. Attackers on path
 between client and server could observe repeated usage of the token and
-use that to track the client over time or over multiple locations. 
+use that to track the client over time or over multiple locations.
 
 The session resumption mechanism allows servers to correlate the resumed sessions
 with the initial sessions, and thus to track the client. This creates a virtual
@@ -856,9 +850,9 @@ This document creates a new registration for the identification of DoQ in the
 
     The "doq" string identifies DoQ:
 
-        Protocol:                 DoQ  
-        Identification Sequence:  0x64 0x6F 0x71 ("doq")  
-        Specification:            This document  
+        Protocol:                 DoQ
+        Identification Sequence:  0x64 0x6F 0x71 ("doq")
+        Specification:            This document
 
 ## Reservation of Dedicated Port
 
@@ -876,13 +870,13 @@ IANA is requested to add the following value to the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
-       Service Name           dns-over-quic  
-       Port Number            853  
-       Transport Protocol(s)  UDP  
-       Assignee               IESG  
-       Contact                IETF Chair  
-       Description            DNS query-response protocol run over QUIC  
-       Reference              This document  
+       Service Name           dns-over-quic
+       Port Number            853
+       Transport Protocol(s)  UDP
+       Assignee               IESG
+       Contact                IETF Chair
+       Description            DNS query-response protocol run over QUIC
+       Reference              This document
 
 ### Port number 784 for experimentations
 
@@ -900,7 +894,7 @@ the Extended DNS Error Codes registry {{!RFC8914}}:
 
        INFO-CODE              TBD
        Purpose                Too Early
-       Reference              This document  
+       Reference              This document
 
 ## DNS over QUIC Error Codes Registry {#iana-error-codes}
 
@@ -992,7 +986,7 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 # The NOTIFY service
 
-This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data. 
+This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data.
 
 Section {{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
 used to send DNS requests that are not "replayable" transactions", and suggests
@@ -1006,11 +1000,10 @@ request to the primary on the basis that a newer version of the zone is
 available. It has long been recognized that NOTIFYs can be forged and, in
 theory, used to cause a secondary to send repeated unnecessary requests to the
 primary. For this reason, most implementations have some form of throttling of the
-SOA/XFR queries triggered by the receipt of one or more NOTIFYs. 
+SOA/XFR queries triggered by the receipt of one or more NOTIFYs.
 
 RFC9103 describes the privacy risks associated with both NOTIFY and SOA queries
 and does not include addressing those risks within the scope of encrypting zone
 transfers. Given this, the privacy benefit of using DoQ for NOTIFY is not clear -
 but for the same reason, sending NOTIFY as 0-RTT data has no privacy risk above
 that of sending it using cleartext DNS.
-
