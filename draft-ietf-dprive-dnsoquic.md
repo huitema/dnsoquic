@@ -325,6 +325,9 @@ DOQ_REQUEST_CANCELLED (0x03):
 : A DoQ client uses this to signal that it wants to cancel an
 outstanding transaction.
 
+DOQ_ERROR_RESERVED (0xd098ea5e):
+: Alternative error code used for tests. 
+
 See {{iana-error-codes}} for details on registering new error codes.
 
 ### Transaction Cancellation
@@ -335,10 +338,10 @@ a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
 any time but will be ignored if the server has already sent the response. The
 corresponding DNS transaction MUST be abandoned.
 
-A server that receives STOP_SENDING MUST issue a RESET_STREAM with error code
-DOQ_REQUEST_CANCELLED, unless it has already sent a complete response in which
-case it MAY ignore the STOP_SENDING request. Servers MAY limit the number of
-DOQ_REQUEST_CANCELLED errors received on a connection before choosing to close
+A server that receives STOP_SENDING MUST issue a RESET_STREAM request.
+The error code of the reset stream request SHOULD be sent to 
+DOQ_REQUEST_CANCELLED. Servers MAY limit the number of
+reset stream requests received on a connection before choosing to close
 the connection.
 
 Note that this mechanism provides a way for secondaries to cancel a single zone
@@ -354,7 +357,7 @@ notified to the client by sending back a response with the Response Code set to
 SERVFAIL.
 
 If a server is incapable of sending a DNS response due to an internal error, it
-SHOULD issue a QUIC Stream Reset with error code DOQ_INTERNAL_ERROR. The
+SHOULD issue a QUIC Stream Reset. The error code SHOULD be set to DOQ_INTERNAL_ERROR. The
 corresponding DNS transaction MUST be abandoned. Clients MAY limit the number of
 unsolicited QUIC Stream Resets received on a connection before choosing to close the
 connection.
@@ -382,10 +385,26 @@ messages during a transaction. These include (but are not limited to)
 
 If a peer encounters such an error condition it is considered a fatal error. It
 SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
-and use the DoQ error code DOQ_PROTOCOL_ERROR.
+and SHOULD use the DoQ error code DOQ_PROTOCOL_ERROR.
 
 It is noted that the restrictions on use of the above EDNS(0) options has
 implications for proxying message from TCP/DoT/DoH over DoQ.
+
+### Alternative error codes
+
+This specification suggests specific error codes {{transaction-cancellation}},
+{{transaction-errors}}, and {{protocol-errors}}. These error codes are meant
+to facilitates investigation of failures and other incidents. New error
+codes may be defined in future versions of DoQ, or registered as specified
+in {{iana-error-codes}}.
+
+Because new error codes can be defined without negotiation, use of an error
+code in an unexpected context or receipt of an unknown error code MUST be
+treated as equivalent to DOQ_NO_ERROR.
+
+Implementations that wish to test the support for the error code extension
+mechanism MAY use DOQ_ERROR_RESERVED, or any error code registered according
+to {{iana-error-codes}}.
 
 ## Connection Management
 
@@ -609,7 +628,7 @@ Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
 to {{?RFC8446}}.
 Clients could receive address validation tokens from the server using the
 NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
-risks are mentioned in {{privacy-issues-with-new-tokens}}.
+risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
 Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
 
@@ -971,6 +990,7 @@ The initial contents of this registry are shown in {{iana-error-table}}.
 | 0x1  | DOQ_INTERNAL_ERROR | Implementation error | {{doq-error-codes}} |
 | 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation | {{doq-error-codes}} |
 | 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client | {{doq-error-codes}} |
+| 0xd098ea5e | DOQ_ERROR_RESERVED | Alternative error code used for tests | {{doq-error-codes}} |
 {: #iana-error-table title="Initial DNS over QUIC Error Codes Entries"}
 
 # Acknowledgements
