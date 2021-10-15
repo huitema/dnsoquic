@@ -2,7 +2,7 @@
 title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-05
+docName: draft-ietf-dprive-dnsoquic-06
 
 stand_alone: yes
 
@@ -156,9 +156,8 @@ discussion on this is provided in {{privacy-considerations}}.
 
 ## Design for Minimum Latency
 
-QUIC is specifically designed to reduce the delay between HTTP
-queries and HTTP responses.  This is achieved through three main
-components:
+QUIC is specifically designed to reduce protocol-induced delays, with features
+such as:
 
  1.  Support for 0-RTT data during session resumption.
 
@@ -180,16 +179,13 @@ three ways:
      generating the sustained traffic required to benefit from
      advanced recovery features.
 
- 3.  Fast resumption of QUIC connections to manage the disconnect-on-idle
-     feature of QUIC without incurring retransmission time-outs.
-
- 4.  Mapping of each DNS Query/Response transaction to a separate stream,
+ 3.  Mapping of each DNS Query/Response transaction to a separate stream,
      to mitigate head-of-line blocking. This enables servers to respond
      to queries "out of order". It also enables clients to process
      responses as soon as they arrive, without having to wait for in
      order delivery of responses previously posted by the server.
 
-These considerations will be reflected in the mapping of DNS traffic
+These considerations are reflected in the mapping of DNS traffic
 to QUIC streams in {{stream-mapping-and-usage}}.
 
 ## No Specific Middlebox Bypass Mechanism
@@ -609,7 +605,7 @@ Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
 to {{?RFC8446}}.
 Clients could receive address validation tokens from the server using the
 NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
-risks are mentioned in {{privacy-issues-with-new-tokens}}.
+risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
 Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
 
