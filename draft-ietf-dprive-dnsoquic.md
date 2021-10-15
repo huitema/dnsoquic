@@ -558,8 +558,8 @@ section attempts to specify which and how those considerations apply to DoQ.
 
 Historic implementations of DNS clients are known to open and close TCP
 connections for each DNS query. To avoid excess QUIC connections, each with a
-single query, clients SHOULD reuse a single QUIC connection to the recursive
-resolver.
+single query, clients SHOULD send all queries to the same server over a single
+QUIC connection.
 
 In order to achieve performance on par with UDP, DNS clients SHOULD send their
 queries concurrently over the QUIC streams on a QUIC connection. That is, when
