@@ -758,8 +758,10 @@ thus find out what name was queried for in the 0-RTT data.
 This risk is in fact a subset of the general problem of observing the behavior
 of the recursive resolver discussed in "DNS Privacy Considerations"
 {{?RFC9076}}. The attack is partially mitigated by reducing the observability
-of this traffic. However, the risk is amplified for 0-RTT data, because the
-attacker might replay it at chosen times, several times.
+of this traffic. The risk is also largely mitigated by the replay protection 
+of TLS 1.3 {{?RFC8446}}, which is mandatory to implement.
+0-RTT packets can only be replayed within a narrow window,
+which is only wide enough to account for variations in clock skew and network transmission.
 
 The recommendation for TLS 1.3 {{?RFC8446}} is that the capability to use 0-RTT
 data should be turned off by default, and only enabled if the user clearly
@@ -773,13 +775,6 @@ The prevention on allowing replayable transactions in 0-RTT data
 expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
 risks of replay attacks, as it only allows for transactions that will
 not change the long term state of the server.
-
-Attacks trying to assess the state of the cache are more powerful if
-the attacker can choose the time at which the 0-RTT data will be replayed.
-Such attacks are blocked if the server enforces single-use tickets, or
-if the server implements a combination of Client Hello
-recording and freshness checks, as specified in
-section 8 of {{?RFC8446}}.
 
 The attacks described above apply to the stub resolver to recursive
 resolver scenario, but similar attacks might be envisaged in the
