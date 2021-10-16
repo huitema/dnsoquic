@@ -412,8 +412,9 @@ the client will establish a new connection and send the query over that
 connection.
 
 Clients MAY discard their connection to the server before the idle timeout
-expires. If they do that, they SHOULD close the connection explicitly, using
-QUIC's CONNECTION_CLOSE mechanism, and use the DoQ error code DOQ_NO_ERROR.
+expires. If they do that while responses to already sent queries are still expected,
+they SHOULD close the connection explicitly, using
+QUIC's CONNECTION_CLOSE mechanism with the DoQ error code DOQ_NO_ERROR.
 
 Clients and servers MAY close the connection for a variety of other
 reasons, indicated using QUIC's CONNECTION_CLOSE. Client and servers
