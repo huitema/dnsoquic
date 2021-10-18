@@ -207,10 +207,11 @@ initiated transactions within established DoQ connections.
 That is, only the initiator of the DoQ connection may send queries over the
 connection.
 
-DSO supports server-initiated transactions within existing connections, however
-DSO is not applicable to DNS over HTTP since HTTP has its own mechanism for
-managing sessions, and this is incompatible with the DSO; the same is true for
-DoQ.
+DSO does support server-initiated transactions within existing connections.
+However DoQ as defined here does not meet the criteria for an applicable
+transport for DSO because it does not guarantee in-order delivery of messages,
+see Section 4.2 of {{?RFC8490}}.
+
 
 # Specifications
 
