@@ -606,7 +606,9 @@ risks while enjoying the performance benefits of 0-RTT data, with the
 restriction specified in {{session-resumption-and-0-rtt}}.
 
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
-to {{?RFC8446}}.
+to {{?RFC8446}}. By default, clients SHOULD NOT use session resumption if the
+client's connectivity has changed.
+
 Clients could receive address validation tokens from the server using the
 NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
@@ -618,6 +620,15 @@ so that clients are not tempted to either keep connection alive or frequently po
 to renew session resumption tickets.
 Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
 {{?RFC8446}}.
+
+### Controlling Connection Migration For Privacy
+
+DoQ implementation might consider using the connection migration features defined
+in Section 9 of {{!RFC9000}}. These features enable connections to continue operating
+as the client's connectivity changes.
+As detailed in {{privacy-issues-with-long-duration-sessions}}, these features
+trade off privacy for latency. By default, clients SHOULD be configured
+to prioritise privacy and start new sessions if their connectivity changes.
 
 ## Processing Queries in Parallel
 
@@ -831,6 +842,24 @@ unknowingly moving to a new location.
 
 The recommendations in {{using-0-rtt-and-session-resumption}} mitigates
 this risk by tying the usage of the NEW_TOKEN to that of session resumption.
+
+## Privacy Issues With Long Duration Sessions
+
+A potential alternative to session resumption is the use of long duration sessions:
+if a session remains open for a long time, new queries can be sent without incurring
+connection establishment delays. It is worth pointing out that the two solutions have
+similar privacy characteristics. Session resumption may allow servers to keep track
+of the IP addresses of clients, but long duration sessions have the same effect.
+
+In particular, a DoQ implementation might take advantage of the connection migration
+features of QUIC to maintain a session even if the client's connectivity changes,
+for example if the client migrates from a Wi-Fi connection to a cellular network
+connection, and then to another Wi-Fi connection. The server would be
+able to track the client location by monitoring the succession of IP addresses
+used by the long duration connection.
+
+The recommendation in {{controlling-connection-migration-for-privacy}} mitigates
+the privacy concerns related to long duration sessions using multiple client addresses.
 
 ## Traffic Analysis
 
