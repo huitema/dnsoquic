@@ -285,12 +285,6 @@ Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
 4, and so on.
 
-For completeness it is noted that versions prior to -02 of this specification
-proposed a simpler mapping scheme which omitted the 2 byte length field and
-supported only a single response on a given stream. The more complex mapping
-above was adopted to specifically cater for XFR support, however it breaks
-compatibility with earlier versions.
-
 ### DNS Message IDs
 
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
@@ -1033,7 +1027,7 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 --- back
 
-# The NOTIFY service
+# The NOTIFY Service
 
 This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data.
 
@@ -1056,3 +1050,14 @@ and does not include addressing those risks within the scope of encrypting zone
 transfers. Given this, the privacy benefit of using DoQ for NOTIFY is not clear -
 but for the same reason, sending NOTIFY as 0-RTT data has no privacy risk above
 that of sending it using cleartext DNS.
+
+# Notable Changes From Previous Versions
+(RFC EDITOR NOTE: THIS SECTION TO BE REMOVED BEFORE PUBLICATION)
+
+## Stream Mapping Incompatibility With Draft-02
+Versions prior to -02 of this specification
+proposed a simpler mapping scheme of queries and responses to QUIc stream,
+which omitted the 2 byte length field and
+supported only a single response on a given stream. The more complex mapping
+in {{stream-mapping-and-usage}} was adopted to specifically cater for XFR support, however it breaks
+compatibility with earlier versions.
