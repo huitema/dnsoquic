@@ -433,11 +433,11 @@ this mechanism. These privacy issues are detailed in
 and the implementation considerations are discussed in
 {{using-0-rtt-and-session-resumption}}.
 
-The 0-RTT mechanism SHOULD NOT be used to send DNS requests that are
-not "replayable" transactions. Our analysis so far shows that
-such replayable transactions can only be QUERY requests,
-although we may need to also consider NOTIFY requests once
-the analysis of NOTIFY services is complete, see {{the-notify-service}}.
+The 0-RTT mechanism SHOULD NOT be used to send DNS requests that are not
+"replayable" transactions. In this specification, only transactions that have
+an OPCODE of QUERY or NOTIFY are considered replayable and MAY be sent in 0-RTT
+data. See {{the-notify-service}} for a detailed discussion of why NOTIFY is
+included here.
 
 Servers MUST NOT execute non replayable transactions received in 0-RTT
 data. Servers MUST adopt one of the following behaviors:
@@ -448,12 +448,6 @@ has been completed, as defined in section 4.1.1 of {{!RFC9001}}.
 an Extended DNS Error Code (EDE) "Too Early", see
 {{reservation-of-extended-dns-error-code-too-early}}.
 * Close the connection with the error code DOQ_PROTOCOL_ERROR.
-
-For the zone transfer scenario, it would be possible to replay an XFR QUERY
-that had been sent in 0-RTT data. However the authentication mechanisms described
-in RFC9103 ("Zone transfer over TLS") will ensure that the response is not sent by
-the primary until the identity of the secondary has been verified i.e. the first
-behavior listed above.
 
 ## Message Sizes
 
@@ -1015,14 +1009,13 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 # The NOTIFY service
 
-This appendix discusses the issue of allowing NOTIFY to be sent in 0-RTT data.
+This appendix discusses why it is considered acceptable to send NOTIFY in 0-RTT data.
 
-Section {{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT be
-used to send DNS requests that are not "replayable" transactions", and suggests
-this is limited to OPCODE QUERY. It might also be viable to propose that NOTIFY
-should be permitted in 0-RTT data because although it technically changes the
-state of the receiving server, the effect of replaying NOTIFYs has negligible
-impact in practice.
+Section {{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT
+be used to send DNS requests that are not "replayable" transactions". This
+specification supports sending a NOTIFY in 0-RTT data because
+although a NOTIFY technically changes the state of the receiving server, the
+effect of replaying NOTIFYs has negligible impact in practice.
 
 NOTIFY messages prompt a secondary to either send an SOA query or an XFR
 request to the primary on the basis that a newer version of the zone is
@@ -1031,7 +1024,7 @@ theory, used to cause a secondary to send repeated unnecessary requests to the
 primary. For this reason, most implementations have some form of throttling of the
 SOA/XFR queries triggered by the receipt of one or more NOTIFYs.
 
-RFC9103 describes the privacy risks associated with both NOTIFY and SOA queries
+{{!RFC9103}} describes the privacy risks associated with both NOTIFY and SOA queries
 and does not include addressing those risks within the scope of encrypting zone
 transfers. Given this, the privacy benefit of using DoQ for NOTIFY is not clear -
 but for the same reason, sending NOTIFY as 0-RTT data has no privacy risk above
