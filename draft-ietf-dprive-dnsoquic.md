@@ -608,6 +608,7 @@ restriction specified in {{session-resumption-and-0-rtt}}.
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
 to {{?RFC8446}}. By default, clients SHOULD NOT use session resumption if the
 client's connectivity has changed.
+
 Clients could receive address validation tokens from the server using the
 NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
@@ -623,7 +624,7 @@ Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
 ### Controlling Connection Migration For Privacy
 
 DoQ implementation might consider using the connection migration features defined
-in section 9 of {{!RFC9000}}. These features enable connections to continue operating
+in Section 9 of {{!RFC9000}}. These features enable connections to continue operating
 as the client's connectivity changes.
 As detailed in {{privacy-issues-with-long-duration-sessions}}, these features
 trade off privacy for latency. By default, clients SHOULD be configured
@@ -846,7 +847,7 @@ this risk by tying the usage of the NEW_TOKEN to that of session resumption.
 
 A potential alternative to session resumption is the use of long duration sessions:
 if a session remains open for a long time, new queries can be sent without incurring
-connection establishment delays. It is worse pointing out that the two solutions have
+connection establishment delays. It is worth pointing out that the two solutions have
 similar privacy characteristics. Session resumption may allow servers to keep track
 of the IP addresses of clients, but long duration sessions have the same effect.
 
