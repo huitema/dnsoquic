@@ -156,9 +156,8 @@ discussion on this is provided in {{privacy-considerations}}.
 
 ## Design for Minimum Latency
 
-QUIC is specifically designed to reduce the delay between HTTP
-queries and HTTP responses.  This is achieved through three main
-components:
+QUIC is specifically designed to reduce protocol-induced delays, with features
+such as:
 
  1.  Support for 0-RTT data during session resumption.
 
@@ -180,16 +179,13 @@ three ways:
      generating the sustained traffic required to benefit from
      advanced recovery features.
 
- 3.  Fast resumption of QUIC connections to manage the disconnect-on-idle
-     feature of QUIC without incurring retransmission time-outs.
-
- 4.  Mapping of each DNS Query/Response transaction to a separate stream,
+ 3.  Mapping of each DNS Query/Response transaction to a separate stream,
      to mitigate head-of-line blocking. This enables servers to respond
      to queries "out of order". It also enables clients to process
      responses as soon as they arrive, without having to wait for in
      order delivery of responses previously posted by the server.
 
-These considerations will be reflected in the mapping of DNS traffic
+These considerations are reflected in the mapping of DNS traffic
 to QUIC streams in {{stream-mapping-and-usage}}.
 
 ## No Specific Middlebox Bypass Mechanism
