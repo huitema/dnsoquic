@@ -758,8 +758,8 @@ thus find out what name was queried for in the 0-RTT data.
 This risk is in fact a subset of the general problem of observing the behavior
 of the recursive resolver discussed in "DNS Privacy Considerations"
 {{?RFC9076}}. The attack is partially mitigated by reducing the observability
-of this traffic. The risk is also largely mitigated by the replay protection 
-of TLS 1.3 {{?RFC8446}}, which is mandatory to implement.
+of this traffic. The mandatory replay protection mechanisms in
+TLS 1.3 {{?RFC8446}} limit but do not eliminate the risk of replay.
 0-RTT packets can only be replayed within a narrow window,
 which is only wide enough to account for variations in clock skew and network transmission.
 
