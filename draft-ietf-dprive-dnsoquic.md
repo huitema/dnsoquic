@@ -2,7 +2,7 @@
 title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-05
+docName: draft-ietf-dprive-dnsoquic-06
 
 stand_alone: yes
 
@@ -326,7 +326,7 @@ DOQ_REQUEST_CANCELLED (0x3):
   outstanding transaction.
 
 DOQ_EXCESSIVE_LOAD (0x4):
-: A DoQ client uses this to signal when closing a connectiondue to excessive load.
+: A DoQ implementation uses this to signal when closing a connection due to excessive load.
 
 DOQ_ERROR_RESERVED (0xd098ea5e):
 : Alternative error code used for tests. 
@@ -343,7 +343,11 @@ corresponding DNS transaction MUST be abandoned.
 
 Servers that receive STOP_SENDING act in accordance with section 3.5 of {{!RFC9000}}.
 Servers MAY impose implementation limits on the total number or rate of request cancellations.
-If limits are encountered, servers SHOULD close the connection with error code DOQ_EXCESSIVE_LOAD.
+If limits are encountered, servers MAY close the connection. In this case,
+servers wanting to help client debugging MAY use the error code DOQ_EXCESSIVE_LOAD.
+There is always a trade-off between helping good faith clients debug issues
+and allowing denial-of-service attackers to test server defenses, so depending
+on circumstances servers might very well chose to send different error codes.
 
 Note that this mechanism provides a way for secondaries to cancel a single zone
 transfer occurring on a given stream without having to close the QUIC
@@ -991,7 +995,7 @@ The initial contents of this registry are shown in {{iana-error-table}}.
 | 0x1  | DOQ_INTERNAL_ERROR | Implementation error | {{doq-error-codes}} |
 | 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation | {{doq-error-codes}} |
 | 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client | {{doq-error-codes}} |
-| 0x4  | DOQ_EXCESSIVE_LOAD | Server closing a connection for excessive load | {{doq-error-codes}} |
+| 0x4  | DOQ_EXCESSIVE_LOAD | Closing a connection for excessive load | {{doq-error-codes}} |
 | 0xd098ea5e | DOQ_ERROR_RESERVED | Alternative error code used for tests | {{doq-error-codes}} |
 {: #iana-error-table title="Initial DNS over QUIC Error Codes Entries"}
 
