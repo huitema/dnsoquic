@@ -232,15 +232,18 @@ draft-ietf-dprive-dnsoquic-00 is identified using the string "doq-i00".
 
 By default, a DNS server that supports DoQ MUST listen for and accept QUIC
 connections on the dedicated UDP port TBD (number to be defined in
-{{iana-considerations}}), unless it has mutual agreement with its clients to
-use a port other than TBD for DoQ. In order to use a port other than TBD, both
-clients and servers would need a configuration option in their software.
+{{iana-considerations}}), unless there is a mutual agreement to
+use another port.
 
 By default, a DNS client desiring to use DoQ with a particular server MUST
-establish a QUIC connection to UDP port TBD on the server, unless it has mutual
-agreement with its server to use a port other than port TBD for DoQ. Such
-another port MUST NOT be port 53. This recommendation against use of port 53
-for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
+establish a QUIC connection to UDP port TBD on the server, unless there is a
+mutual agreement to use another port.
+
+In order to use a port other than TBD, both clients and servers would need a
+configuration option in their software.
+
+DoQ connections MUST NOT use UDP port 53. This recommendation against use of
+port 53 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
 {{!RFC1035}}.
 
 In the stub to recursive scenario, the use of port 443 as a mutually agreed
