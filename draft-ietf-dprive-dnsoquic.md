@@ -285,7 +285,7 @@ Servers MAY defer processing of a query until the STREAM FIN has been indicated
 on the stream selected by the client. Servers and clients MAY monitor the number
 of "dangling" streams for which the expected queries or responses have been received but
 not the STREAM FIN. Implementations MAY impose a limit on the number of
-such dangling streams. If limits are encountered, implemetations MAY close the connection.
+such dangling streams. If limits are encountered, implementations MAY close the connection.
 
 Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
