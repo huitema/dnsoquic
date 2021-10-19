@@ -281,15 +281,15 @@ The server MUST send the response(s) on the same stream and MUST indicate, after
 the last response, through the STREAM FIN mechanism that no further data will be
 sent on that stream.
 
+Therefore, a single client initiated DNS transaction consumes a single stream.
+This means that the client's first query occurs on QUIC stream 0, the second on
+4, and so on.
+
 Servers MAY defer processing of a query until the STREAM FIN has been indicated
 on the stream selected by the client. Servers and clients MAY monitor the number
 of "dangling" streams for which the expected queries or responses have been received but
 not the STREAM FIN. Implementations MAY impose a limit on the number of
 such dangling streams. If limits are encountered, implemetations MAY close the connection.
-
-Therefore, a single client initiated DNS transaction consumes a single stream.
-This means that the client's first query occurs on QUIC stream 0, the second on
-4, and so on.
 
 For completeness it is noted that versions prior to -02 of this specification
 proposed a simpler mapping scheme which omitted the 2 byte length field and
