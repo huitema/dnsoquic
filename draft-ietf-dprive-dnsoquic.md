@@ -384,7 +384,7 @@ messages during a transaction. These include (but are not limited to)
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management-and-idle-timeout-values}})
 * a client or a server attempts to open an unidirectional QUIC stream
-* a server attempts to open a server-initiated bidirectional QUIC sream
+* a server attempts to open a server-initiated bidirectional QUIC stream
 
 If a peer encounters such an error condition it is considered a fatal error. It
 SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
