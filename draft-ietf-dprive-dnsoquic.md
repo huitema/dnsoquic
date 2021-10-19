@@ -1009,9 +1009,10 @@ conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 # The NOTIFY service
 
-This appendix discusses why it is considered acceptable to send NOTIFY in 0-RTT data.
+This appendix discusses why it is considered acceptable to send NOTIFY
+(see {{?RFC1996}}) in 0-RTT data.
 
-Section {{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT
+{{session-resumption-and-0-rtt}} says "The 0-RTT mechanism SHOULD NOT
 be used to send DNS requests that are not "replayable" transactions". This
 specification supports sending a NOTIFY in 0-RTT data because
 although a NOTIFY technically changes the state of the receiving server, the
