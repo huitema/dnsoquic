@@ -381,8 +381,8 @@ messages during a transaction. These include (but are not limited to)
 * a client receives a different number of responses on a stream than expected
   (e.g. multiple responses to a query for an A record)
 * a client receives a STOP_SENDING request
-* the maximum number of dangling streams exceeds the limits set by the implementation
-  (see {{stream-mapping-and-usage}})
+* the client or server does not indicate the expected STREAM FIN after
+  sending requests or responses (see {{stream-mapping-and-usage}}).
 * an implementation receives a message containing the edns-tcp-keepalive
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management-and-idle-timeout-values}})
