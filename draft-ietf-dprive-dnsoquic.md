@@ -978,7 +978,7 @@ split into three regions that are governed by different policies:
 
 * Permanent registrations for values between 0x00 and 0x3f (in hexadecimal;
 inclusive), which are assigned using Standards Action or IESG Approval as
-defined in {{Section 4.9 of RFC8126}} and {{Section 4.10 of RFC8126}}
+defined in {{Section 4.9 and Section 4.10 of RFC8126}}
 
 * Permanent registrations for values larger than 0x3f, which are assigned
 using the Specification Required policy ({{!RFC8126}})
