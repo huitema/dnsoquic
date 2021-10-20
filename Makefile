@@ -5,7 +5,7 @@
 DRAFT=draft-ietf-dprive-dnsoquic
 VERSION=06
 
-XML=$(DRAFT).xml
+XML=$(DRAFT)-$(VERSION).xml
 HTML=$(DRAFT)-$(VERSION).html
 TXT=$(DRAFT)-$(VERSION).txt
 
