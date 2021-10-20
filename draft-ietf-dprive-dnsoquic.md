@@ -380,7 +380,7 @@ messages during a transaction. These include (but are not limited to)
 * a client receives a STOP_SENDING request
 * an implementation receives a message containing the edns-tcp-keepalive
   EDNS(0) Option {{!RFC7828}} (see
-  {{resource-management-and-idle-timeout-values}})
+  {{resource-management}})
 * a client or a server attempts to open an unidirectional QUIC stream
 * a server attempts to open a server-initiated bidirectional QUIC stream
 
@@ -421,7 +421,7 @@ Closing on idle timeout is done without any packet exchange, which minimizes
 protocol overhead. Per section 10.1 of the QUIC transport specification, the
 effective value of the idle timeout is computed as the minimum of the values
 advertised by the two endpoints. Practical considerations on setting the idle
-timeout are discussed in {{resource-management-and-idle-timeout-values}}.
+timeout are discussed in {{resource-management}}.
 
 Clients SHOULD monitor the idle time incurred on their connection to the
 server, defined by the time spent since the last packet from the server has
@@ -564,29 +564,28 @@ to the following recommendation:
 ## Connection Handling
 
 "DNS Transport over TCP - Implementation Requirements" {{!RFC7766}} provides
-updated guidance on DNS over TCP, some of which is applicable to DoQ. This
-section attempts to specify which and how those considerations apply to DoQ.
+updated guidance on DNS over TCP, some of which is applicable to DoQ. This 
+section provides similar advice on connection handling for DoQ.
 
 ### Connection Reuse
 
 Historic implementations of DNS clients are known to open and close TCP
-connections for each DNS query. As outlined in section 6.2.1 of {{!RFC7766}}, to
-amortise connection setup costs, both clients and servers SHOULD support
-connection reuse by sending multiple queries and responses over a single
-persistent QUIC connection.
+connections for each DNS query. To amortise connection setup costs, both
+clients and servers SHOULD support connection reuse by sending multiple queries
+and responses over a single persistent QUIC connection.
 
-As outlined in Section 6.2.1.1 of {{!RFC7766}}, in order to achieve performance
-on par with UDP, DNS clients SHOULD send their queries concurrently over the
-QUIC streams on a QUIC connection. That is, when a DNS client sends multiple
-queries to a server over a QUIC connection, it SHOULD NOT wait for an
-outstanding reply before sending the next query.
+In order to achieve performance on par with UDP, DNS clients SHOULD send their
+queries concurrently over the QUIC streams on a QUIC connection. That is, when
+a DNS client sends multiple queries to a server over a QUIC connection, it
+SHOULD NOT wait for an outstanding reply before sending the next query.
 
-### Resource Management and Idle Timeout Values
+### Resource Management
 
 Proper management of established and idle connections is important to the
-healthy operation of a DNS server. An implementation of DoQ SHOULD follow best
-practices similar to those specified for DNS over TCP {{!RFC7766}}, in
-particular with regard to:
+healthy operation of a DNS server.
+
+An implementation of DoQ SHOULD follow best practices similar to those
+specified for DNS over TCP {{!RFC7766}}, in particular with regard to:
 
 * Concurrent Connections (Section 6.2.2), updated by Section 6.4 of {{!RFC9103}}
 * Security Considerations (Section 10)
