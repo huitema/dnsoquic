@@ -206,7 +206,7 @@ connection.
 DSO does support server-initiated transactions within existing connections.
 However DoQ as defined here does not meet the criteria for an applicable
 transport for DSO because it does not guarantee in-order delivery of messages,
-see Section 4.2 of {{?RFC8490}}.
+see {{Section 4.2 of RFC8490}}.
 
 
 # Specifications
@@ -255,7 +255,7 @@ the subject of ongoing work.
 ## Stream Mapping and Usage
 
 The mapping of DNS traffic over QUIC streams takes advantage of the QUIC stream
-features detailed in Section 2 of the QUIC transport specification {{!RFC9000}}.
+features detailed in {{Section 2 of RFC9000}}, the QUIC transport specification.
 
 DNS traffic follows a simple pattern in which the client sends a query, and the
 server provides one or more responses (multiple responses can occur in zone
@@ -341,7 +341,7 @@ a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
 any time but will be ignored if the server has already sent the response. The
 corresponding DNS transaction MUST be abandoned.
 
-Servers that receive STOP_SENDING act in accordance with section 3.5 of {{!RFC9000}}.
+Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}.
 Servers MAY impose implementation limits on the total number or rate of request cancellations.
 If limits are encountered, servers MAY close the connection. In this case,
 servers wanting to help client debugging MAY use the error code DOQ_EXCESSIVE_LOAD.
@@ -415,7 +415,7 @@ DOQ_ERROR_RESERVED.
 
 ## Connection Management
 
-Section 10 of the QUIC transport specification {{!RFC9000}} specifies that
+{{Section 10 of RFC9000}}, the QUIC transport specification, specifies that
 connections can be closed in three ways:
 
 * idle timeout
@@ -424,7 +424,7 @@ connections can be closed in three ways:
 
 Clients and servers implementing DoQ SHOULD negotiate use of the idle timeout.
 Closing on idle timeout is done without any packet exchange, which minimizes
-protocol overhead. Per section 10.1 of the QUIC transport specification, the
+protocol overhead. Per {{Section 10.1 of RFC9000}}, the QUIC transport specification, the
 effective value of the idle timeout is computed as the minimum of the values
 advertised by the two endpoints. Practical considerations on setting the idle
 timeout are discussed in {{resource-management}}.
@@ -468,7 +468,7 @@ Servers MUST NOT execute non replayable transactions received in 0-RTT
 data. Servers MUST adopt one of the following behaviors:
 
 * Queue the offending transaction and only execute it after the QUIC handshake
-has been completed, as defined in section 4.1.1 of {{!RFC9001}}.
+has been completed, as defined in {{Section 4.1.1 of RFC9001}}.
 * Reply to the offending transaction with a response code REFUSED and
 an Extended DNS Error Code (EDE) "Too Early", see
 {{reservation-of-extended-dns-error-code-too-early}}.
@@ -523,20 +523,20 @@ server).  DNS clients following an out-of-band key-pinned privacy profile
 
 ## Address Validation
 
-Section 8 of the QUIC transport specification {{!RFC9000}} defines Address
+{{Section 8 of RFC9000}}, the QUIC transport specification, defines Address
 Validation procedures to avoid servers being used in address amplification
 attacks. DoQ implementations MUST conform to this specification, which limits
 the worst case amplification to a factor 3.
 
 DoQ implementations SHOULD consider configuring servers to use the Address
-Validation using Retry Packets procedure defined in section 8.1.2 of the QUIC
-transport specification {{!RFC9000}}). This procedure imposes a 1-RTT delay for
+Validation using Retry Packets procedure defined in {{Section 8.1.2 of RFC9000}}, the QUIC
+transport specification. This procedure imposes a 1-RTT delay for
 verifying the return routability of the source address of a client, similar to
 the DNS Cookies mechanism {{!RFC7873}}.
 
 DoQ implementations that configure Address Validation using Retry Packets
 SHOULD implement the Address Validation for Future Connections procedure
-defined in section 8.1.3 of the QUIC transport specification {{!RFC9000}}).
+defined in {{Section 8.1.3 of RFC9000}}, the QUIC transport specification.
 This defines how servers can send NEW_TOKEN frames to clients after the client
 address is validated, in order to avoid the 1-RTT penalty during subsequent
 connections by the client from the same address.
@@ -547,7 +547,7 @@ Implementations SHOULD protect against the traffic analysis attacks described in
 {{traffic-analysis}} by the judicious injection of padding. This
 could be done either by padding individual DNS messages using the
 EDNS(0) Padding Option {{!RFC7830}} and by padding QUIC packets (see
-Section 8.6 of the QUIC transport specification {{!RFC9000}}).
+{{Section 8.6 of RFC9000}}, the QUIC transport specification.
 
 In theory, padding at the QUIC level could result in better performance for the equivalent
 protection, because the amount of padding can take into account non-DNS frames
@@ -593,14 +593,14 @@ healthy operation of a DNS server.
 An implementation of DoQ SHOULD follow best practices similar to those
 specified for DNS over TCP {{!RFC7766}}, in particular with regard to:
 
-* Concurrent Connections (Section 6.2.2), updated by Section 6.4 of {{!RFC9103}}
-* Security Considerations (Section 10)
+* Concurrent Connections ({{Section 6.2.2 of RFC7766}}, updated by {{Section 6.4 of RFC9103}})
+* Security Considerations ({{Section 10 of RFC7766}})
 
 Failure to do so may lead to resource exhaustion and denial of service.
 
 Clients that want to maintain long duration DoQ connections SHOULD use the idle
-timeout mechanisms defined in Section 10.1 of the QUIC transport specification
-{{!RFC9000}}. Clients and servers MUST NOT send the edns-tcp-keepalive EDNS(0)
+timeout mechanisms defined in {{Section 10.1 of RFC9000}}, the QUIC transport
+specification. Clients and servers MUST NOT send the edns-tcp-keepalive EDNS(0)
 Option {{?RFC7828}} in any messages sent on a DoQ connection (because it is
 specific to the use of TCP/TLS as a transport).
 
@@ -630,7 +630,7 @@ to {{?RFC8446}}. By default, clients SHOULD NOT use session resumption if the
 client's connectivity has changed.
 
 Clients could receive address validation tokens from the server using the
-NEW_TOKEN mechanism; see section 8 of {{!RFC9000}}. The associated tracking
+NEW_TOKEN mechanism; see {{Section 8 of RFC9000}}. The associated tracking
 risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
 Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
@@ -638,13 +638,12 @@ resumption, thus avoiding additional tracking risks.
 Servers SHOULD issue session resumption tickets with a sufficiently long life time (e.g., 6 hours),
 so that clients are not tempted to either keep connection alive or frequently poll the server
 to renew session resumption tickets.
-Servers SHOULD implement the anti-replay mechanisms specified in section 8 of
-{{?RFC8446}}.
+Servers SHOULD implement the anti-replay mechanisms specified in {{Section 8 of RFC8446}}.
 
 ### Controlling Connection Migration For Privacy
 
 DoQ implementation might consider using the connection migration features defined
-in Section 9 of {{!RFC9000}}. These features enable connections to continue operating
+in {{Section 9 of RFC9000}}. These features enable connections to continue operating
 as the client's connectivity changes.
 As detailed in {{privacy-issues-with-long-duration-sessions}}, these features
 trade off privacy for latency. By default, clients SHOULD be configured
@@ -652,8 +651,8 @@ to prioritise privacy and start new sessions if their connectivity changes.
 
 ## Processing Queries in Parallel
 
-As specified in Section 7 of "DNS Transport over TCP - Implementation
-Requirements" {{!RFC7766}}, resolvers are RECOMMENDED to support the preparing
+As specified in {{Section 7 of RFC7766}} "DNS Transport over TCP - Implementation
+Requirements", resolvers are RECOMMENDED to support the preparing
 of responses in parallel and sending them out of order. In DoQ, they do that by
 sending responses on their specific stream as soon as possible, without waiting
 for availability of responses for previously opened streams.
@@ -681,7 +680,7 @@ connections. For example:
 ## Flow Control Mechanisms
 
 Servers and Clients manage flow control using the mechanisms defined in
-section 4 of {{!RFC9000}}. These mechanisms allow clients and servers to specify
+{{Section 4 of RFC9000}}. These mechanisms allow clients and servers to specify
 how many streams can be created, how much data can be sent on a stream,
 and how much data can be sent on the union of all streams. For DNS over QUIC,
 controlling how many streams are created allows servers to control how many
@@ -846,7 +845,7 @@ protections as stub to recursive applications.
 
 ## Privacy Issues With Address Validation Tokens
 
-QUIC specifies address validation mechanisms in section 8 of {{!RFC9000}}.
+QUIC specifies address validation mechanisms in {{Section 8 of RFC9000}}.
 Use of an address validation token allows QUIC servers to avoid an extra RTT
 for new connections. Address validation tokens are typically tied to an IP address. QUIC
 clients normally only use these tokens when setting a new connection
@@ -919,7 +918,7 @@ several years have passed since the specification was published).
 
 This specification proposes to additionally reserve the use of port 853 for
 DoQ. QUIC was designed to be able to co-exist with other protocols on the same
-port, including DTLS , see Section 17.2 in {{!RFC9000}}.
+port, including DTLS , see {{Section 17.2 of RFC9000}}.
 
 IANA is requested to add the following value to the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
@@ -979,19 +978,19 @@ split into three regions that are governed by different policies:
 
 * Permanent registrations for values between 0x00 and 0x3f (in hexadecimal;
 inclusive), which are assigned using Standards Action or IESG Approval as
-defined in Section 4.9 and 4.10 of {{!RFC8126}}
+defined in {{Section 4.9 and Section 4.10 of RFC8126}}
 
 * Permanent registrations for values larger than 0x3f, which are assigned
 using the Specification Required policy ({{!RFC8126}})
 
 * Provisonal registrations for values larger than 0x3f, which require Expert
-Review, as defined in Section 4.5 of {{!RFC8126}}.
+Review, as defined in {{Section 4.5 of RFC8126}}.
 
 Provisional reservations share the range of values larger than 0x3f
 with some permanent registrations. This is by design, to enable conversion
 of provisional registrations into permanent registrations without requiring
 changes in deployed systems. (This design is aligned with the principles
-set in section 22 of {{!RFC9000}}.)
+set in {{Section 22 of RFC9000}}.)
 
 Registrations in this registry MUST include the following fields:
 
