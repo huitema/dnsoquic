@@ -250,7 +250,7 @@ In the stub to recursive scenario, the use of port 443 as a mutually agreed
 alternative port can be operationally beneficial, since port 443 is less likely
 to be blocked than other ports. Several mechanisms for stubs to discover
 recursives offering encrypted transports, including the use of custom ports, are
-the subject of work in the ADD working group.
+the subject of ongoing work.
 
 ## Stream Mapping and Usage
 
