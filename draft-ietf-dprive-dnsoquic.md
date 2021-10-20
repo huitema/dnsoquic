@@ -289,6 +289,12 @@ Therefore, a single client initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
 4, and so on.
 
+Servers MAY defer processing of a query until the STREAM FIN has been indicated
+on the stream selected by the client. Servers and clients MAY monitor the number
+of "dangling" streams for which the expected queries or responses have been received but
+not the STREAM FIN. Implementations MAY impose a limit on the number of
+such dangling streams. If limits are encountered, implementations MAY close the connection.
+
 ### DNS Message IDs
 
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
@@ -384,6 +390,8 @@ messages during a transaction. These include (but are not limited to)
 * a client receives a different number of responses on a stream than expected
   (e.g. multiple responses to a query for an A record)
 * a client receives a STOP_SENDING request
+* the client or server does not indicate the expected STREAM FIN after
+  sending requests or responses (see {{stream-mapping-and-usage}}).
 * an implementation receives a message containing the edns-tcp-keepalive
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management}})
