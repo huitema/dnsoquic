@@ -294,14 +294,10 @@ This means that the client's first query occurs on QUIC stream 0, the second on
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
 zero.
 
-This has implications for proxying DoQ message to and from other transports. 
-
-One aspect is that a single DoQ connection can, in principle, support more
-outstanding queries at a given point in time than, for example, a single TCP
-connection which is limited by the Message ID space. Proxy implementations
-could choose to manage mappings where multiple TCP/DoT connections are required
-due to a large number of outstanding queries. For UDP, such a scenario will
-require other solutions e.g. delaying or dropping messages.
+This has implications for proxying DoQ message to and from other transports.
+For example, proxies may have to manage the fact that DoQ can support a larger
+number of outstanding queries on a single connection than e.g., DNS over TCP
+because DoQ is not limited by the Message ID space.
 
 When forwarding a DNS message from DoQ over another transport, a DNS Message ID
 MUST be generated according to the rules of the protocol that is in use. When
