@@ -438,10 +438,8 @@ QUIC's CONNECTION_CLOSE mechanism, and use the DoQ error code DOQ_NO_ERROR.
 Clients and servers MAY close the connection for a variety of other
 reasons, indicated using QUIC's CONNECTION_CLOSE. Client and servers
 that send packets over a connection discarded by their peer MAY
-receive a stateless reset indication. If a connection fails,
-all queries in progress over the connection MUST be considered failed,
-and a Server Failure (SERVFAIL, {{!RFC1035}}) SHOULD be notified
-to the initiator of the transaction.
+receive a stateless reset indication. If a connection fails, all the
+in progress transaction on that connection MUST be abandoned.
 
 ## Session Resumption and 0-RTT
 
