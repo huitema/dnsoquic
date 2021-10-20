@@ -306,7 +306,7 @@ require other solutions e.g. delaying or dropping messages.
 When forwarding a DNS message from DoQ over another transport, a DNS Message ID
 MUST be generated according to the rules of the protocol that is in use. When
 forwarding a DNS message from another transport over DoQ, the Message ID MUST
-be set to zero
+be set to zero.
 
 ## DoQ Error Codes
 
