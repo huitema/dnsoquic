@@ -294,9 +294,15 @@ This means that the client's first query occurs on QUIC stream 0, the second on
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
 zero.
 
-It is noted that this has implications for proxying DoQ message to other
-transports in that a mapping of some form must be performed (e.g., from DoQ
-connection/stream to unique Message ID).
+This has implications for proxying DoQ message to and from other transports.
+For example, proxies may have to manage the fact that DoQ can support a larger
+number of outstanding queries on a single connection than e.g., DNS over TCP
+because DoQ is not limited by the Message ID space.
+
+When forwarding a DNS message from DoQ over another transport, a DNS Message ID
+MUST be generated according to the rules of the protocol that is in use. When
+forwarding a DNS message from another transport over DoQ, the Message ID MUST
+be set to zero.
 
 ## DoQ Error Codes
 
