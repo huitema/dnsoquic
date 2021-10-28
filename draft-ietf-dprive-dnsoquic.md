@@ -197,8 +197,8 @@ avoid such classification. Consequently, firewalls and other middleboxes might
 be able to distinguish DoQ from other protocols that use QUIC, like HTTP, and
 apply different treatment.
 
-The lack of measures in this specification to avoid protocol classification is not an endorsement of such practices.
-an endorsement of such practices.
+The lack of measures in this specification to avoid protocol classification is 
+not an endorsement of such practices.
 
 ## No Server Initiated Transactions
 
