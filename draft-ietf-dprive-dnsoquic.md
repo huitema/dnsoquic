@@ -113,6 +113,13 @@ application will use QUIC. This is done for HTTP in "Hypertext Transfer
 Protocol Version 3 (HTTP/3)"{{?I-D.ietf-quic-http}}. The purpose of this
 document is to define the way DNS messages can be transmitted over QUIC.
 
+Future work might specify DNS over HTTP/3 for one or all of the scenarios
+covered by the scope of this document. However, a lightweight direct mapping
+for DNS over QUIC can be regarded as a more natural fit for both the recursive
+to authoritative queries and zone transfers which rarely involve
+intermediaries. In these scenarios, the additional overhead of HTTP is
+not offset by, e.g., benefits of HTTP proxying and caching behavior.
+
 In this document, {{design-considerations}} presents the reasoning that guided
 the proposed design. {{specifications}} specifies the actual mapping of DoQ.
 {{implementation-requirements}} presents guidelines on the implementation,
