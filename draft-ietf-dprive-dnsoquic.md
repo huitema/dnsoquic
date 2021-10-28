@@ -409,7 +409,7 @@ implications for proxying message from TCP/DoT/DoH over DoQ.
 
 This specification suggests specific error codes {{transaction-cancellation}},
 {{transaction-errors}}, and {{protocol-errors}}. These error codes are meant
-to facilitates investigation of failures and other incidents. New error
+to facilitate investigation of failures and other incidents. New error
 codes may be defined in future versions of DoQ, or registered as specified
 in {{iana-error-codes}}.
 
