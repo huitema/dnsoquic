@@ -116,7 +116,7 @@ document is to define the way DNS messages can be transmitted over QUIC.
 Future work might specify DNS over HTTP/3 for one or all of the scenarios
 covered by the scope of this document. However, a lightweight direct mapping
 for DNS over QUIC can be regarded as a more natural fit for both the recursive
-to authoritative queries and zone transfers which rarely involve
+to authoritative and zone transfer scenarios which rarely involve
 intermediaries. In these scenarios, the additional overhead of HTTP is
 not offset by, e.g., benefits of HTTP proxying and caching behavior.
 
