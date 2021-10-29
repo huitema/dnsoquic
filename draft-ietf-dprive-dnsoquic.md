@@ -188,13 +188,17 @@ three ways:
 These considerations are reflected in the mapping of DNS traffic
 to QUIC streams in {{stream-mapping-and-usage}}.
 
-## No Specific Middlebox Bypass Mechanism
+## Middlebox Considerations
 
-The mapping of DoQ is defined for minimal overhead and maximum
-performance. This means a different traffic profile than HTTP3 over QUIC. This
-difference can be noted by firewalls and middleboxes. There may be environments
-in which HTTP3 over QUIC will be able to pass through, but DoQ will be blocked
-by these middle boxes.
+Using QUIC might allow a protocol to disguise its purpose from devices on the
+network path using encryption and traffic analysis resistance techniques like
+padding. This specification does not include any measures that are designed to
+avoid such classification. Consequently, firewalls and other middleboxes might
+be able to distinguish DoQ from other protocols that use QUIC, like HTTP, and
+apply different treatment.
+
+The lack of measures in this specification to avoid protocol classification is 
+not an endorsement of such practices.
 
 ## No Server Initiated Transactions
 
