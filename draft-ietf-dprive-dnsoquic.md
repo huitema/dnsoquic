@@ -298,12 +298,14 @@ such dangling streams. If limits are encountered, implementations MAY close the 
 ### DNS Message IDs
 
 When sending queries over a QUIC connection, the DNS Message ID MUST be set to
-zero.
+zero. The stream mapping for DoQ allows for unambiguous correlation of queries
+and responses and so the Message ID field is not required.
 
 This has implications for proxying DoQ message to and from other transports.
 For example, proxies may have to manage the fact that DoQ can support a larger
 number of outstanding queries on a single connection than e.g., DNS over TCP
-because DoQ is not limited by the Message ID space.
+because DoQ is not limited by the Message ID space. This issue already exists for DoH,
+where a Message ID of 0 is recommended.
 
 When forwarding a DNS message from DoQ over another transport, a DNS Message ID
 MUST be generated according to the rules of the protocol that is in use. When
