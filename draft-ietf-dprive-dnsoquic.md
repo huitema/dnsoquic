@@ -113,12 +113,12 @@ application will use QUIC. This is done for HTTP in "Hypertext Transfer
 Protocol Version 3 (HTTP/3)"{{?I-D.ietf-quic-http}}. The purpose of this
 document is to define the way DNS messages can be transmitted over QUIC.
 
-Future work might specify DNS over HTTP/3 for one or all of the scenarios
-covered by the scope of this document. However, a lightweight direct mapping
-for DNS over QUIC can be regarded as a more natural fit for both the recursive
-to authoritative and zone transfer scenarios which rarely involve
-intermediaries. In these scenarios, the additional overhead of HTTP is
-not offset by, e.g., benefits of HTTP proxying and caching behavior.
+DNS over HTTP {{?RFC8484}} can be used with HTTP/3 to get some of the
+benefits of QUIC. However, a lightweight direct mapping for DNS over QUIC can
+be regarded as a more natural fit for both the recursive to authoritative and
+zone transfer scenarios which rarely involve intermediaries. In these
+scenarios, the additional overhead of HTTP is not offset by, e.g., benefits of
+HTTP proxying and caching behavior.
 
 In this document, {{design-considerations}} presents the reasoning that guided
 the proposed design. {{specifications}} specifies the actual mapping of DoQ.
@@ -496,7 +496,7 @@ up to 2^62 bytes. However, DNS messages are restricted in practice to a maximum
 size of 65535 bytes. This maximum size is enforced by the use of a two-octet
 message length field in DNS over TCP {{!RFC1035}} and DNS over TLS
 {{!RFC7858}}, and by the definition of the "application/dns-message" for DNS
-over HTTP {{!RFC8484}}. DoQ enforces the same restriction.
+over HTTP {{?RFC8484}}. DoQ enforces the same restriction.
 
 The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify the
 UDP message size. This parameter is ignored by DoQ. DoQ implementations always
