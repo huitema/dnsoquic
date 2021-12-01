@@ -5,10 +5,10 @@
 Network Working Group                                         C. Huitema
 Internet-Draft                                      Private Octopus Inc.
 Intended status: Standards Track                            S. Dickinson
-Expires: 15 May 2022                                          Sinodun IT
+Expires: 4 June 2022                                          Sinodun IT
                                                                A. Mankin
                                                               Salesforce
-                                                        11 November 2021
+                                                         1 December 2021
 
 
                   DNS over Dedicated QUIC Connections
@@ -39,7 +39,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 May 2022.
+   This Internet-Draft will expire on 4 June 2022.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 1]
+Huitema, et al.            Expires 4 June 2022                  [Page 1]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    and restrictions with respect to this document.  Code Components
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 2]
+Huitema, et al.            Expires 4 June 2022                  [Page 2]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
      9.3.  Privacy Issues With Address Validation Tokens . . . . . .  22
@@ -165,9 +165,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 3]
+Huitema, et al.            Expires 4 June 2022                  [Page 3]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    *  the "recursive resolver to authoritative nameserver" scenario and
@@ -221,9 +221,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 4]
+Huitema, et al.            Expires 4 June 2022                  [Page 4]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
 3.  Document work via GitHub
@@ -277,9 +277,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 5]
+Huitema, et al.            Expires 4 June 2022                  [Page 5]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    2.  Long-lived QUIC connections over which multiple DNS transactions
@@ -333,9 +333,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 6]
+Huitema, et al.            Expires 4 June 2022                  [Page 6]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
 5.1.1.  Draft Version Identification
@@ -389,9 +389,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 7]
+Huitema, et al.            Expires 4 June 2022                  [Page 7]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    The mapping specified here requires that the client selects a
@@ -445,9 +445,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 8]
+Huitema, et al.            Expires 4 June 2022                  [Page 8]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    This has implications for proxying DoQ message to and from other
@@ -501,9 +501,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                  [Page 9]
+Huitema, et al.            Expires 4 June 2022                  [Page 9]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    Servers that receive STOP_SENDING act in accordance with Section 3.5
@@ -557,9 +557,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 10]
+Huitema, et al.            Expires 4 June 2022                 [Page 10]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    *  a client receives a different number of responses on a stream than
@@ -613,9 +613,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 11]
+Huitema, et al.            Expires 4 June 2022                 [Page 11]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    *  immediate close
@@ -669,9 +669,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 12]
+Huitema, et al.            Expires 4 June 2022                 [Page 12]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    *  Queue the offending transaction and only execute it after the QUIC
@@ -725,9 +725,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 13]
+Huitema, et al.            Expires 4 June 2022                 [Page 13]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
 6.2.  Fallback to Other Protocols on Connection Failure
@@ -781,9 +781,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 14]
+Huitema, et al.            Expires 4 June 2022                 [Page 14]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    In theory, padding at the QUIC level could result in better
@@ -837,9 +837,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 15]
+Huitema, et al.            Expires 4 June 2022                 [Page 15]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    An implementation of DoQ SHOULD follow best practices similar to
@@ -893,9 +893,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 16]
+Huitema, et al.            Expires 4 June 2022                 [Page 16]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    Clients could receive address validation tokens from the server using
@@ -949,9 +949,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 17]
+Huitema, et al.            Expires 4 June 2022                 [Page 17]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
       -  use the same QUIC connection for both AXFR and IXFR requests to
@@ -1005,9 +1005,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 18]
+Huitema, et al.            Expires 4 June 2022                 [Page 18]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    1.  AdGuard launched a DoQ recursive resolver service in December
@@ -1061,9 +1061,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 19]
+Huitema, et al.            Expires 4 June 2022                 [Page 19]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    *  Performs better in mobile environments due to the increased
@@ -1117,9 +1117,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 20]
+Huitema, et al.            Expires 4 June 2022                 [Page 20]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    This risk is in fact a subset of the general problem of observing the
@@ -1173,9 +1173,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 21]
+Huitema, et al.            Expires 4 June 2022                 [Page 21]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    The privacy trade-offs here may be context specific.  Stub resolvers
@@ -1229,9 +1229,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 22]
+Huitema, et al.            Expires 4 June 2022                 [Page 22]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    The recommendation in Section 6.5.4 mitigates the privacy concerns
@@ -1285,9 +1285,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 23]
+Huitema, et al.            Expires 4 June 2022                 [Page 23]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    IANA is requested to add the following value to the "Service Name and
@@ -1341,9 +1341,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 24]
+Huitema, et al.            Expires 4 June 2022                 [Page 24]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    *  Permanent registrations for values between 0x00 and 0x3f (in
@@ -1397,9 +1397,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 25]
+Huitema, et al.            Expires 4 June 2022                 [Page 25]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    The initial contents of this registry are shown in Table 1.
@@ -1453,9 +1453,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 26]
+Huitema, et al.            Expires 4 June 2022                 [Page 26]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    [I-D.ietf-dnsop-rfc8499bis]
@@ -1509,9 +1509,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 27]
+Huitema, et al.            Expires 4 June 2022                 [Page 27]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    [RFC7858]  Hu, Z., Zhu, L., Heidemann, J., Mankin, A., Wessels, D.,
@@ -1565,9 +1565,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 28]
+Huitema, et al.            Expires 4 June 2022                 [Page 28]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    [RFC9103]  Toorop, W., Dickinson, S., Sahib, S., Aras, P., and A.
@@ -1621,9 +1621,9 @@ Internet-Draft           DNS over Dedicated QUIC           November 2021
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 29]
+Huitema, et al.            Expires 4 June 2022                 [Page 29]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
    [RFC8932]  Dickinson, S., Overeinder, B., van Rijswijk-Deij, R., and
@@ -1677,9 +1677,9 @@ Appendix B.  Notable Changes From Previous Versions
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 30]
+Huitema, et al.            Expires 4 June 2022                 [Page 30]
 
-Internet-Draft           DNS over Dedicated QUIC           November 2021
+Internet-Draft           DNS over Dedicated QUIC           December 2021
 
 
 B.1.  Stream Mapping Incompatibility With Draft-02
@@ -1733,4 +1733,4 @@ Authors' Addresses
 
 
 
-Huitema, et al.            Expires 15 May 2022                 [Page 31]
+Huitema, et al.            Expires 4 June 2022                 [Page 31]
