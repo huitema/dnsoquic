@@ -931,8 +931,10 @@ Specification:
 
 ## Reservation of Dedicated Port
 
-Port 853 is currently reserved for 'DNS query-response protocol run over
-TLS/DTLS' {{!RFC7858}}. However, the specification for DNS over DTLS (DoD)
+Port 853 for both TCP and UDP is currently reserved for 'DNS query-response protocol run over
+TLS/DTLS' {{!RFC7858}}. 
+
+However, the specification for DNS over DTLS (DoD)
 {{!RFC8094}} is experimental, limited to stub to resolver, and no
 implementations or deployments currently exist to our knowledge (even though
 several years have passed since the specification was published).
@@ -946,12 +948,12 @@ significant bit in each UDP payload. Such deployments ought to check the
 signatures of future versions or extensions (e.g. {{?I-D.ietf-quic-bit-grease}})
 of QUIC and DTLS before deploying them to serve DNS on the same port.
 
-IANA is requested to add the following value to the "Service Name and Transport
+IANA is requested to update the following value in the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
 Service Name:
-: dns-over-quic
+: domain-s
 
 Port Number:
 : 853
@@ -966,10 +968,13 @@ Contact:
 : IETF Chair
 
 Description:
-: DNS query-response protocol run over QUIC
+: DNS query-response protocol run over DTLS or QUIC
 
 Reference:
 : This document
+
+Additionally IANA is requested to update the Description for TCP port 853 to be 'DNS query-response protocol run over
+TLS' for consistency.
 
 ### Port number 784 for experimentations
 
