@@ -935,7 +935,7 @@ Port 853 for both TCP and UDP is currently reserved for 'DNS query-response prot
 TLS/DTLS' {{!RFC7858}}. 
 
 However, the specification for DNS over DTLS (DoD)
-{{!RFC8094}} is experimental, limited to stub to resolver, and no
+{{?RFC8094}} is experimental, limited to stub to resolver, and no
 implementations or deployments currently exist to our knowledge (even though
 several years have passed since the specification was published).
 
