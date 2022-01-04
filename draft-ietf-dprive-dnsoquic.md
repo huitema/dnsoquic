@@ -564,15 +564,15 @@ connections by the client from the same address.
 
 ## Padding
 
-Implementations SHOULD protect against the traffic analysis attacks described in
+Implementations MUST protect against the traffic analysis attacks described in
 {{traffic-analysis}} by the judicious injection of padding. This
 could be done either by padding individual DNS messages using the
-EDNS(0) Padding Option {{!RFC7830}} and by padding QUIC packets (see
+EDNS(0) Padding Option {{!RFC7830}} or by padding QUIC packets (see
 {{Section 8.6 of RFC9000}}, the QUIC transport specification.
 
 In theory, padding at the QUIC level could result in better performance for the equivalent
 protection, because the amount of padding can take into account non-DNS frames
-such as acknowledgeemnts or flow control updates, and also because QUIC packets
+such as acknowledgements or flow control updates, and also because QUIC packets
 can carry multiple DNS messages. However, applications can only control the
 amount of padding in QUIC packets if the implementation of QUIC exposes adequate APIs. This leads
 to the following recommendation:
@@ -585,7 +585,7 @@ to the following recommendation:
 * if padding at the QUIC level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
   a small set of fixed sizes, using the EDNS padding extension as specified
-  in "Padding Policies for Extension
+  in {{!RFC7830}}. The sizes SHOULD be aligned with the recommendations of the "Padding Policies for Extension
   Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
 
 ## Connection Handling
