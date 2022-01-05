@@ -357,8 +357,8 @@ See {{iana-error-codes}} for details on registering new error codes.
 In QUIC, sending STOP_SENDING requests that a peer cease transmission on a
 stream. If a DoQ client wishes to cancel an outstanding request, it MUST issue
 a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
-any time but will be ignored if the server has already sent the response. The
-corresponding DNS transaction MUST be abandoned.
+any time but will be ignored if the server response has already been 
+acknowledged. The corresponding DNS transaction MUST be abandoned.
 
 Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}.
 Servers MAY impose implementation limits on the total number or rate of request cancellations.
@@ -937,9 +937,14 @@ TLS/DTLS' {{!RFC7858}}. However, the specification for DNS over DTLS (DoD)
 implementations or deployments currently exist to our knowledge (even though
 several years have passed since the specification was published).
 
-This specification proposes to additionally reserve the use of port 853 for
-DoQ. QUIC was designed to be able to co-exist with other protocols on the same
-port, including DTLS , see {{Section 17.2 of RFC9000}}.
+This specification proposes to additionally reserve the use of UDP port 853 for
+DoQ. QUIC version 1 was designed to be able to co-exist with other protocols on
+the same port, including DTLS , see {{Section 17.2 of RFC9000}}. This means
+that deployments that serve DNS over DTLS and DNS over QUIC (QUIC version 1) on the
+same port will be able to demultiplex the two due to the second most
+significant bit in each UDP payload. Such deployments ought to check the
+signatures of future versions or extensions (e.g. {{?I-D.ietf-quic-bit-grease}})
+of QUIC and DTLS before deploying them to serve DNS on the same port.
 
 IANA is requested to add the following value to the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
