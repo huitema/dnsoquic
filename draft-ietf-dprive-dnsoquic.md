@@ -58,8 +58,11 @@ This document describes the use of QUIC to provide transport privacy for DNS.
 The encryption provided by QUIC has similar properties to that provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
 TCP and provides more efficient packet loss recovery than UDP. DNS over QUIC
-(DoQ) has privacy properties similar to DNS over TLS (DoT) specified in RFC7858,
-and latency characteristics similar to classic DNS over UDP.
+(DoQ) has privacy properties similar to DNS over TLS (DoT) specified in
+RFC7858, and latency characteristics similar to classic DNS over UDP. This
+specification describes the use of DNS over QUIC as a general-purpose transport
+for DNS and includes the use of DNS over QUIC for stub to recursive,
+recursive to authoritative, and zone transfer scenarios.
 
 --- middle
 
@@ -96,7 +99,7 @@ DNS, the scope of this document includes
 * the "recursive resolver to authoritative nameserver" scenario and
 * the "nameserver to nameserver" scenario (mainly used for zone transfers (XFR) {{!RFC1995}}, {{RFC5936}}).
 
-In other words, this document is intended to specify QUIC as a general purpose
+In other words, this document specifies QUIC as a general-purpose
 transport for DNS.
 
 The specific non-goals of this document are:
@@ -104,7 +107,7 @@ The specific non-goals of this document are:
 1.  No attempt is made to evade potential blocking of DNS over QUIC
     traffic by middleboxes.
 
-2. No attempt to support server initiated transactions, which are used only in
+2. No attempt to support server-initiated transactions, which are used only in
    DNS Stateful Operations (DSO) {{?RFC8490}}.
 
 Specifying the transmission of an application over QUIC requires specifying how
@@ -128,10 +131,11 @@ usage and deployment of DoQ.
 
 # Key Words
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in BCP 14 {{!RFC8174}}.
-
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 {{!RFC2119}} {{!RFC8174}} when, and only when, they
+appear in all capitals, as shown here.
 
 # Document work via GitHub
 
@@ -144,7 +148,8 @@ functional changes should always first be discussed on the IETF DPRIVE WG
 # Design Considerations
 
 This section and its subsections present the design guidelines that were used
-for DoQ. This section is informative in nature.
+for DoQ. Whilst all other sections in this document are normative, this section
+is informative in nature.
 
 ## Provide DNS Privacy
 
@@ -207,18 +212,16 @@ apply different treatment.
 The lack of measures in this specification to avoid protocol classification is 
 not an endorsement of such practices.
 
-## No Server Initiated Transactions
+## No Server-Initiated Transactions
 
-As stated in {{introduction}}, this document does not specify support for server
-initiated transactions within established DoQ connections.
-That is, only the initiator of the DoQ connection may send queries over the
-connection.
+As stated in {{introduction}}, this document does not specify support for
+server-initiated transactions within established DoQ connections. That is, only
+the initiator of the DoQ connection may send queries over the connection.
 
 DSO does support server-initiated transactions within existing connections.
-However DoQ as defined here does not meet the criteria for an applicable
+However, DoQ as defined here does not meet the criteria for an applicable
 transport for DSO because it does not guarantee in-order delivery of messages,
 see {{Section 4.2 of RFC8490}}.
-
 
 # Specifications
 
@@ -249,9 +252,6 @@ use another port.
 By default, a DNS client desiring to use DoQ with a particular server MUST
 establish a QUIC connection to UDP port TBD on the server, unless there is a
 mutual agreement to use another port.
-
-In order to use a port other than TBD, both clients and servers would need a
-configuration option in their software.
 
 DoQ connections MUST NOT use UDP port 53. This recommendation against use of
 port 53 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
@@ -296,7 +296,7 @@ The server MUST send the response(s) on the same stream and MUST indicate, after
 the last response, through the STREAM FIN mechanism that no further data will be
 sent on that stream.
 
-Therefore, a single client initiated DNS transaction consumes a single stream.
+Therefore, a single client-initiated DNS transaction consumes a single stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
 4, and so on.
 
@@ -408,7 +408,7 @@ messages during a transaction. These include (but are not limited to)
 * an implementation receives a message containing the edns-tcp-keepalive
   EDNS(0) Option {{!RFC7828}} (see
   {{resource-management}})
-* a client or a server attempts to open an unidirectional QUIC stream
+* a client or a server attempts to open a unidirectional QUIC stream
 * a server attempts to open a server-initiated bidirectional QUIC stream
 
 If a peer encounters such an error condition it is considered a fatal error. It
@@ -572,7 +572,7 @@ EDNS(0) Padding Option {{!RFC7830}} and by padding QUIC packets (see
 
 In theory, padding at the QUIC level could result in better performance for the equivalent
 protection, because the amount of padding can take into account non-DNS frames
-such as acknowledgeemnts or flow control updates, and also because QUIC packets
+such as acknowledgements or flow control updates, and also because QUIC packets
 can carry multiple DNS messages. However, applications can only control the
 amount of padding in QUIC packets if the implementation of QUIC exposes adequate APIs. This leads
 to the following recommendation:
@@ -597,7 +597,7 @@ section provides similar advice on connection handling for DoQ.
 ### Connection Reuse
 
 Historic implementations of DNS clients are known to open and close TCP
-connections for each DNS query. To amortise connection setup costs, both
+connections for each DNS query. To amortize connection setup costs, both
 clients and servers SHOULD support connection reuse by sending multiple queries
 and responses over a single persistent QUIC connection.
 
@@ -668,7 +668,7 @@ in {{Section 9 of RFC9000}}. These features enable connections to continue opera
 as the client's connectivity changes.
 As detailed in {{privacy-issues-with-long-duration-sessions}}, these features
 trade off privacy for latency. By default, clients SHOULD be configured
-to prioritise privacy and start new sessions if their connectivity changes.
+to prioritize privacy and start new sessions if their connectivity changes.
 
 ## Processing Queries in Parallel
 
@@ -757,8 +757,8 @@ proposal described in {{?RFC7942}}.
 
 ## Performance Measurements
 
-To our knowledge, no benchmarking studies comparing DoT, DoH and DoQ are
-published yet. However anecdotal evidence from the [AdGuard DoQ recursive
+To the author's knowledge, no benchmarking studies comparing DoT, DoH and DoQ are
+published yet. However, anecdotal evidence from the [AdGuard DoQ recursive
 resolver deployment](https://adguard.com/en/blog/dns-over-quic.html) indicates
 that it performs well compared to the other encrypted protocols, particularly
 in mobile environments. Reasons given for this include that DoQ
@@ -825,7 +825,7 @@ and {{using-0-rtt-and-session-resumption}}.
 The prevention on allowing replayable transactions in 0-RTT data
 expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
 risks of replay attacks, as it only allows for transactions that will
-not change the long term state of the server.
+not change the long-term state of the server.
 
 The attacks described above apply to the stub resolver to recursive
 resolver scenario, but similar attacks might be envisaged in the
@@ -866,14 +866,15 @@ protections as stub to recursive applications.
 
 ## Privacy Issues With Address Validation Tokens
 
-QUIC specifies address validation mechanisms in {{Section 8 of RFC9000}}.
-Use of an address validation token allows QUIC servers to avoid an extra RTT
-for new connections. Address validation tokens are typically tied to an IP address. QUIC
-clients normally only use these tokens when setting a new connection
-from a previously used address. However, due to the prevalence of NAT,
-clients are not always aware that they are using a new address. There
-is a linkability risk if clients mistakenly use address validation tokens after
-unknowingly moving to a new location.
+QUIC specifies address validation mechanisms in {{Section 8 of RFC9000}}. Use
+of an address validation token allows QUIC servers to avoid an extra RTT for
+new connections. Address validation tokens are typically tied to an IP address.
+QUIC clients normally only use these tokens when setting up a new connection
+from a previously used address. However, clients are not always aware that they
+are using a new address. This could be due to NAT, or because the client does
+not have an API available to check if the IP address has changed (which can be
+quite often for IPv6). There is a linkability risk if clients mistakenly use
+address validation tokens after unknowingly moving to a new location.
 
 The recommendations in {{using-0-rtt-and-session-resumption}} mitigates
 this risk by tying the usage of the NEW_TOKEN to that of session resumption.
@@ -1004,7 +1005,7 @@ defined in {{Section 4.9 and Section 4.10 of RFC8126}}
 * Permanent registrations for values larger than 0x3f, which are assigned
 using the Specification Required policy ({{!RFC8126}})
 
-* Provisonal registrations for values larger than 0x3f, which require Expert
+* Provisional registrations for values larger than 0x3f, which require Expert
 Review, as defined in {{Section 4.5 of RFC8126}}.
 
 Provisional reservations share the range of values larger than 0x3f
@@ -1111,5 +1112,5 @@ Versions prior to -02 of this specification
 proposed a simpler mapping scheme of queries and responses to QUIc stream,
 which omitted the 2 byte length field and
 supported only a single response on a given stream. The more complex mapping
-in {{stream-mapping-and-usage}} was adopted to specifically cater for XFR support, however it breaks
+in {{stream-mapping-and-usage}} was adopted to specifically cater for XFR support, however, it breaks
 compatibility with earlier versions.
