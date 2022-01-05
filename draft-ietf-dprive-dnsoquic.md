@@ -931,8 +931,8 @@ Specification:
 
 ## Reservation of Dedicated Port
 
-Port 853 for both TCP and UDP is currently reserved for 'DNS query-response protocol run over
-TLS/DTLS' {{!RFC7858}}. 
+For both TCP and UDP port 853 is currently reserved for 'DNS query-response 
+protocol run over TLS/DTLS' {{!RFC7858}}. 
 
 However, the specification for DNS over DTLS (DoD)
 {{?RFC8094}} is experimental, limited to stub to resolver, and no
@@ -952,6 +952,8 @@ IANA is requested to update the following value in the "Service Name and Transpo
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
+IANA responded to the early allocation request with the following TEMPORARY assignment:
+
 Service Name:
 : domain-s
 
@@ -962,19 +964,22 @@ Transport Protocol(s):
 : UDP
 
 Assignee:
-: IESG
+: IETF DPRIVE Chairs
 
 Contact:
-: IETF Chair
+: Brian Haberman
 
 Description:
 : DNS query-response protocol run over DTLS or QUIC
 
 Reference:
-: This document
+: {{!RFC7858}}{{?RFC8094}} This document
 
-Additionally IANA is requested to update the Description for TCP port 853 to be 'DNS query-response protocol run over
-TLS' for consistency.
+The TEMPORARY assignment expires 13th December 2022.
+
+Additionally, IANA is requested to update the Description field for the
+corresponding TCP port 853 allocation to be 'DNS query-response protocol run
+over TLS' for consistency and clarity.
 
 ### Port number 784 for experimentations
 
