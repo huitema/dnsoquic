@@ -578,15 +578,17 @@ amount of padding in QUIC packets if the implementation of QUIC exposes adequate
 to the following recommendation:
 
 * if the implementation of QUIC exposes APIs to set a padding policy,
-  DNS over QUIC SHOULD use that API to align the packet length to a small set of fixed sizes,
-  aligned with the recommendations of the "Padding Policies for Extension
-  Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
+  DNS over QUIC SHOULD use that API to align the packet length to a small set of
+  fixed sizes.
 
 * if padding at the QUIC level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
   a small set of fixed sizes, using the EDNS padding extension as specified
-  in {{!RFC7830}}. The sizes SHOULD be aligned with the recommendations of the "Padding Policies for Extension
-  Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
+  in {{!RFC7830}}. 
+
+In the absence of a standard policy for padding sizes, implementations should
+consider following the recommendations of the Experimental status "Padding
+Policies for Extension Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
 
 ## Connection Handling
 
