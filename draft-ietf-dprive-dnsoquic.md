@@ -583,8 +583,12 @@ to the following recommendation:
 
 * if padding at the QUIC level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
-  a small set of fixed sizes, using the EDNS padding extension as specified
-  in {{!RFC7830}}. 
+  a small set of fixed sizes, using the EDNS(0) padding extension as specified
+  in {{!RFC7830}}.
+
+Implementation might choose not to use a QUIC API for padding if it is
+significantly simpler to re-use existing DNS message padding logic which is
+applied to other encrypted transports.
 
 In the absence of a standard policy for padding sizes, implementations should
 consider following the recommendations of the Experimental status "Padding
