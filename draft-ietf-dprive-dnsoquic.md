@@ -931,9 +931,11 @@ Specification:
 
 ## Reservation of Dedicated Port
 
-Port 853 is currently reserved for 'DNS query-response protocol run over
-TLS/DTLS' {{!RFC7858}}. However, the specification for DNS over DTLS (DoD)
-{{!RFC8094}} is experimental, limited to stub to resolver, and no
+For both TCP and UDP port 853 is currently reserved for 'DNS query-response 
+protocol run over TLS/DTLS' {{!RFC7858}}. 
+
+However, the specification for DNS over DTLS (DoD)
+{{?RFC8094}} is experimental, limited to stub to resolver, and no
 implementations or deployments currently exist to our knowledge (even though
 several years have passed since the specification was published).
 
@@ -946,12 +948,14 @@ significant bit in each UDP payload. Such deployments ought to check the
 signatures of future versions or extensions (e.g. {{?I-D.ietf-quic-bit-grease}})
 of QUIC and DTLS before deploying them to serve DNS on the same port.
 
-IANA is requested to add the following value to the "Service Name and Transport
+IANA is requested to update the following value in the "Service Name and Transport
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
+IANA responded to the early allocation request with the following TEMPORARY assignment:
+
 Service Name:
-: dns-over-quic
+: domain-s
 
 Port Number:
 : 853
@@ -960,16 +964,22 @@ Transport Protocol(s):
 : UDP
 
 Assignee:
-: IESG
+: IETF DPRIVE Chairs
 
 Contact:
-: IETF Chair
+: Brian Haberman
 
 Description:
-: DNS query-response protocol run over QUIC
+: DNS query-response protocol run over DTLS or QUIC
 
 Reference:
-: This document
+: {{!RFC7858}}{{?RFC8094}} This document
+
+The TEMPORARY assignment expires 13th December 2022.
+
+Additionally, IANA is requested to update the Description field for the
+corresponding TCP port 853 allocation to be 'DNS query-response protocol run
+over TLS' for consistency and clarity.
 
 ### Port number 784 for experimentations
 
