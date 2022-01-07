@@ -757,11 +757,12 @@ proposal described in {{?RFC7942}}.
 
 ## Performance Measurements
 
-To the author's knowledge, no benchmarking studies comparing DoT, DoH and DoQ are
-published yet. However, anecdotal evidence from the [AdGuard DoQ recursive
+To the author's knowledge, no benchmarking studies comparing DoT, DoH and DoQ
+are published yet. However, anecdotal evidence from the [AdGuard DoQ recursive
 resolver deployment](https://adguard.com/en/blog/dns-over-quic.html) indicates
-that it performs well compared to the other encrypted protocols, particularly
-in mobile environments. Reasons given for this include that DoQ
+that it performs similarly (and possibly better) compared to the other
+encrypted protocols, particularly in mobile environments. Reasons given for
+this include that DoQ
 
 * Uses less bandwidth due to a more efficient handshake (and due to less per
   message overhead when compared to DoH).
