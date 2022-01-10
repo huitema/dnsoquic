@@ -2,7 +2,7 @@
 title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-07
+docName: draft-ietf-dprive-dnsoquic-08
 
 stand_alone: yes
 
@@ -763,7 +763,7 @@ proposal described in {{?RFC7942}}.
 
 ## Performance Measurements
 
-To the author's knowledge, no benchmarking studies comparing DoT, DoH and DoQ
+To the authors' knowledge, no benchmarking studies comparing DoT, DoH and DoQ
 are published yet. However, anecdotal evidence from the [AdGuard DoQ recursive
 resolver deployment](https://adguard.com/en/blog/dns-over-quic.html) indicates
 that it performs similarly (and possibly better) compared to the other
@@ -823,11 +823,11 @@ which is only wide enough to account for variations in clock skew and network tr
 
 The recommendation for TLS 1.3 {{?RFC8446}} is that the capability to use 0-RTT
 data should be turned off by default, and only enabled if the user clearly
-understands the associated risks. In our case, allowing 0-RTT data
-provides significant performance gains, and we are concerned that a
-recommendation to not use it would simply be ignored. Instead, we provide
-a set of practical recommendations in {{session-resumption-and-0-rtt}}
-and {{using-0-rtt-and-session-resumption}}.
+understands the associated risks. In the case of DoQ, allowing 0-RTT data
+provides significant performance gains, and there is a concern that a
+recommendation to not use it would simply be ignored. Instead, a set of
+practical recommendations is provided in {{session-resumption-and-0-rtt}} and
+{{using-0-rtt-and-session-resumption}}.
 
 The prevention on allowing replayable transactions in 0-RTT data
 expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
@@ -944,7 +944,7 @@ protocol run over TLS/DTLS' {{!RFC7858}}.
 
 However, the specification for DNS over DTLS (DoD)
 {{?RFC8094}} is experimental, limited to stub to resolver, and no
-implementations or deployments currently exist to our knowledge (even though
+implementations or deployments currently exist to the authors' knowledge (even though
 several years have passed since the specification was published).
 
 This specification proposes to additionally reserve the use of UDP port 853 for
