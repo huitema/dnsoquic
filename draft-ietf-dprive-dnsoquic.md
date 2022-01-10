@@ -564,10 +564,10 @@ connections by the client from the same address.
 
 ## Padding
 
-Implementations SHOULD protect against the traffic analysis attacks described in
+Implementations MUST protect against the traffic analysis attacks described in
 {{traffic-analysis}} by the judicious injection of padding. This
 could be done either by padding individual DNS messages using the
-EDNS(0) Padding Option {{!RFC7830}} and by padding QUIC packets (see
+EDNS(0) Padding Option {{!RFC7830}} or by padding QUIC packets (see
 {{Section 8.6 of RFC9000}}, the QUIC transport specification.
 
 In theory, padding at the QUIC level could result in better performance for the equivalent
@@ -578,15 +578,21 @@ amount of padding in QUIC packets if the implementation of QUIC exposes adequate
 to the following recommendation:
 
 * if the implementation of QUIC exposes APIs to set a padding policy,
-  DNS over QUIC SHOULD use that API to align the packet length to a small set of fixed sizes,
-  aligned with the recommendations of the "Padding Policies for Extension
-  Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
+  DNS over QUIC SHOULD use that API to align the packet length to a small set of
+  fixed sizes.
 
 * if padding at the QUIC level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
-  a small set of fixed sizes, using the EDNS padding extension as specified
-  in "Padding Policies for Extension
-  Mechanisms for DNS (EDNS(0))" {{!RFC8467}}.
+  a small set of fixed sizes, using the EDNS(0) padding extension as specified
+  in {{!RFC7830}}.
+
+Implementation might choose not to use a QUIC API for padding if it is
+significantly simpler to re-use existing DNS message padding logic which is
+applied to other encrypted transports.
+
+In the absence of a standard policy for padding sizes, implementations should
+consider following the recommendations of the Experimental status "Padding
+Policies for Extension Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
 
 ## Connection Handling
 
