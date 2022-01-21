@@ -420,7 +420,7 @@ implications for proxying message from TCP/DoT/DoH over DoQ.
 
 ### Alternative error codes
 
-This specification suggests specific error codes {{transaction-cancellation}},
+This specification suggests specific error codes in {{transaction-cancellation}},
 {{transaction-errors}}, and {{protocol-errors}}. These error codes are meant
 to facilitate investigation of failures and other incidents. New error
 codes may be defined in future versions of DoQ, or registered as specified
