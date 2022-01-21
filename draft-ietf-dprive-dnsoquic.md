@@ -505,8 +505,8 @@ message length field in DNS over TCP {{!RFC1035}} and DNS over TLS
 over HTTP {{?RFC8484}}. DoQ enforces the same restriction.
 
 The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify the
-UDP message size. This parameter is ignored by DoQ. DoQ implementations always
-assume that the maximum message size is 65535 bytes.
+UDP message size. This parameter is ignored by DoQ. DoQ implementations MUST
+always assume that the maximum message size is 65535 bytes.
 
 
 # Implementation Requirements
