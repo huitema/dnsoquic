@@ -296,7 +296,7 @@ The server MUST send the response(s) on the same stream and MUST indicate, after
 the last response, through the STREAM FIN mechanism that no further data will be
 sent on that stream.
 
-Therefore, a single unidirectional client-initiated DNS transaction consumes a single stream.
+Therefore, a single DNS transaction consumes a single bidirectional client-initiated stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
 4, and so on (see {{Section 2.1 of RFC9000}}.
 
