@@ -960,8 +960,6 @@ IANA is requested to update the following value in the "Service Name and Transpo
 Protocol Port Number Registry" in the System Range. The registry for that range
 requires IETF Review or IESG Approval {{?RFC6335}}.
 
-IANA responded to the early allocation request with the following TEMPORARY assignment:
-
 Service Name:
 : domain-s
 
@@ -983,21 +981,10 @@ Description:
 Reference:
 : {{!RFC7858}}{{?RFC8094}} This document
 
-The TEMPORARY assignment expires 13th December 2022.
-
 Additionally, IANA is requested to update the Description field for the
 corresponding TCP port 853 allocation to be 'DNS query-response protocol run
 over TLS' for consistency and clarity.
-
-### Port number 784 for experimentations
-
-(RFC EDITOR NOTE: THIS SECTION TO BE REMOVED BEFORE PUBLICATION) Early
-experiments MAY use port 784. This port is marked in the IANA registry as
-unassigned.
-
-(Note that version in -02 of this draft experiments were directed to use port
-8853.)
-
+(UPDATE ON IANA REQUEST: THIS SENTENCE TO BE REMOVED BEFORE PUBLICATION) Review by the port experts on 13th December 2021 determined that the proposed updates to the existing port allocation were acceptable and will be made when this document is approved for publication.
 ## Reservation of Extended DNS Error Code Too Early
 
 IANA is requested to add the following value to
