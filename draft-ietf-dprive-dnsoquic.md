@@ -474,8 +474,8 @@ in progress transaction on that connection MUST be abandoned.
 A client MAY take advantage of the session resumption mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
 potential privacy issues associated with session resumption before deciding to use
-this mechanism. These privacy issues are detailed in
-{{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}},
+this mechanism. These privacy issues are detailed in {{privacy-issues-with-0-rtt-data}}
+and {{privacy-issues-with-session-resumption}},
 and the implementation considerations are discussed in
 {{using-0-rtt-and-session-resumption}}.
 
