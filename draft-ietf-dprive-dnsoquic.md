@@ -356,7 +356,7 @@ See {{iana-error-codes}} for details on registering new error codes.
 
 In QUIC, sending STOP_SENDING requests that a peer cease transmission on a
 stream. If a DoQ client wishes to cancel an outstanding request, it MUST issue
-a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
+a QUIC STOP_SENDING with error code DOQ_REQUEST_CANCELLED. This may be sent at
 any time but will be ignored if the server response has already been 
 acknowledged. The corresponding DNS transaction MUST be abandoned.
 
