@@ -984,7 +984,7 @@ Reference:
 Additionally, IANA is requested to update the Description field for the
 corresponding TCP port 853 allocation to be 'DNS query-response protocol run
 over TLS' for consistency and clarity.
-
+(UPDATE ON IANA REQUEST: THIS SENTENCE TO BE REMOVED BEFORE PUBLICATION) Review by the port experts on 13th December 2021 determined that the proposed updates to the existing port allocation were acceptable and will be made when this document is approved for publication.
 ## Reservation of Extended DNS Error Code Too Early
 
 IANA is requested to add the following value to
