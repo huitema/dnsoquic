@@ -453,7 +453,7 @@ timeout are discussed in {{resource-management}}.
 Clients SHOULD monitor the idle time incurred on their connection to the
 server, defined by the time spent since the last packet from the server has
 been received. When a client prepares to send a new DNS query to the server, it
-will check whether the idle time is sufficient lower than the idle timer. If it
+will check whether the idle time is sufficiently lower than the idle timer. If it
 is, the client will send the DNS query over the existing connection. If not,
 the client will establish a new connection and send the query over that
 connection.
