@@ -1086,8 +1086,11 @@ Kahn Gillmor (DKG) in a message to the IETF "DPRIVE" working group {{DNS0RTT}}.
 
 Thanks to Tony Finch for an extensive review of the initial version of this
 draft, and to Robert Evans for the discussion of 0-RTT privacy issues.
-Reviews by Paul Hoffman and Martin Thomson and interoperability tests
+Early reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
+
+Thanks also to Martin Thomson and Martin Duke for their later reviews focussing
+on the low level QUIC details which helped clarify several aspects of DoQ.
 
 --- back
 
