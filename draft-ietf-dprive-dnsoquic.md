@@ -356,7 +356,7 @@ See {{iana-error-codes}} for details on registering new error codes.
 
 In QUIC, sending STOP_SENDING requests that a peer cease transmission on a
 stream. If a DoQ client wishes to cancel an outstanding request, it MUST issue
-a QUIC Stop Sending with error code DOQ_REQUEST_CANCELLED. This may be sent at
+a QUIC STOP_SENDING with error code DOQ_REQUEST_CANCELLED. This may be sent at
 any time but will be ignored if the server response has already been 
 acknowledged. The corresponding DNS transaction MUST be abandoned.
 
@@ -474,8 +474,8 @@ in progress transaction on that connection MUST be abandoned.
 A client MAY take advantage of the session resumption mechanisms supported by
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
 potential privacy issues associated with session resumption before deciding to use
-this mechanism. These privacy issues are detailed in
-{{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}},
+this mechanism. These privacy issues are detailed in {{privacy-issues-with-0-rtt-data}}
+and {{privacy-issues-with-session-resumption}},
 and the implementation considerations are discussed in
 {{using-0-rtt-and-session-resumption}}.
 
