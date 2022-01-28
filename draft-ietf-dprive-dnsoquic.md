@@ -590,9 +590,12 @@ Implementation might choose not to use a QUIC API for padding if it is
 significantly simpler to re-use existing DNS message padding logic which is
 applied to other encrypted transports.
 
-In the absence of a standard policy for padding sizes, implementations should
-consider following the recommendations of the Experimental status "Padding
-Policies for Extension Mechanisms for DNS (EDNS(0))" {{?RFC8467}}.
+In the absence of a standard policy for padding sizes, implementations SHOULD
+follow the recommendations of the Experimental status "Padding Policies for
+Extension Mechanisms for DNS (EDNS(0))" {{!RFC8467}}. While Experimental,
+these recommendations are referenced because they are implemented and deployed
+for DoT, and provide a way for implementations to be fully compliant with this
+specification.
 
 ## Connection Handling
 
