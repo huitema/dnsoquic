@@ -1090,8 +1090,9 @@ Early reviews by Paul Hoffman and Martin Thomson and interoperability tests
 conducted by Stephane Bortzmeyer helped improve the definition of the protocol.
 
 Thanks also to Martin Thomson and Martin Duke for their later reviews focussing
-on the low level QUIC details which helped clarify several aspects of DoQ.
-
+on the low level QUIC details which helped clarify several aspects of DoQ. Thanks
+to Andrey Meshkov, Loganaden Velvindron, Lucas Pardue, Matt Joras, Mirja Kuelewind,
+and Phillip Hallam-Baker for their reviews and contributions.
 --- back
 
 # The NOTIFY Service
