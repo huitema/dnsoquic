@@ -783,8 +783,23 @@ this include that DoQ
 
 # Security Considerations
 
+A general Threat Analysis of the Domain Name System is found in {{?RFC3833}}.
+This analysis was written before the development of DoT, DoH and DoQ, and
+probably needs to be updated.
+
 The security considerations of DoQ should be comparable to those of DoT
-{{?RFC7858}}.
+{{?RFC7858}}. DoT as specified in {{?RFC7858}} only addresses the stub to
+recursive resolver scenario, but the considerations about person-in-the-middle
+attacks, middleboxes and caching of data from clear text connections also
+apply for DoQ to the resolver to authoritative server scenario. 
+DoQ provides a form of "channel security" similar to that provided by TSIG
+{{?RFC8945}}, and as such addresses some of the concerns about Securing DNS
+Zone Replication expressed in {{Section 4.3 of RFC3833}}.
+
+DoQ relies on QUIC, which itself relies on TLS 1.3 and thus supports by default
+the protections against downgrade attacks described in {{?BCP195}}.
+QUIC specific issues and their mitigations are described in
+{{Section 21 of RFC9000}}. 
 
 
 # Privacy Considerations
