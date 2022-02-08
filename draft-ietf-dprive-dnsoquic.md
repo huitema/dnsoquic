@@ -792,9 +792,7 @@ The security considerations of DoQ should be comparable to those of DoT
 recursive resolver scenario, but the considerations about person-in-the-middle
 attacks, middleboxes and caching of data from clear text connections also
 apply for DoQ to the resolver to authoritative server scenario. 
-DoQ provides a form of "channel security" similar to that provided by TSIG
-{{?RFC8945}}, and as such addresses some of the concerns about Securing DNS
-Zone Replication expressed in {{Section 4.3 of RFC3833}}.
+As stated in {{authentication}} the authentication requirements for securing zone transfer using DoQ are the same as those for zone transfer over DoT, therefore the general security considerations are entirely analogous to those described in {{!RFFC9103}.
 
 DoQ relies on QUIC, which itself relies on TLS 1.3 and thus supports by default
 the protections against downgrade attacks described in {{?BCP195}}.
