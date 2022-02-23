@@ -986,10 +986,10 @@ Transport Protocol(s):
 : UDP
 
 Assignee:
-: IETF DPRIVE Chairs
+: IESG
 
 Contact:
-: Brian Haberman
+: IETF Chair
 
 Description:
 : DNS query-response protocol run over DTLS or QUIC
