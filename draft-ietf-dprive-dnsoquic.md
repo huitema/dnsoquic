@@ -488,7 +488,7 @@ data. See {{the-notify-service}} for a detailed discussion of why NOTIFY is
 included here.
  
 Servers MAY support session resumption, and MAY do that with or without supporting
-0-RTT, using the mechanisms described in {{Section 4.2.10 of RFC8446}}.
+0-RTT, using the mechanisms described in {{Section 4.6.1 of RFC9001}}.
 Servers supporting 0-RTT MUST NOT execute non replayable transactions received in 0-RTT
 data, and MUST adopt one of the following behaviors:
 
