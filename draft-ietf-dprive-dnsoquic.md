@@ -481,7 +481,7 @@ and {{privacy-issues-with-session-resumption}},
 and the implementation considerations are discussed in
 {{using-0-rtt-and-session-resumption}}.
 
-The 0-RTT mechanism SHOULD NOT be used to send DNS requests that are not
+The 0-RTT mechanism MUST NOT be used to send DNS requests that are not
 "replayable" transactions. In this specification, only transactions that have
 an OPCODE of QUERY or NOTIFY are considered replayable and MAY be sent in 0-RTT
 data. See {{the-notify-service}} for a detailed discussion of why NOTIFY is
