@@ -54,7 +54,7 @@ informative:
 
 --- abstract
 
-This document describes the use of QUIC to provide transport privacy for DNS.
+This document describes the use of QUIC to provide transport confidentiality for DNS.
 The encryption provided by QUIC has similar properties to that provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
 TCP and provides more efficient packet loss recovery than UDP. DNS over QUIC
@@ -204,7 +204,8 @@ to QUIC streams in {{stream-mapping-and-usage}}.
 
 Using QUIC might allow a protocol to disguise its purpose from devices on the
 network path using encryption and traffic analysis resistance techniques like
-padding. This specification does not include any measures that are designed to
+padding, traffic pacing, and traffic shaping. This specification does not
+include any measures that are designed to
 avoid such classification. Consequently, firewalls and other middleboxes might
 be able to distinguish DoQ from other protocols that use QUIC, like HTTP, and
 apply different treatment.
@@ -357,7 +358,7 @@ See {{iana-error-codes}} for details on registering new error codes.
 In QUIC, sending STOP_SENDING requests that a peer cease transmission on a
 stream. If a DoQ client wishes to cancel an outstanding request, it MUST issue
 a QUIC STOP_SENDING with error code DOQ_REQUEST_CANCELLED. This may be sent at
-any time but will be ignored if the server response has already been 
+any time but will have no effect if the server response has already been
 acknowledged. The corresponding DNS transaction MUST be abandoned.
 
 Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}.
@@ -381,7 +382,7 @@ notified to the client by sending back a response with the Response Code set to
 SERVFAIL.
 
 If a server is incapable of sending a DNS response due to an internal error, it
-SHOULD issue a QUIC Stream Reset. The error code SHOULD be set to DOQ_INTERNAL_ERROR. The
+SHOULD issue a QUIC RESET_STREAM frame. The error code SHOULD be set to DOQ_INTERNAL_ERROR. The
 corresponding DNS transaction MUST be abandoned. Clients MAY limit the number of
 unsolicited QUIC Stream Resets received on a connection before choosing to close the
 connection.
@@ -521,7 +522,7 @@ server. Given this, and to align with the authentication model for DoH, DoQ stub
 SHOULD use a Strict authentication profile. Client authentication for the encrypted
 stub to recursive scenario is not described in any DNS RFC.
 
-For zone transfer, the requirements are the same as described in
+For zone transfer, the authentication requirements are the same as described in
 {{!RFC9103}}.
 
 For the recursive resolver to authoritative nameserver scenario, authentication
@@ -536,11 +537,11 @@ fall back to DoT and then potentially clear text, as specified in DoT
 {{!RFC8310}}, depending on their privacy profile.
 
 DNS clients SHOULD remember server IP addresses that don't support DoQ.
-Timeouts, connection refusals, and QUIC handshake failures are valid indicators
+Timeouts, connection refusals, and QUIC handshake failures are indicators
 that a server does not support DoQ.  Clients SHOULD NOT attempt DoQ queries to a
 server that does not support DoQ for a reasonable period (such as one hour per
 server).  DNS clients following an out-of-band key-pinned privacy profile
-({{?RFC7858}}) MAY be more aggressive about retrying DoQ connection failures.
+({{?RFC7858}}) MAY be more aggressive about retrying after DoQ connection failures.
 
 ## Address Validation
 
@@ -652,8 +653,8 @@ Session resumption and 0-RTT data transmission create
 privacy risks detailed in detailed in
 {{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}}.
 The following recommendations are meant to reduce the privacy
-risks while enjoying the performance benefits of 0-RTT data, with the
-restriction specified in {{session-resumption-and-0-rtt}}.
+risks while enjoying the performance benefits of 0-RTT data, subject to the
+restrictions specified in {{session-resumption-and-0-rtt}}.
 
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
 to {{?RFC8446}}. By default, clients SHOULD NOT use session resumption if the
@@ -672,7 +673,7 @@ Servers SHOULD implement the anti-replay mechanisms specified in {{Section 8 of 
 
 ### Controlling Connection Migration For Privacy
 
-DoQ implementation might consider using the connection migration features defined
+DoQ implementations might consider using the connection migration features defined
 in {{Section 9 of RFC9000}}. These features enable connections to continue operating
 as the client's connectivity changes.
 As detailed in {{privacy-issues-with-long-duration-sessions}}, these features
@@ -783,7 +784,7 @@ this include that DoQ
 
 # Security Considerations
 
-A general Threat Analysis of the Domain Name System is found in {{?RFC3833}}.
+A Threat Analysis of the Domain Name System is found in {{?RFC3833}}.
 This analysis was written before the development of DoT, DoH and DoQ, and
 probably needs to be updated.
 
@@ -873,7 +874,8 @@ tracking after changes of the client's address.
 The recommendations in {{using-0-rtt-and-session-resumption}} are designed to
 mitigate these risks. Using session tickets only once mitigates
 the risk of tracking by third parties. Refusing to resume a session if addresses
-change mitigates the risk of tracking by the server.
+change mitigates the incremental risk of tracking by the server (but the risk of
+tracking by IP address remains).
 
 The privacy trade-offs here may be context specific. Stub resolvers will have a strong
 motivation to prefer privacy over latency since they often change location. However,
@@ -900,7 +902,9 @@ quite often for IPv6). There is a linkability risk if clients mistakenly use
 address validation tokens after unknowingly moving to a new location.
 
 The recommendations in {{using-0-rtt-and-session-resumption}} mitigates
-this risk by tying the usage of the NEW_TOKEN to that of session resumption.
+this risk by tying the usage of the NEW_TOKEN to that of session resumption,
+though this recommendation does not cover the case where the client is unaware
+of the address change.
 
 ## Privacy Issues With Long Duration Sessions
 
