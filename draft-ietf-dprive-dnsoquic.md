@@ -472,8 +472,9 @@ in progress transaction on that connection MUST be abandoned.
 
 ## Session Resumption and 0-RTT
 
-A client MAY take advantage of the session resumption mechanisms supported by
-QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}. Clients SHOULD consider
+A client MAY take advantage of the session resumption and 0-RTT mechanisms supported by
+QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}, if the server supports them.
+Clients SHOULD consider
 potential privacy issues associated with session resumption before deciding to use
 this mechanism. These privacy issues are detailed in {{privacy-issues-with-0-rtt-data}}
 and {{privacy-issues-with-session-resumption}},
@@ -485,9 +486,11 @@ The 0-RTT mechanism SHOULD NOT be used to send DNS requests that are not
 an OPCODE of QUERY or NOTIFY are considered replayable and MAY be sent in 0-RTT
 data. See {{the-notify-service}} for a detailed discussion of why NOTIFY is
 included here.
-
-Servers MUST NOT execute non replayable transactions received in 0-RTT
-data. Servers MUST adopt one of the following behaviors:
+ 
+Servers MAY support session resumption, and MAY do that with or without supporting
+0-RTT, using the mechanisms described in {{Section 4.2.10 of RFC8446}}.
+Servers supporting 0-RTT MUST NOT execute non replayable transactions received in 0-RTT
+data, and MUST adopt one of the following behaviors:
 
 * Queue the offending transaction and only execute it after the QUIC handshake
 has been completed, as defined in {{Section 4.1.1 of RFC9001}}.
@@ -508,7 +511,6 @@ over HTTP {{?RFC8484}}. DoQ enforces the same restriction.
 The Extension Mechanisms for DNS (EDNS) {{!RFC6891}} allow peers to specify the
 UDP message size. This parameter is ignored by DoQ. DoQ implementations always
 assume that the maximum message size is 65535 bytes.
-
 
 # Implementation Requirements
 
