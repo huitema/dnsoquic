@@ -205,8 +205,10 @@ to QUIC streams in {{stream-mapping-and-usage}}.
 Using QUIC might allow a protocol to disguise its purpose from devices on the
 network path using encryption and traffic analysis resistance techniques like
 padding, traffic pacing, and traffic shaping. This specification does not
-include any measures that are designed to
-avoid such classification. Consequently, firewalls and other middleboxes might
+include any measures that are designed to avoid such classification --
+the padding mechanisms defined in {{padding}} are meant to hide which
+names and records are looked up, but not the fact that this is DNS traffic.
+Consequently, firewalls and other middleboxes might
 be able to distinguish DoQ from other protocols that use QUIC, like HTTP, and
 apply different treatment.
 
@@ -259,7 +261,8 @@ port 53 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
 {{!RFC1035}}.
 
 In the stub to recursive scenario, the use of port 443 as a mutually agreed
-alternative port can be operationally beneficial, since port 443 is less likely
+alternative port can be operationally beneficial, since port 443 is 
+used by many services using QUIC and HTTP-3 and thus less likely
 to be blocked than other ports. Several mechanisms for stubs to discover
 recursives offering encrypted transports, including the use of custom ports, are
 the subject of ongoing work.
