@@ -206,8 +206,8 @@ Using QUIC might allow a protocol to disguise its purpose from devices on the
 network path using encryption and traffic analysis resistance techniques like
 padding, traffic pacing, and traffic shaping. This specification does not
 include any measures that are designed to avoid such classification --
-the padding mechanisms defined in {{padding}} are meant to hide which
-names and records are looked up, but not the fact that this is DNS traffic.
+the padding mechanisms defined in {{padding}} are intended to obfuscate the specific
+records contained in DNS queries and responses, but not the fact that this is DNS traffic.
 Consequently, firewalls and other middleboxes might
 be able to distinguish DoQ from other protocols that use QUIC, like HTTP, and
 apply different treatment.
