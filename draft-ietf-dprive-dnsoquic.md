@@ -483,8 +483,8 @@ and the implementation considerations are discussed in
 
 The 0-RTT mechanism MUST NOT be used to send DNS requests that are not
 "replayable" transactions. In this specification, only transactions that have
-an OPCODE of QUERY or NOTIFY are considered replayable and MAY be sent in 0-RTT
-data. See {{the-notify-service}} for a detailed discussion of why NOTIFY is
+an OPCODE of QUERY or NOTIFY are considered replayable and therefore other OPCODES MUST NOT
+be sent in 0-RTT data. See {{the-notify-service}} for a detailed discussion of why NOTIFY is
 included here.
  
 Servers MAY support session resumption, and MAY do that with or without supporting
