@@ -302,9 +302,15 @@ This means that the client's first query occurs on QUIC stream 0, the second on
 4, and so on (see {{Section 2.1 of RFC9000}}.
 
 Servers MAY defer processing of a query until the STREAM FIN has been indicated
-on the stream selected by the client. Servers and clients MAY monitor the number
-of "dangling" streams for which the expected queries or responses have been received but
-not the STREAM FIN. Implementations MAY impose a limit on the number of
+on the stream selected by the client.
+
+Servers and clients MAY monitor the number
+of "dangling" streams. These are open streams for which
+
+* the expected queries or responses have not been received or,
+* the expected queries or responses have been received but not the STREAM FIN
+
+after implementation defined timeouts. Implementations MAY impose a limit on the number of
 such dangling streams. If limits are encountered, implementations MAY close the connection.
 
 ### DNS Message IDs
@@ -466,7 +472,7 @@ DOQ_NO_ERROR.
 
 Clients and servers MAY close the connection for a variety of other
 reasons, indicated using QUIC's CONNECTION_CLOSE. Client and servers
-that send packets over a connection discarded by their peer MAY
+that send packets over a connection discarded by their peer might
 receive a stateless reset indication. If a connection fails, all the
 in progress transaction on that connection MUST be abandoned.
 
