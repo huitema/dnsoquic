@@ -230,7 +230,7 @@ see {{Section 4.2 of RFC8490}}.
 
 DoQ connections are established as described in the QUIC transport
 specification {{!RFC9000}}. During connection establishment, DoQ support is
-indicated by selecting the ALPN (Application-Layer Protocol Negotiation) token "doq" in the crypto handshake.
+indicated by selecting the Application-Layer Protocol Negotiation (ALPN) token "doq" in the crypto handshake.
 
 ### Draft Version Identification
 
