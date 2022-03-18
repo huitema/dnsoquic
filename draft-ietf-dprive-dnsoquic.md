@@ -1056,9 +1056,6 @@ Status:
 Contact:
 : Contact details for the registrant.
 
-Notes:
-: Supplementary notes about the registration.
-
 In addition, permanent registrations MUST include:
 
 Error:
@@ -1082,16 +1079,27 @@ Date:
 A request to update the date on any provisional
 registration can be made without review from the designated expert(s).
 
-The initial contents of this registry are shown in {{iana-error-table}}.
+The initial contents of this registry are shown in {{iana-error-table}} and all
+entries share the following fields:
 
-| Value | Error                     | Description                   | Specification   |
-|:------|:--------------------------|:------------------------------|:----------------|
-| 0x0   | DOQ_NO_ERROR | No error | {{doq-error-codes}} |
-| 0x1  | DOQ_INTERNAL_ERROR | Implementation error | {{doq-error-codes}} |
-| 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation | {{doq-error-codes}} |
-| 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client | {{doq-error-codes}} |
-| 0x4  | DOQ_EXCESSIVE_LOAD | Closing a connection for excessive load | {{doq-error-codes}} |
-| 0xd098ea5e | DOQ_ERROR_RESERVED | Alternative error code used for tests | {{doq-error-codes}} |
+Status:
+: Permanent
+
+Contact:
+: DPRIVE WG
+
+Specification:
+: {{doq-error-codes}}
+
+
+| Value | Error                     | Description                   |
+|:------|:--------------------------|:------------------------------|
+| 0x0   | DOQ_NO_ERROR | No error |
+| 0x1  | DOQ_INTERNAL_ERROR | Implementation error |
+| 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation |
+| 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client |
+| 0x4  | DOQ_EXCESSIVE_LOAD | Closing a connection for excessive load |
+| 0xd098ea5e | DOQ_ERROR_RESERVED | Alternative error code used for tests |
 {: #iana-error-table title="Initial DNS over QUIC Error Codes Entries"}
 
 # Acknowledgements
