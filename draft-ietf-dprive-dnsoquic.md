@@ -89,7 +89,7 @@ The goals of the DoQ mapping are:
 2.  Provide an improved level of source address validation for DNS
     servers compared to classic DNS over UDP.
 
-3.  Provide a transport that is not constrained by path MTU limitations on the
+3.  Provide a transport that does not impose path MTU limitations on the
     size of DNS responses it can send.
 
 In order to achieve these goals, and to support ongoing work on encryption of
@@ -139,7 +139,7 @@ appear in all capitals, as shown here.
 
 # Document work via GitHub
 
-(RFC EDITOR NOTE: THIS SECTION TO BE REMOVED BEFORE PUBLICATION)The Github
+(RFC EDITOR NOTE: THIS SECTION TO BE REMOVED BEFORE PUBLICATION)The GitHub
 repository for this document is at https://github.com/huitema/dnsoquic.
 Proposed text and editorial changes are very much welcomed there, but any
 functional changes should always first be discussed on the IETF DPRIVE WG
@@ -230,7 +230,7 @@ see {{Section 4.2 of RFC8490}}.
 
 DoQ connections are established as described in the QUIC transport
 specification {{!RFC9000}}. During connection establishment, DoQ support is
-indicated by selecting the ALPN token "doq" in the crypto handshake.
+indicated by selecting the Application-Layer Protocol Negotiation (ALPN) token "doq" in the crypto handshake.
 
 ### Draft Version Identification
 
@@ -338,7 +338,7 @@ DOQ_INTERNAL_ERROR (0x1):
   pursuing the transaction or the connection.
 
 DOQ_PROTOCOL_ERROR (0x2):
-: The DoQ implementation encountered an protocol error and is forcibly aborting
+: The DoQ implementation encountered a protocol error and is forcibly aborting
   the connection.
 
 DOQ_REQUEST_CANCELLED (0x3):
@@ -402,7 +402,7 @@ messages during a transaction. These include (but are not limited to)
 * a client receives a STREAM FIN before receiving all the expected responses
 * a server receives more than one query on a stream
 * a client receives a different number of responses on a stream than expected
-  (e.g. multiple responses to a query for an A record)
+  (e.g., multiple responses to a query for an A record)
 * a client receives a STOP_SENDING request
 * the client or server does not indicate the expected STREAM FIN after
   sending requests or responses (see {{stream-mapping-and-usage}}).
@@ -573,7 +573,7 @@ could be done either by padding individual DNS messages using the
 EDNS(0) Padding Option {{!RFC7830}} or by padding QUIC packets (see
 {{Section 8.6 of RFC9000}}, the QUIC transport specification.
 
-In theory, padding at the QUIC level could result in better performance for the equivalent
+In theory, padding at the QUIC packet level could result in better performance for the equivalent
 protection, because the amount of padding can take into account non-DNS frames
 such as acknowledgements or flow control updates, and also because QUIC packets
 can carry multiple DNS messages. However, applications can only control the
@@ -584,7 +584,7 @@ to the following recommendation:
   DNS over QUIC SHOULD use that API to align the packet length to a small set of
   fixed sizes.
 
-* if padding at the QUIC level is not available or not used,
+* if padding at the QUIC packet level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
   a small set of fixed sizes, using the EDNS(0) padding extension as specified
   in {{!RFC7830}}.
@@ -652,7 +652,7 @@ manage. They can do that because the clients that use 0-RTT will not incur
 latency penalties if new connections are required for a query.
 
 Session resumption and 0-RTT data transmission create
-privacy risks detailed in detailed in
+privacy risks detailed in
 {{privacy-issues-with-session-resumption}} and {{privacy-issues-with-0-rtt-data}}.
 The following recommendations are meant to reduce the privacy
 risks while enjoying the performance benefits of 0-RTT data, subject to the
@@ -668,7 +668,7 @@ risks are mentioned in {{privacy-issues-with-address-validation-tokens}}.
 Clients SHOULD only use the address validation tokens when they are also using session
 resumption, thus avoiding additional tracking risks.
 
-Servers SHOULD issue session resumption tickets with a sufficiently long life time (e.g., 6 hours),
+Servers SHOULD issue session resumption tickets with a sufficiently long lifetime (e.g., 6 hours),
 so that clients are not tempted to either keep connection alive or frequently poll the server
 to renew session resumption tickets.
 Servers SHOULD implement the anti-replay mechanisms specified in {{Section 8 of RFC8446}}.
@@ -931,7 +931,7 @@ the privacy concerns related to long duration sessions using multiple client add
 Even though QUIC packets are encrypted, adversaries can gain information from
 observing packet lengths, in both queries and responses, as well as packet
 timing. Many DNS requests are emitted by web browsers. Loading a specific web
-page may require resolving dozen of DNS names. If an application adopts a
+page may require resolving dozens of DNS names. If an application adopts a
 simple mapping of one query or response per packet, or "one QUIC STREAM frame
 per packet", then the succession of packet lengths may provide enough
 information to identify the requested site.
@@ -975,7 +975,7 @@ the same port, including DTLS , see {{Section 17.2 of RFC9000}}. This means
 that deployments that serve DNS over DTLS and DNS over QUIC (QUIC version 1) on the
 same port will be able to demultiplex the two due to the second most
 significant bit in each UDP payload. Such deployments ought to check the
-signatures of future versions or extensions (e.g. {{?I-D.ietf-quic-bit-grease}})
+signatures of future versions or extensions (e.g., {{?I-D.ietf-quic-bit-grease}})
 of QUIC and DTLS before deploying them to serve DNS on the same port.
 
 IANA is requested to update the following value in the "Service Name and Transport
