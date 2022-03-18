@@ -571,7 +571,7 @@ could be done either by padding individual DNS messages using the
 EDNS(0) Padding Option {{!RFC7830}} or by padding QUIC packets (see
 {{Section 8.6 of RFC9000}}, the QUIC transport specification.
 
-In theory, padding at the QUIC level could result in better performance for the equivalent
+In theory, padding at the QUIC packet level could result in better performance for the equivalent
 protection, because the amount of padding can take into account non-DNS frames
 such as acknowledgements or flow control updates, and also because QUIC packets
 can carry multiple DNS messages. However, applications can only control the
@@ -582,7 +582,7 @@ to the following recommendation:
   DNS over QUIC SHOULD use that API to align the packet length to a small set of
   fixed sizes.
 
-* if padding at the QUIC level is not available or not used,
+* if padding at the QUIC packet level is not available or not used,
   DNS over QUIC MUST ensure that all DNS queries and responses are padded to
   a small set of fixed sizes, using the EDNS(0) padding extension as specified
   in {{!RFC7830}}.
