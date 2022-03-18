@@ -377,7 +377,7 @@ If limits are encountered, servers MAY close the connection. In this case,
 servers wanting to help client debugging MAY use the error code DOQ_EXCESSIVE_LOAD.
 There is always a trade-off between helping good faith clients debug issues
 and allowing denial-of-service attackers to test server defenses, so depending
-on circumstances servers might very well chose to send different error codes.
+on circumstances servers might very well choose to send different error codes.
 
 Note that this mechanism provides a way for secondaries to cancel a single zone
 transfer occurring on a given stream without having to close the QUIC
@@ -421,6 +421,8 @@ messages during a transaction. These include (but are not limited to)
   {{resource-management}})
 * a client or a server attempts to open a unidirectional QUIC stream
 * a server attempts to open a server-initiated bidirectional QUIC stream
+* receiving a "replayable" transaction in O-RTT data (for servers not willing to
+   handle this case -  see section {{session-resumption-and-0-rtt}})
 
 If a peer encounters such an error condition it is considered a fatal error. It
 SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
