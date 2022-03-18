@@ -305,12 +305,13 @@ Servers MAY defer processing of a query until the STREAM FIN has been indicated
 on the stream selected by the client.
 
 Servers and clients MAY monitor the number
-of "dangling" streams. These are open streams for which
+of "dangling" streams. These are open streams where the following events have not 
+occurred after implementation defined timeouts:
 
 * the expected queries or responses have not been received or,
 * the expected queries or responses have been received but not the STREAM FIN
 
-after implementation defined timeouts. Implementations MAY impose a limit on the number of
+Implementations MAY impose a limit on the number of
 such dangling streams. If limits are encountered, implementations MAY close the connection.
 
 ### DNS Message IDs
