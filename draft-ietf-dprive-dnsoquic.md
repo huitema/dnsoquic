@@ -414,7 +414,9 @@ messages during a transaction. These include (but are not limited to)
 
 If a peer encounters such an error condition it is considered a fatal error. It
 SHOULD forcibly abort the connection using QUIC's CONNECTION_CLOSE mechanism,
-and SHOULD use the DoQ error code DOQ_PROTOCOL_ERROR.
+and SHOULD use the DoQ error code DOQ_PROTOCOL_ERROR. In some cases, it MAY
+instead silently abandon the connection, which uses fewer of the local resources
+but makes debugging at the offending node more difficult.
 
 It is noted that the restrictions on use of the above EDNS(0) options has
 implications for proxying message from TCP/DoT/DoH over DoQ.
