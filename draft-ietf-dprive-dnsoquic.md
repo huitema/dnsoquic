@@ -75,7 +75,7 @@ UDP and TCP is specified in "Domain names - implementation and specification"
 
  This document presents a mapping of the DNS protocol over the
 QUIC transport {{!RFC9000}} {{!RFC9001}}. DNS over QUIC is referred here as DoQ,
-in line with "DNS Terminology" {{!I-D.ietf-dnsop-rfc8499bis}}.
+in line with "DNS Terminology" {{?I-D.ietf-dnsop-rfc8499bis}}.
 
 The goals of the DoQ mapping are:
 
@@ -258,7 +258,9 @@ mutual agreement to use another port.
 
 DoQ connections MUST NOT use UDP port 53. This recommendation against use of
 port 53 for DoQ is to avoid confusion between DoQ and the use of DNS over UDP
-{{!RFC1035}}.
+{{!RFC1035}}. The risk of confusion exists even if two parties agreed on
+port 53, as other parties without knowledge of that agreement might still
+try to use that port. 
 
 In the stub to recursive scenario, the use of port 443 as a mutually agreed
 alternative port can be operationally beneficial, since port 443 is 
@@ -272,7 +274,8 @@ the subject of ongoing work.
 The mapping of DNS traffic over QUIC streams takes advantage of the QUIC stream
 features detailed in {{Section 2 of RFC9000}}, the QUIC transport specification.
 
-DNS traffic follows a simple pattern in which the client sends a query, and the
+DNS DNS query/response traffic {{RFC1034}}, {{RFC1035}}
+follows a simple pattern in which the client sends a query, and the
 server provides one or more responses (multiple responses can occur in zone
 transfers).
 
@@ -290,7 +293,9 @@ in {{RFC1035}}.
 
 The client MUST select the next available client-initiated bidirectional stream
 for each subsequent query on a QUIC connection, in conformance with the QUIC
-transport specification {{!RFC9000}}.
+transport specification {{!RFC9000}}. Packet losses and other network events might
+cause queries to arrive in a different order. Servers SHOULD process queries
+as they arrive, as not doing so would cause unnecessary delays.
 
 The client MUST send the DNS query over the selected stream, and MUST indicate
 through the STREAM FIN mechanism that no further data will be sent on that
@@ -298,7 +303,7 @@ stream.
 
 The server MUST send the response(s) on the same stream and MUST indicate, after
 the last response, through the STREAM FIN mechanism that no further data will be
-sent on that stream.
+sent on that stream. 
 
 Therefore, a single DNS transaction consumes a single bidirectional client-initiated stream.
 This means that the client's first query occurs on QUIC stream 0, the second on
@@ -417,7 +422,7 @@ messages during a transaction. These include (but are not limited to)
 * the client or server does not indicate the expected STREAM FIN after
   sending requests or responses (see {{stream-mapping-and-usage}}).
 * an implementation receives a message containing the edns-tcp-keepalive
-  EDNS(0) Option {{!RFC7828}} (see
+  EDNS(0) Option {{?RFC7828}} (see
   {{resource-management}})
 * a client or a server attempts to open a unidirectional QUIC stream
 * a server attempts to open a server-initiated bidirectional QUIC stream
@@ -503,14 +508,16 @@ included here.
  
 Servers MAY support session resumption, and MAY do that with or without supporting
 0-RTT, using the mechanisms described in {{Section 4.6.1 of RFC9001}}.
-Servers supporting 0-RTT MUST NOT execute non replayable transactions received in 0-RTT
+Servers supporting 0-RTT MUST NOT take any action in
+response to non replayable transactions received in 0-RTT
 data, and MUST adopt one of the following behaviors:
 
-* Queue the offending transaction and only execute it after the QUIC handshake
+* Queue the offending transaction and only process it after the QUIC handshake
 has been completed, as defined in {{Section 4.1.1 of RFC9001}}.
 * Reply to the offending transaction with a response code REFUSED and
-an Extended DNS Error Code (EDE) "Too Early", see
-{{reservation-of-extended-dns-error-code-too-early}}.
+an Extended DNS Error Code (EDE) "Too Early", using the extended RCODE
+mechanisms defined in {{!RFC6891}} and the extended DNS errros defined in {{!RFC8914}}; see
+{{reservation-of-extended-dns-error-code-too-early}}. 
 * Close the connection with the error code DOQ_PROTOCOL_ERROR.
 
 ## Message Sizes
@@ -570,7 +577,7 @@ DoQ implementations SHOULD consider configuring servers to use the Address
 Validation using Retry Packets procedure defined in {{Section 8.1.2 of RFC9000}}, the QUIC
 transport specification. This procedure imposes a 1-RTT delay for
 verifying the return routability of the source address of a client, similar to
-the DNS Cookies mechanism {{!RFC7873}}.
+the DNS Cookies mechanism {{?RFC7873}}.
 
 DoQ implementations that configure Address Validation using Retry Packets
 SHOULD implement the Address Validation for Future Connections procedure
@@ -585,7 +592,7 @@ Implementations MUST protect against the traffic analysis attacks described in
 {{traffic-analysis}} by the judicious injection of padding. This
 could be done either by padding individual DNS messages using the
 EDNS(0) Padding Option {{!RFC7830}} or by padding QUIC packets (see
-{{Section 8.6 of RFC9000}}, the QUIC transport specification.
+{{Section 19.1 of RFC9000}}.
 
 In theory, padding at the QUIC packet level could result in better performance for the equivalent
 protection, because the amount of padding can take into account non-DNS frames
@@ -673,7 +680,7 @@ risks while enjoying the performance benefits of 0-RTT data, subject to the
 restrictions specified in {{session-resumption-and-0-rtt}}.
 
 Clients SHOULD use resumption tickets only once, as specified in Appendix C.4
-to {{?RFC8446}}. By default, clients SHOULD NOT use session resumption if the
+to {{!RFC8446}}. By default, clients SHOULD NOT use session resumption if the
 client's connectivity has changed.
 
 Clients could receive address validation tokens from the server using the
@@ -719,10 +726,8 @@ connections. For example:
 * DoQ implementations SHOULD
      * use the same QUIC connection for both AXFR and IXFR requests to the same
        primary
-     * pipeline such requests (if they pipeline XFR requests in general) and
-       MAY intermingle them
      * send the response(s) for each request as soon as they are available i.e.
-       responses MAY be sent intermingled
+       responses streams MAY be sent intermingled
 
 ## Flow Control Mechanisms
 
@@ -814,8 +819,7 @@ As stated in {{authentication}} the authentication requirements for securing zon
 DoQ relies on QUIC, which itself relies on TLS 1.3 and thus supports by default
 the protections against downgrade attacks described in {{?BCP195}}.
 QUIC specific issues and their mitigations are described in
-{{Section 21 of RFC9000}}. 
-
+{{Section 21 of RFC9000}}.
 
 # Privacy Considerations
 
@@ -862,9 +866,8 @@ recommendation to not use it would simply be ignored. Instead, a set of
 practical recommendations is provided in {{session-resumption-and-0-rtt}} and
 {{using-0-rtt-and-session-resumption}}.
 
-The prevention on allowing replayable transactions in 0-RTT data
-expressed in {{session-resumption-and-0-rtt}} blocks the most obvious
-risks of replay attacks, as it only allows for transactions that will
+The specifications in {{session-resumption-and-0-rtt}} block the most obvious
+risks of replay attacks, as they only allows for transactions that will
 not change the long-term state of the server.
 
 The attacks described above apply to the stub resolver to recursive
