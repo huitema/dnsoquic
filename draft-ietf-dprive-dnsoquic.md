@@ -274,7 +274,7 @@ the subject of ongoing work.
 The mapping of DNS traffic over QUIC streams takes advantage of the QUIC stream
 features detailed in {{Section 2 of RFC9000}}, the QUIC transport specification.
 
-DNS DNS query/response traffic {{RFC1034}}, {{RFC1035}}
+DNS query/response traffic {{RFC1034}}, {{RFC1035}}
 follows a simple pattern in which the client sends a query, and the
 server provides one or more responses (multiple responses can occur in zone
 transfers).
