@@ -727,7 +727,7 @@ connections. For example:
      * use the same QUIC connection for both AXFR and IXFR requests to the same
        primary
      * send the response(s) for each request as soon as they are available i.e.
-       responses streams MAY be sent intermingled
+       response streams MAY be sent intermingled
 
 ## Flow Control Mechanisms
 
