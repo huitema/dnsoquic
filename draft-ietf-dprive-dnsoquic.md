@@ -390,7 +390,7 @@ Note that this mechanism provides a way for secondaries to cancel a single zone
 transfer occurring on a given stream without having to close the QUIC
 connection.
 
-Servers MUST NOT continue processing a transaction if they receive a RESET_STREAM
+Servers MUST NOT continue processing a DNS transaction if they receive a RESET_STREAM
 request from the client before the client indicates the STREAM FIN. If the
 server has not yet sent the response and indicated the STREAM FIN in the response
 stream or already sent a RESET_STREAM, the server MUST issue a RESET_STREAM to
