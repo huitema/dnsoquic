@@ -717,7 +717,9 @@ for availability of responses for previously opened streams.
 and includes updates to {{!RFC1995}} (IXFR), {{!RFC5936}} (AXFR) and
 {{!RFC7766}}. Considerations relating to the re-use of XoT connections
 described there apply analogously to zone transfers performed using DoQ
-connections. For example:
+connections. One reason for re-iterating such specific guidance is the
+lack of effective connection re-use in existing TCP/TLS zone transfer
+implementations today. The following recommendations apply:
 
 * DoQ servers MUST be able to handle multiple concurrent IXFR requests on a
   single QUIC connection
@@ -726,6 +728,9 @@ connections. For example:
 * DoQ implementations SHOULD
      * use the same QUIC connection for both AXFR and IXFR requests to the same
        primary
+     * send those requests in parallel as soon as they are queued i.e. do not wait
+       for a response before sending the next query on the connection
+       (this is analogous to pipelining requests on a TCP/TLS connection)
      * send the response(s) for each request as soon as they are available i.e.
        response streams MAY be sent intermingled
 
