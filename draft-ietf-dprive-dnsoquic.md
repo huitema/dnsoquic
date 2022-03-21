@@ -575,6 +575,9 @@ fall back to DoT and then potentially clear text, as specified in DoT
 {{!RFC8310}}, depending on their privacy profile.
 
 DNS clients SHOULD remember server IP addresses that don't support DoQ.
+Mobile clients might also remember the lack of DoQ support by
+given IP addresses on a per-context basis (e.g.per network or provisioning domain).
+
 Timeouts, connection refusals, and QUIC handshake failures are indicators
 that a server does not support DoQ.  Clients SHOULD NOT attempt DoQ queries to a
 server that does not support DoQ for a reasonable period (such as one hour per
