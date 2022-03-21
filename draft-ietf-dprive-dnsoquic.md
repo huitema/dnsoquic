@@ -378,7 +378,9 @@ any time but will have no effect if the server response has already been
 sent, in which case the client will simply discard the incoming response.
 The corresponding DNS transaction MUST be abandoned.
 
-Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}.
+Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}. 
+Servers SHOULD NOT continue processing a DNS transaction if they receive a STOP_SENDING.
+
 Servers MAY impose implementation limits on the total number or rate of request cancellations.
 If limits are encountered, servers MAY close the connection. In this case,
 servers wanting to help client debugging MAY use the error code DOQ_EXCESSIVE_LOAD.
