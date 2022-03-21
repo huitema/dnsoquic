@@ -55,7 +55,7 @@ informative:
 --- abstract
 
 This document describes the use of QUIC to provide transport confidentiality for DNS.
-The encryption provided by QUIC has similar properties to that provided by TLS,
+The encryption provided by QUIC has similar properties to those provided by TLS,
 while QUIC transport eliminates the head-of-line blocking issues inherent with
 TCP and provides more efficient packet loss recovery than UDP. DNS over QUIC
 (DoQ) has privacy properties similar to DNS over TLS (DoT) specified in
@@ -74,7 +74,7 @@ UDP and TCP is specified in "Domain names - implementation and specification"
 {{!RFC1035}}.
 
  This document presents a mapping of the DNS protocol over the
-QUIC transport {{!RFC9000}} {{!RFC9001}}. DNS over QUIC is referred here as DoQ,
+QUIC transport {{!RFC9000}} {{!RFC9001}}. DNS over QUIC is referred to here as DoQ,
 in line with "DNS Terminology" {{?I-D.ietf-dnsop-rfc8499bis}}.
 
 The goals of the DoQ mapping are:
@@ -488,9 +488,9 @@ timeout are discussed in {{resource-management}}.
 Clients SHOULD monitor the idle time incurred on their connection to the
 server, defined by the time spent since the last packet from the server has
 been received. When a client prepares to send a new DNS query to the server, it
-will check whether the idle time is sufficiently lower than the idle timer. If it
-is, the client will send the DNS query over the existing connection. If not,
-the client will establish a new connection and send the query over that
+SHOULD check whether the idle time is sufficiently lower than the idle timer. If it
+is, the client SHOULD send the DNS query over the existing connection. If not,
+the client SHOULD establish a new connection and send the query over that
 connection.
 
 Clients MAY discard their connections to the server before the idle timeout
@@ -510,7 +510,8 @@ A client MAY take advantage of the session resumption and 0-RTT mechanisms suppo
 QUIC transport {{!RFC9000}} and QUIC TLS {{!RFC9001}}, if the server supports them.
 Clients SHOULD consider
 potential privacy issues associated with session resumption before deciding to use
-this mechanism. These privacy issues are detailed in {{privacy-issues-with-0-rtt-data}}
+this mechanism and specifically evaluate the trade-offs presented in the various sections of this document. 
+The privacy issues are detailed in {{privacy-issues-with-0-rtt-data}}
 and {{privacy-issues-with-session-resumption}},
 and the implementation considerations are discussed in
 {{using-0-rtt-and-session-resumption}}.
