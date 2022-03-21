@@ -342,6 +342,7 @@ be set to zero.
 ## DoQ Error Codes
 
 The following error codes are defined for use when abruptly terminating streams,
+and used as application protocol error codes when
 aborting reading of streams, or immediately closing connections:
 
 DOQ_NO_ERROR (0x0):
@@ -363,6 +364,9 @@ DOQ_REQUEST_CANCELLED (0x3):
 DOQ_EXCESSIVE_LOAD (0x4):
 : A DoQ implementation uses this to signal when closing a connection due to excessive load.
 
+DOQ_UNSPECIFIED_ERROR (0x5):
+: A DoQ implementation uses this in the absence of a more specific error code.  
+
 DOQ_ERROR_RESERVED (0xd098ea5e):
 : Alternative error code used for tests. 
 
@@ -372,11 +376,16 @@ See {{iana-error-codes}} for details on registering new error codes.
 
 In QUIC, sending STOP_SENDING requests that a peer cease transmission on a
 stream. If a DoQ client wishes to cancel an outstanding request, it MUST issue
-a QUIC STOP_SENDING with error code DOQ_REQUEST_CANCELLED. This may be sent at
+a QUIC STOP_SENDING, and it SHOULD use the error code DOQ_REQUEST_CANCELLED.
+It MAY use a more specific error code registered according to {{iana-error-codes}}.
+The STOP_SENDING request may be sent at
 any time but will have no effect if the server response has already been
-acknowledged. The corresponding DNS transaction MUST be abandoned.
+sent, in which case the client will simply discard the incoming response.
+The corresponding DNS transaction MUST be abandoned.
 
-Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}.
+Servers that receive STOP_SENDING act in accordance with {{Section 3.5 of RFC9000}}. 
+Servers SHOULD NOT continue processing a DNS transaction if they receive a STOP_SENDING.
+
 Servers MAY impose implementation limits on the total number or rate of request cancellations.
 If limits are encountered, servers MAY close the connection. In this case,
 servers wanting to help client debugging MAY use the error code DOQ_EXCESSIVE_LOAD.
@@ -387,6 +396,12 @@ on circumstances servers might very well choose to send different error codes.
 Note that this mechanism provides a way for secondaries to cancel a single zone
 transfer occurring on a given stream without having to close the QUIC
 connection.
+
+Servers MUST NOT continue processing a DNS transaction if they receive a RESET_STREAM
+request from the client before the client indicates the STREAM FIN. If the
+server has not yet sent the response and indicated the STREAM FIN in the response
+stream or already sent a RESET_STREAM, the server MUST issue a RESET_STREAM to
+indicate that the transaction is abandoned.
 
 ### Transaction Errors
 
@@ -448,7 +463,7 @@ in {{iana-error-codes}}.
 
 Because new error codes can be defined without negotiation, use of an error
 code in an unexpected context or receipt of an unknown error code MUST be
-treated as equivalent to DOQ_NO_ERROR.
+treated as equivalent to DOQ_UNSPECIFIED_ERROR.
 
 Implementations MAY wish to test the support for the error code extension
 mechanism by using error codes not listed in this document, or they MAY use
@@ -1123,6 +1138,7 @@ Specification:
 | 0x2  | DOQ_PROTOCOL_ERROR | Generic protocol violation |
 | 0x3  | DOQ_REQUEST_CANCELLED | Request cancelled by client |
 | 0x4  | DOQ_EXCESSIVE_LOAD | Closing a connection for excessive load |
+| 0x5 | DOQ_UNSPECIFIED_ERROR | No error reason specified |  
 | 0xd098ea5e | DOQ_ERROR_RESERVED | Alternative error code used for tests |
 {: #iana-error-table title="Initial DNS over QUIC Error Codes Entries"}
 
