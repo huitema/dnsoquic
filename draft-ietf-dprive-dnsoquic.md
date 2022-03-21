@@ -508,8 +508,8 @@ included here.
  
 Servers MAY support session resumption, and MAY do that with or without supporting
 0-RTT, using the mechanisms described in {{Section 4.6.1 of RFC9001}}.
-Servers supporting 0-RTT MUST NOT immediately process a
-replayable transactions received in 0-RTT data, but instead
+Servers supporting 0-RTT MUST NOT immediately process
+non-replayable transactions received in 0-RTT data, but instead
 MUST adopt one of the following behaviours:
 
 * Queue the offending transaction and only process it after the QUIC handshake
