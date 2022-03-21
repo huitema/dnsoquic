@@ -2,7 +2,7 @@
 title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-10
+docName: draft-ietf-dprive-dnsoquic-11
 
 stand_alone: yes
 

@@ -3,7 +3,7 @@
 # - xml2rfc (https://xml2rfc.tools.ietf.org/)
 
 DRAFT=draft-ietf-dprive-dnsoquic
-VERSION=10
+VERSION=11
 
 XML=$(DRAFT)-$(VERSION).xml
 HTML=$(DRAFT)-$(VERSION).html
