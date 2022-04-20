@@ -2,7 +2,7 @@
 title: DNS over Dedicated QUIC Connections
 abbrev: DNS over Dedicated QUIC
 category: std
-docName: draft-ietf-dprive-dnsoquic-11
+docName: draft-ietf-dprive-dnsoquic-12
 
 stand_alone: yes
 
@@ -1047,7 +1047,9 @@ Reference:
 
 Additionally, IANA is requested to update the Description field for the
 corresponding TCP port 853 allocation to be 'DNS query-response protocol run
-over TLS' for consistency and clarity.
+over TLS' and to remove {{?RFC8094}} from the TCP allocation's Reference field
+for consistency and clarity.
+
 
 (UPDATE ON IANA REQUEST: THIS SENTENCE TO BE REMOVED BEFORE PUBLICATION) Review by the port experts on 13th December 2021 determined that the proposed updates to the existing port allocation were acceptable and will be made when this document is approved for publication.
 
